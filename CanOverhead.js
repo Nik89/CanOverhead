@@ -81,3 +81,77 @@ let applyBitStuffing = (bits) => {
     }
     return bitsAfterStuffing;
 }
+
+// "  1101 0011 1" -> [true, true, false, ...]
+let parseBinaryStringToBoolArray = (str) => {
+    let bits = [];
+    for (let bit_char of str) {
+        if (bit_char === "1") {
+            bits.push(true);
+        } else if (bit_char === "0") {
+            bits.push(false);
+        } else if (bit_char.trim() === "") {
+            /* Skip whitespace char */
+        } else {
+            throw new RangeError("Unsupported character: " + bit_char);
+        }
+    }
+    return bits;
+}
+
+// [true, true, false, ...] -> "1101001011"
+let boolArrayToBinaryString = (bits) => {
+    let str = "";
+    for (let bit of bits) {
+        if (bit) {
+            str += "1";
+        } else {
+            str += "0";
+        }
+    }
+    return str;
+}
+
+// [true, false, true, ... ] -> "01 1111 1100"
+let boolArrayToPrettyBinaryString = (bits) => {
+    let str = "";
+    let count = bits.length;
+    for (let bit of bits) {
+        if (bit) {
+            str += "1";
+        } else {
+            str += "0";
+        }
+        count--;
+        if (count % 4 === 0 && count > 0) {
+            str += " ";
+        }
+    }
+    return str;
+}
+
+// [true, false, true, ... ] -> "17A"
+let boolArrayToHexString = (bits) => {
+    let str = "";
+    let nibble_value = 0;
+    let bits_in_nibble = 0;
+    for (let i = bits.length - 1; i >= 0; i--) {
+        if (bits[i]) {
+            nibble_value |= 1 << bits_in_nibble;
+        }
+        bits_in_nibble++;
+        if (bits_in_nibble === 4) {
+            str = nibble_value.toString(16) + str; // Prepend
+            bits_in_nibble = 0;
+            nibble_value = 0;
+        }
+    }
+    // Handle any leftover less-than-4 bits
+    if (bits_in_nibble > 0) {
+        str = nibble_value.toString(16) + str; // Prepend
+    }
+    return str.toUpperCase();
+}
+
+// TODO class boolArray with methods: from/to string, stuffing
+// TODO same for the CAN ID?
