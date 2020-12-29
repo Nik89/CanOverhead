@@ -55,7 +55,7 @@ let exactAmountOfStuffBits = (bits) => {
  * Returns the exact amount of stuff bits, given the array of bits
  * Example (using 0 and 1 instead of true and false):
  *         Input:    11111 0000
- *         Output:    11111000001
+ *         Output:   11111000001
  * @param {boolean[]} bits - Array of bits
  * @returns {Number} Amount of stuff bits needed for the considered array of bits
  */
