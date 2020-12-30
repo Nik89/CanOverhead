@@ -266,3 +266,104 @@ class BitSequence {
         return clone;
     }
 }
+
+const RECESSIVE = true;
+const DOMINANT = false;
+
+/**
+ * Data structure representing a Classic CAN frame with 11-bit identifier.
+ */
+class CanFrame11Bit {
+    /**
+     * Constructs a Classic CAN frame with an 11-bit ID.
+     *
+     * @param {number|string} id integer of binary string of the CAN ID
+     * @param {number[]|string} payload array of integers or hex string
+     */
+    constructor(id, payload) {
+        // TODO check ID is 11 bits max
+        this.id = id;
+        this.remoteTransmissionRequest = false; // Hardcoded, for now
+        if (payload.length > 8) {
+            throw new RangeError("Classic CAN supports payloads of up to 8 B.");
+        }
+        this.payload = payload;
+    }
+
+    /**
+     * Computes the length of the whole frame with a given payload length
+     * without including the stuff bits.
+     *
+     * @param {number} payloadLength - size of the payload in bytes
+     * @returns {number} whole frame length in bits
+     */
+    static exactLengthBeforeStuffing(payloadLength) {
+
+    }
+
+    /**
+     * Computes the maximum possible length of the whole frame with a given
+     * payload length after the addition of the stuff bits.
+     *
+     * @param {number} payloadLength - size of the payload in bytes
+     * @returns {number} max whole frame length in bits, including stuff bits
+     */
+    static maxLengthAfterStuffing(payloadLength) {
+
+    }
+
+    /**
+     * Provides the DLC header field as BitSequence.
+     *
+     * @returns {BitSequence}
+     */
+    dataLengthCode() {
+        return new BitSequence(this.payload.length).leftZeroPadToLength(4);
+    }
+
+    /**
+     * Computes the length of the whole frame after the addition of the stuff
+     * bits.
+     *
+     * @returns {number} exact whole frame length in bits, including stuff bits
+     */
+    exactLengthAfterStuffing() {
+
+    }
+
+
+    /**
+     * Computes the Cyclic Redundancy Check (CRC-15) field of the frame
+     * without the inclusion of any stuff bits.
+     *
+     * Used polynomial: 0xC599 = x^15 + x^14 + x^10 + x^8 + x^7 + x^4 + x^3 + 1
+     *
+     * @returns {BitSequence} CRC-15 sequence of bits.
+     */
+    crc() {
+
+    }
+
+    /**
+     * Concatenates all frame fields together into a contiguous BitSequence
+     * which does not include any stuff bits.
+     *
+     * @returns {BitSequence} all the bits in the frame.
+     */
+    toBitSequence() {
+
+    }
+
+    /**
+     * Concatenates all frame fields together into a contiguous BitSequence
+     * which does include any stuff bits.
+     *
+     * Stuff bits are not included in the CRC delimiter, ACK field and the end
+     * of frame bits. In other words: anything after the CRC (which is stuffed).
+     *
+     * @returns {BitSequence} all the bits in the frame, including stuff bits.
+     */
+    toBitSequenceAfterStuffing() {
+
+    }
+}
