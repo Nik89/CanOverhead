@@ -1,13 +1,25 @@
-class Bits {
-    // "  1101 0011 1" -> [true, true, false, ...]
-    constructor(binString) {
-        this.bitsArray = [];
-        if (typeof (binString) === "string") {
+/**
+ * Wrapper of an array of bits.
+ */
+class BitSequence {
+    /**
+     * Constructs an empty array of bits, optionally initialising with a
+     * string of bits like " 11 0110".
+     *
+     * @param {string|boolean[]} binString optional binary number as a string
+     *     or as boolean array. White spaces in the string are skipped.
+     * @param {boolean} isStuffed true when the provided sequence is already
+     *     stuffed
+     */
+    constructor(binString = [], isStuffed = false) {
+        this.isStuffed = Boolean(isStuffed);
+        if (typeof binString === "string") {
+            this.sequence = [];
             for (let bit_char of binString) {
                 if (bit_char === "1") {
-                    this.bitsArray.push(true);
+                    this.sequence.push(true);
                 } else if (bit_char === "0") {
-                    this.bitsArray.push(false);
+                    this.sequence.push(false);
                 } else if (bit_char.trim() === "") {
                     /* Skip whitespace char */
                 } else {
@@ -15,48 +27,69 @@ class Bits {
                 }
             }
         } else {
-            throw new TypeError(
-                "Unsupported type for construction of Bits: "
-                + typeof (binString));
+            this.sequence = binString;
         }
     }
 
     /**
-     * Returns the maximum amount of stuff bits that could be added, given the
-     * length of the array of bits.
+     * Checks whether this object is equal to another, including the content
+     * of its members.
      *
-     * @param {Number} amountOfBits - Length of the array of bits
-     * @returns {Number} Amount of maximum stuff bits needed for the considered
-     * array of bits
+     * @param {BitSequence} other any other object
+     * @returns {boolean} true when the other object has the same members
+     * as this object and their same content (field-by-field array equality
+     * included).
      */
-    maxAmountOfStuffBits(amountOfBits) {
+    equal(other) {
+        if (typeof (other.isStuffed) !== "boolean"
+            || other.isStuffed !== this.isStuffed
+            || !Array.isArray(other.sequence)
+            || other.sequence.length !== this.sequence.length) return false;
+        for (let i = 0; i < this.sequence.length; i++) {
+            if (this.sequence[i] !== other.sequence[i]) return false;
+        }
+        return true;
+    }
+
+    /**
+     * Provides the maximum possible amount of stuff bits that could be added to
+     * a sequence of bits of a given length.
+     *
+     * @param {number} amountOfBits - length of the sequence of bits
+     * @returns {number} maximum possible amount of stuff bits that could
+     * be added to the sequence
+     */
+    static maxAmountOfStuffBits(amountOfBits) {
         return Math.floor(amountOfBits / 5);
     }
 
     /**
-     * Returns the maximum length of the array of bits including the maximum stuff
-     * bits, given the length of the array of bits.
+     * Provides the length of the sequence of bits after adding to it the
+     * maximum possible amount of of stuff bits.
      *
-     * @param {Number} amountOfBits - Length of the array of bits
-     * @returns {Number} maximum length of the considered array of bits plus the
-     * maximum stuff bits needed.
+     * @param {number} amountOfBits - length of the sequence of bits
+     * @returns {number} maximum possible length of the sequence after the
+     * stuff bits have been added to it
      */
-    maxBitsAfterStuffing(amountOfBits) {
-        return amountOfBits + maxAmountOfStuffBits(amountOfBits);
+    static maxBitsAfterStuffing(amountOfBits) {
+        return amountOfBits + this.maxAmountOfStuffBits(amountOfBits);
     }
 
     /**
-     * Returns the exact amount of stuff bits, given the array of bits
+     * Provides the exact amount of stuff bits that would be added to the Bits.
+     *
      * Example (using 0 and 1 instead of true and false):
-     *         Input:    11111 0000
-     *         Output:    11111000001        -> 2 bits of stuffing required
-     * @returns {Number} Amount of stuff bits needed for the considered array of bits
+     *     Before:    11111 0000
+     *     Stuffing:       0    1 => returns 2
+     *
+     * @returns {number} exact amount of stuff bits for the given sequence of
+     * bits
      */
     exactAmountOfStuffBits() {
         let amountOfStuffBits = 0;
         let repeatedBits = 1;
         let previousBit = undefined;
-        for (let bit of this.bitsArray) {
+        for (let bit of this.sequence) {
             if (bit === previousBit) {
                 repeatedBits++;
             } else {
@@ -74,17 +107,24 @@ class Bits {
     }
 
     /**
-     * Returns the exact amount of stuff bits, given the array of bits
+     * Provides a copy of a sequence of bits with stuff bits added to it.
+     *
      * Example (using 0 and 1 instead of true and false):
-     *         Input:    11111 0000
-     *         Output:   11111000001
-     * @returns {Number} Amount of stuff bits needed for the considered array of bits
+     *     Input:    11111 0000
+     *     Stuffing:      0    1
+     *     Output:   11111000001
+     *
+     * @returns {BitSequence} clone of this object with stuff bits applied to it.
      */
     applyBitStuffing() {
+        if (this.isStuffed) {
+            // Prevent stuffing twice.
+            throw new TypeError("Bits sequence already stuffed.");
+        }
         let bitsAfterStuffing = [];
         let repeatedBits = 1;
         let previousBit = undefined;
-        for (let bit of this.bitsArray) {
+        for (let bit of this.sequence) {
             if (bit === previousBit) {
                 repeatedBits++;
             } else {
@@ -100,13 +140,20 @@ class Bits {
                 previousBit = bit;
             }
         }
-        return bitsAfterStuffing;
+        return new BitSequence(bitsAfterStuffing, true);
     }
 
-    // [true, true, false, ...] -> "1101001011"
+    /**
+     * Binary string representation of the sequence of bits.
+     *
+     * Example: "0001100100110". Left-most bit is the first found in the
+     * bit sequence, right-most one is the last.
+     *
+     * @returns {string} string with only "1" and "0" characters
+     */
     boolArrayToBinaryString() {
         let str = "";
-        for (let bit of this.bitsArray) {
+        for (let bit of this.sequence) {
             if (bit) {
                 str += "1";
             } else {
@@ -116,11 +163,19 @@ class Bits {
         return str;
     }
 
-    // [true, false, true, ... ] -> "01 1111 1100"
+    /**
+     * Binary string representation of the sequence of bits with spaces every
+     * 4 bits for better readability.
+     *
+     * Example: "0 0011 0010 0110". Left-most bit is the first found in the
+     * bit sequence, right-most one is the last.
+     *
+     * @returns {string} string with only "1", "0" and " " characters
+     */
     boolArrayToPrettyBinaryString() {
         let str = "";
-        let count = this.bitsArray.length;
-        for (let bit of this.bitsArray) {
+        let count = this.sequence.length;
+        for (let bit of this.sequence) {
             if (bit) {
                 str += "1";
             } else {
@@ -134,13 +189,24 @@ class Bits {
         return str;
     }
 
-    // [true, false, true, ... ] -> "17A"
+    /**
+     * Hex string representation of the sequence of bits.
+     *
+     * Example: [1,0,1,1,1,1,0,1,0] -> "17A".
+     *
+     * The first bit of the sequence (left-most) is interpreted as the most
+     * significant of the whole sequence and is represented in the left-most
+     * character (nibble) of the hex string as the most-significant bit
+     * of that nibble. (big-endian, but bit-wise instead of byte-wise)
+     *
+     * @returns {string} string with only "1", "0" and " " characters
+     */
     boolArrayToHexString() {
         let str = "";
         let nibble_value = 0;
         let bits_in_nibble = 0;
-        for (let i = this.bitsArray.length - 1; i >= 0; i--) {
-            if (this.bitsArray[i]) {
+        for (let i = this.sequence.length - 1; i >= 0; i--) {
+            if (this.sequence[i]) {
                 nibble_value |= 1 << bits_in_nibble;
             }
             bits_in_nibble++;
