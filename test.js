@@ -139,3 +139,12 @@ check(new BitSequence("0110101").toHexString() === "35");
 check(new BitSequence("0 0001 1111").toHexString() === "01F");
 check(new BitSequence("1 0001 1111").toHexString() === "11F");
 check(new BitSequence("10 1111 1111").toHexString() === "2FF");
+
+// leftPadWithZeros
+check(new BitSequence("").leftZeroPadToLength(0).toBinString() === "");
+check(new BitSequence("").leftZeroPadToLength(1).toBinString() === "0");
+check(new BitSequence("").leftZeroPadToLength(2).toBinString() === "00");
+check(new BitSequence("1").leftZeroPadToLength(1).toBinString() === "1");
+check(new BitSequence("1").leftZeroPadToLength(2).toBinString() === "01");
+check(new BitSequence("01").leftZeroPadToLength(2).toBinString() === "01");
+check(new BitSequence("11").leftZeroPadToLength(6).toBinString() === "000011");

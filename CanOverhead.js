@@ -243,4 +243,26 @@ class BitSequence {
         }
         return str.toUpperCase();
     }
+
+    /**
+     * Adds zeros (falses) on the beginning (left-side) of the sequence until it
+     * reaches the requested length.
+     *
+     * Returns a copy of the sequence unchanged, if the sequence is already
+     * of the requested length or longer.
+     *
+     * @param {number} newLength desired length in bits
+     * @returns {BitSequence} new left-padded sequence
+     */
+    leftZeroPadToLength(newLength) {
+        let clone = new BitSequence(this.sequence, this.isStuffed);
+        if (newLength > clone.length()) {
+            let zeros = [];
+            for (let i = clone.length(); i < newLength; i++) {
+                zeros.push(false);
+            }
+            clone.sequence = zeros.concat(clone.sequence);
+        }
+        return clone;
+    }
 }
