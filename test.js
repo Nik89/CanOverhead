@@ -100,3 +100,11 @@ check(new BitSequence("1").length() === 1);
 check(new BitSequence("1110101010").length() === 10);
 check(new BitSequence("11111").length() === 5);
 check(new BitSequence("11111000001", true).length() === 11);
+
+// length after stuffing
+check(new BitSequence().exactLengthAfterStuffing() === 0);
+check(new BitSequence("1").exactLengthAfterStuffing() === 1);
+check(new BitSequence("1110101010").exactLengthAfterStuffing() === 10);
+check(new BitSequence("11111").exactLengthAfterStuffing() === 6);
+check(new BitSequence("111110000").exactLengthAfterStuffing() === 11);
+

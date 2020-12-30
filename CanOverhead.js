@@ -115,6 +115,16 @@ class BitSequence {
     }
 
     /**
+     * Provides the exact length of the sequence after the addition
+     * of the stuff bits to it
+     *
+     * @returns {number} exact length
+     */
+    exactLengthAfterStuffing() {
+        return this.length() + this.exactAmountOfStuffBits();
+    }
+
+    /**
      * Provides a copy of a sequence of bits with stuff bits added to it.
      *
      * Example (using 0 and 1 instead of true and false):
