@@ -108,3 +108,28 @@ check(new BitSequence("1110101010").exactLengthAfterStuffing() === 10);
 check(new BitSequence("11111").exactLengthAfterStuffing() === 6);
 check(new BitSequence("111110000").exactLengthAfterStuffing() === 11);
 
+// toBinString
+check(new BitSequence("").toBinString() === "");
+check(new BitSequence("0").toBinString() === "0");
+check(new BitSequence("10").toBinString() === "10");
+check(new BitSequence("0010").toBinString() === "0010");
+check(new BitSequence("0110101").toBinString() === "0110101");
+
+// toBinStringWithSpaces
+check(new BitSequence("").toBinStringWithSpaces() === "");
+check(new BitSequence("0").toBinStringWithSpaces() === "0");
+check(new BitSequence("10").toBinStringWithSpaces() === "10");
+check(new BitSequence("0010").toBinStringWithSpaces() === "0010");
+check(new BitSequence("0110101").toBinStringWithSpaces() === "011 0101");
+check(new BitSequence("010110101").toBinStringWithSpaces() === "0 1011 0101");
+
+// toHexString
+check(new BitSequence("").toHexString() === "");
+check(new BitSequence("0").toHexString() === "0");
+check(new BitSequence("00 0000 0000").toHexString() === "000");
+check(new BitSequence("10").toHexString() === "2");
+check(new BitSequence("0010").toHexString() === "2");
+check(new BitSequence("0110101").toHexString() === "35");
+check(new BitSequence("0 0001 1111").toHexString() === "01F");
+check(new BitSequence("1 0001 1111").toHexString() === "11F");
+check(new BitSequence("10 1111 1111").toHexString() === "2FF");
