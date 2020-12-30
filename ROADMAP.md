@@ -60,8 +60,8 @@ More input formats accepted.
 - Payload content input accepted (radio button or similar to select input type)
   also as comma-separated list of bits,
   e.g. `1,0,1,1`, or hexadecimal, e.g. `0b12`. Case insensitive, zero-padding
-  to the left required so `b12` is invalid. 
-
+  to the left required so `b12` is invalid.
+- Make stuff bits bold in the provided output
 
 
 [0.4.0]
