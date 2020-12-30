@@ -6,13 +6,16 @@ class BitSequence {
      * Constructs an empty array of bits, optionally initialising with a
      * string of bits like " 11 0110".
      *
-     * @param {string|boolean[]} binString optional binary number as a string
-     *     or as boolean array. White spaces in the string are skipped.
+     * @param {string|boolean[]|number} binString optional binary number as a
+     *     string or as boolean array. White spaces in the string are skipped.
      * @param {boolean} isStuffed true when the provided sequence is already
      *     stuffed
      */
     constructor(binString = [], isStuffed = false) {
         this.isStuffed = Boolean(isStuffed);
+        if (typeof binString === "number") {
+            binString = binString.toString(2);
+        }
         if (typeof binString === "string") {
             this.sequence = [];
             for (let bit_char of binString) {

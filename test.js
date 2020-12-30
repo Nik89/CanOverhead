@@ -61,6 +61,12 @@ check(bits.isStuffed === false);
 bits = new BitSequence("      0  1  101    ", true);
 check(arrayEqual(bits.sequence, [false, true, true, false, true]));
 check(bits.isStuffed === true);
+bits = new BitSequence(0);
+check(arrayEqual(bits.sequence, [false]));
+check(bits.isStuffed === false);
+bits = new BitSequence(4);
+check(arrayEqual(bits.sequence, [true, false, false]));
+check(bits.isStuffed === false);
 
 // exactAmountOfStuffBits
 check(new BitSequence().exactAmountOfStuffBits()
