@@ -325,10 +325,10 @@ class CanFrame11Bit {
     /**
      * Provides the DLC header field as BitSequence.
      *
-     * @returns {BitSequence}
+     * @returns {BitSequence} the DLC padded to 4 bits.
      */
     dataLengthCode() {
-        return new BitSequence(this.payload.length).leftZeroPadToLength(4);
+        return new BitSequence(this.payload.length.toString(2)).leftZeroPadToLength(4);
     }
 
     /**
