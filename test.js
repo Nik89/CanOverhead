@@ -61,11 +61,11 @@ check(bits.isStuffed === false);
 bits = new BitSequence("      0  1  101    ", true);
 check(arrayEqual(bits.sequence, [false, true, true, false, true]));
 check(bits.isStuffed === true);
-bits = new BitSequence(0);
-check(arrayEqual(bits.sequence, [false]));
-check(bits.isStuffed === false);
-bits = new BitSequence(4);
+bits = new BitSequence([1, false, "0"]);
 check(arrayEqual(bits.sequence, [true, false, false]));
+check(bits.isStuffed === false);
+bits = new BitSequence([0, 1, 0]);
+check(arrayEqual(bits.sequence, [false, true, false]));
 check(bits.isStuffed === false);
 
 // exactAmountOfStuffBits
@@ -148,3 +148,12 @@ check(new BitSequence("1").leftZeroPadToLength(1).toBinString() === "1");
 check(new BitSequence("1").leftZeroPadToLength(2).toBinString() === "01");
 check(new BitSequence("01").leftZeroPadToLength(2).toBinString() === "01");
 check(new BitSequence("11").leftZeroPadToLength(6).toBinString() === "000011");
+
+// Extend
+check(new BitSequence("").extend("").toBinString() === "");
+check(new BitSequence("").extend("0").toBinString() === "0");
+check(new BitSequence("").extend("1").toBinString() === "1");
+check(new BitSequence("").extend("01").toBinString() === "01");
+check(new BitSequence("1").extend("00").toBinString() === "100");
+check(new BitSequence("0").extend("11").toBinString() === "011");
+check(new BitSequence("01").extend("00").toBinString() === "0100");

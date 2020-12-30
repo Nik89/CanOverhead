@@ -6,32 +6,42 @@ class BitSequence {
      * Constructs an empty array of bits, optionally initialising with a
      * string of bits like " 11 0110".
      *
-     * @param {string|boolean[]|number} binString optional binary number as a
-     *     string or as boolean array. White spaces in the string are skipped.
+     * @param {string|boolean[]|number[]} bits - iterable sequence of bits
+     *     as binary string ("01 0011", white spaces are skipped)
+     *     or boolean array ([true, true, false])
+     *     or integer array ([1, 1, 0])
+     *     or a hybrid array ([true, "1", 0]).
      * @param {boolean} isStuffed true when the provided sequence is already
      *     stuffed
      */
-    constructor(binString = [], isStuffed = false) {
+    constructor(bits = [], isStuffed = false) {
         this.isStuffed = Boolean(isStuffed);
-        if (typeof binString === "number") {
-            binString = binString.toString(2);
-        }
-        if (typeof binString === "string") {
-            this.sequence = [];
-            for (let bit_char of binString) {
-                if (bit_char === "1") {
-                    this.sequence.push(true);
-                } else if (bit_char === "0") {
-                    this.sequence.push(false);
-                } else if (bit_char.trim() === "") {
-                    /* Skip whitespace char */
-                } else {
-                    throw new RangeError("Unsupported character: " + bit_char);
-                }
+        this.sequence = [];
+        this.extend(bits);
+    }
+
+    /**
+     * Concatenates the given sequence of bits (in multiple formats)
+     * to the end (right-side) of this sequence, changing the BitSequence
+     * object.
+     *
+     * @param {boolean[]|string|number[]} newTail - bits to append at the
+     * end of this sequence.
+     * @returns {BitSequence} self useful to method concatenation
+     */
+    extend(newTail) {
+        for (let bit of newTail) {
+            if (bit === "1" || bit === true || bit === 1) {
+                this.sequence.push(true);
+            } else if (bit === "0" || bit === false || bit === 0) {
+                this.sequence.push(false);
+            } else if (bit.trim() === "") {
+                /* Skip whitespace char */
+            } else {
+                throw new RangeError("Unsupported character: " + bit);
             }
-        } else {
-            this.sequence = binString;
         }
+        return this;
     }
 
     /**
