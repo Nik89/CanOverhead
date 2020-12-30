@@ -28,21 +28,21 @@ check(BitSequence.maxAmountOfStuffBits(16) === 3);
 check(BitSequence.maxAmountOfStuffBits(21) === 4);
 
 
-// maxBitsAfterStuffing
-check(BitSequence.maxBitsAfterStuffing(0) === 0);
-check(BitSequence.maxBitsAfterStuffing(1) === 1);
-check(BitSequence.maxBitsAfterStuffing(2) === 2);
-check(BitSequence.maxBitsAfterStuffing(3) === 3);
-check(BitSequence.maxBitsAfterStuffing(4) === 4);
-check(BitSequence.maxBitsAfterStuffing(5) === 6);
-check(BitSequence.maxBitsAfterStuffing(6) === 7);
-check(BitSequence.maxBitsAfterStuffing(9) === 10);
-check(BitSequence.maxBitsAfterStuffing(10) === 12);
-check(BitSequence.maxBitsAfterStuffing(11) === 13);
-check(BitSequence.maxBitsAfterStuffing(14) === 16);
-check(BitSequence.maxBitsAfterStuffing(15) === 18);
-check(BitSequence.maxBitsAfterStuffing(16) === 19);
-check(BitSequence.maxBitsAfterStuffing(21) === 25);
+// maxLengthAfterStuffing
+check(BitSequence.maxLengthAfterStuffing(0) === 0);
+check(BitSequence.maxLengthAfterStuffing(1) === 1);
+check(BitSequence.maxLengthAfterStuffing(2) === 2);
+check(BitSequence.maxLengthAfterStuffing(3) === 3);
+check(BitSequence.maxLengthAfterStuffing(4) === 4);
+check(BitSequence.maxLengthAfterStuffing(5) === 6);
+check(BitSequence.maxLengthAfterStuffing(6) === 7);
+check(BitSequence.maxLengthAfterStuffing(9) === 10);
+check(BitSequence.maxLengthAfterStuffing(10) === 12);
+check(BitSequence.maxLengthAfterStuffing(11) === 13);
+check(BitSequence.maxLengthAfterStuffing(14) === 16);
+check(BitSequence.maxLengthAfterStuffing(15) === 18);
+check(BitSequence.maxLengthAfterStuffing(16) === 19);
+check(BitSequence.maxLengthAfterStuffing(21) === 25);
 
 // BitSequence constructor
 let bits;

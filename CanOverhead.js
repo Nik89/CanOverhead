@@ -79,7 +79,7 @@ class BitSequence {
      * @returns {number} maximum possible length of the sequence after the
      * stuff bits have been added to it
      */
-    static maxBitsAfterStuffing(amountOfBits) {
+    static maxLengthAfterStuffing(amountOfBits) {
         return amountOfBits + this.maxAmountOfStuffBits(amountOfBits);
     }
 
@@ -122,7 +122,7 @@ class BitSequence {
      *     Stuffing:      0    1
      *     Output:   11111000001
      *
-     * @returns {BitSequence} clone of this object with stuff bits applied to it.
+     * @returns {BitSequence} clone of this object with stuff bits applied to it
      */
     applyBitStuffing() {
         if (this.isStuffed) {
@@ -159,7 +159,7 @@ class BitSequence {
      *
      * @returns {string} string with only "1" and "0" characters
      */
-    boolArrayToBinaryString() {
+    toBinString() {
         let str = "";
         for (let bit of this.sequence) {
             if (bit) {
@@ -180,7 +180,7 @@ class BitSequence {
      *
      * @returns {string} string with only "1", "0" and " " characters
      */
-    boolArrayToPrettyBinaryString() {
+    toBinStringWithSpaces() {
         let str = "";
         let count = this.sequence.length;
         for (let bit of this.sequence) {
@@ -209,7 +209,7 @@ class BitSequence {
      *
      * @returns {string} string with only "1", "0" and " " characters
      */
-    boolArrayToHexString() {
+    toHexString() {
         let str = "";
         let nibble_value = 0;
         let bits_in_nibble = 0;
