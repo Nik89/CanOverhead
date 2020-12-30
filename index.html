@@ -18,7 +18,23 @@
         Please enable JavaScript for this website to work.
     </h2>
 </noscript>
-<!-- Here the input form(s) -->
+v0.1 <br/>
+Input: Payload length: form with decimal integer, e.g. [  7 ]
+<br/>
+Output: frame bits min, max
+<br/>----<br/>
+v0.2 <br/>
+Input: CAN ID: form with binary string, e.g. [   100101 ]<br/>
+Input: Payload: form with binary string, e.g. [   00100111001001 ]<br/>
+<br/>
+Output:<br/>
+frame bits min, max<br/>
+whole frame without stuff bits as binary string, e.g. 100101001001...<br/>
+while frame without stuff bits broken down per parts<br/>
+- SOF: 1 <br/>
+- ID: 1001001 <br/>
+- etc.<br/>
+whole frame WITH stuff bits as binary string, e.g. 100101001001... (optional, make them bold?)<br/>
 <footer>
     <div>Made by <a href="https://github.com/Nik89">Nicola Furlan</a>
         and <a href="https://matjaz.it/">Matjaž Guštin</a>.
