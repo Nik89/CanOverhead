@@ -9,6 +9,8 @@ function arrayEqual(a, b) {
     return true;
 }
 
+console.log("Starting unit tests.");
+
 // maxAmountOfStuffBits
 check(BitSequence.maxAmountOfStuffBits(0) === 0);
 check(BitSequence.maxAmountOfStuffBits(1) === 0);
@@ -88,9 +90,13 @@ check(new BitSequence("111110000").applyBitStuffing()
 try {
     new BitSequence("111110", true).applyBitStuffing();
     check(false, "Error nor raised");
-}
-catch (TypeError) {
+} catch (TypeError) {
     // Error as expected
 }
 
-console.log("Unit tests completed.");
+// length
+check(new BitSequence().length() === 0);
+check(new BitSequence("1").length() === 1);
+check(new BitSequence("1110101010").length() === 10);
+check(new BitSequence("11111").length() === 5);
+check(new BitSequence("11111000001", true).length() === 11);

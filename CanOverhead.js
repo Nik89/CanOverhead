@@ -32,6 +32,14 @@ class BitSequence {
     }
 
     /**
+     * Provides the amount of bits in the sequence.
+     * @returns {number} length of the sequence.
+     */
+    length() {
+        return this.sequence.length;
+    }
+
+    /**
      * Checks whether this object is equal to another, including the content
      * of its members.
      *
