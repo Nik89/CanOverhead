@@ -297,6 +297,22 @@ class BitSequence {
 
 const RECESSIVE = true;
 const DOMINANT = false;
+const START_OF_FRAME = DOMINANT;
+const RTR_IS_DATA_FRAME = DOMINANT;
+const RTR_IS_RTR_FRAME = RECESSIVE;
+const SRR = RECESSIVE;
+const IDE_IS_11_BIT = DOMINANT;
+const IDE_IS_29_BIT = RECESSIVE;
+const R0 = DOMINANT;
+const R1 = DOMINANT;
+const CRC_DELIMITER = RECESSIVE;
+const ACK_SLOT = RECESSIVE;
+const ACK_DELIMITER = RECESSIVE;
+const END_OF_FRAME = [
+    RECESSIVE, RECESSIVE, RECESSIVE, RECESSIVE,
+    RECESSIVE, RECESSIVE, RECESSIVE];
+const PAUSE_AFTER_EOF = [RECESSIVE, RECESSIVE, RECESSIVE];
+
 
 /**
  * Data structure representing a Classic CAN frame with 11-bit identifier.
