@@ -46,9 +46,11 @@ check(BitSequence.maxLengthAfterStuffing(21) === 25);
 
 // BitSequence constructor
 let bits;
+// Default
 bits = new BitSequence();
 check(arrayEqual(bits.sequence, []), bits.sequence);
 check(bits.isStuffed === false);
+// Binart string
 bits = new BitSequence("    1 ")
 check(arrayEqual(bits.sequence, [true]));
 check(bits.isStuffed === false);
@@ -61,11 +63,31 @@ check(bits.isStuffed === false);
 bits = new BitSequence("      0  1  101    ", true);
 check(arrayEqual(bits.sequence, [false, true, true, false, true]));
 check(bits.isStuffed === true);
+// Array of ints
+bits = new BitSequence([0, 1, 0]);
+check(arrayEqual(bits.sequence, [false, true, false]));
+check(bits.isStuffed === false);
+// Array of booleans
+bits = new BitSequence([false, true, false]);
+check(arrayEqual(bits.sequence, [false, true, false]));
+check(bits.isStuffed === false);
+// Hybrid array
 bits = new BitSequence([1, false, "0"]);
 check(arrayEqual(bits.sequence, [true, false, false]));
 check(bits.isStuffed === false);
-bits = new BitSequence([0, 1, 0]);
-check(arrayEqual(bits.sequence, [false, true, false]));
+// Single bit integer
+bits = new BitSequence(0);
+check(arrayEqual(bits.sequence, [false]));
+check(bits.isStuffed === false);
+bits = new BitSequence(1);
+check(arrayEqual(bits.sequence, [true]));
+check(bits.isStuffed === false);
+// Single bit boolean
+bits = new BitSequence(false);
+check(arrayEqual(bits.sequence, [false]));
+check(bits.isStuffed === false);
+bits = new BitSequence(true);
+check(arrayEqual(bits.sequence, [true]));
 check(bits.isStuffed === false);
 
 // exactAmountOfStuffBits
@@ -157,3 +179,7 @@ check(new BitSequence("").extend("01").toBinString() === "01");
 check(new BitSequence("1").extend("00").toBinString() === "100");
 check(new BitSequence("0").extend("11").toBinString() === "011");
 check(new BitSequence("01").extend("00").toBinString() === "0100");
+check(new BitSequence("01").extend(0).toBinString() === "010");
+check(new BitSequence("01").extend(1).toBinString() === "011");
+check(new BitSequence("01").extend(false).toBinString() === "010");
+check(new BitSequence("01").extend(true).toBinString() === "011");

@@ -6,11 +6,14 @@ class BitSequence {
      * Constructs an empty array of bits, optionally initialising with a
      * string of bits like " 11 0110".
      *
-     * @param {string|boolean[]|number[]} bits - iterable sequence of bits
+     * @param {string|boolean[]|number[]|number|boolean} bits -
+     *     iterable sequence of bits
      *     as binary string ("01 0011", white spaces are skipped)
      *     or boolean array ([true, true, false])
      *     or integer array ([1, 1, 0])
-     *     or a hybrid array ([true, "1", 0]).
+     *     or a hybrid array ([true, "1", 0])
+     *     or also a plain single bit, expressed as boolean or integer
+     *     like 0, 1 or false, true.
      * @param {boolean} isStuffed true when the provided sequence is already
      *     stuffed
      */
@@ -25,20 +28,35 @@ class BitSequence {
      * to the end (right-side) of this sequence, changing the BitSequence
      * object.
      *
-     * @param {boolean[]|string|number[]} newTail - bits to append at the
-     * end of this sequence.
+     * @param {boolean[]|string|number[]|number|boolean} newTail - bits to
+     * append at the end of this sequence:
+     *     could be an iterable sequence of bits
+     *     as binary string ("01 0011", white spaces are skipped)
+     *     or boolean array ([true, true, false])
+     *     or integer array ([1, 1, 0])
+     *     or a hybrid array ([true, "1", 0])
+     *     or also a plain single bit, expressed as boolean or integer
+     *     like 0, 1 or false, true.
      * @returns {BitSequence} self useful to method concatenation
      */
     extend(newTail) {
-        for (let bit of newTail) {
-            if (bit === "1" || bit === true || bit === 1) {
-                this.sequence.push(true);
-            } else if (bit === "0" || bit === false || bit === 0) {
-                this.sequence.push(false);
-            } else if (bit.trim() === "") {
-                /* Skip whitespace char */
-            } else {
-                throw new RangeError("Unsupported character: " + bit);
+        // Check if it's a single-bit first
+        if (newTail === 1 || newTail === true) {
+            this.sequence.push(true);
+        } else if (newTail === 0 || newTail === false) {
+            this.sequence.push(false);
+        } else {
+            // Then it must be an iterable
+            for (let bit of newTail) {
+                if (bit === "1" || bit === true || bit === 1) {
+                    this.sequence.push(true);
+                } else if (bit === "0" || bit === false || bit === 0) {
+                    this.sequence.push(false);
+                } else if (bit.trim() === "") {
+                    /* Skip whitespace char */
+                } else {
+                    throw new RangeError("Unsupported character: " + bit);
+                }
             }
         }
         return this;
