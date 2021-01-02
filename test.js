@@ -19,14 +19,21 @@ check(BitSequence.maxAmountOfStuffBits(3) === 0);
 check(BitSequence.maxAmountOfStuffBits(4) === 0);
 check(BitSequence.maxAmountOfStuffBits(5) === 1);
 check(BitSequence.maxAmountOfStuffBits(6) === 1);
-check(BitSequence.maxAmountOfStuffBits(9) === 1);
+check(BitSequence.maxAmountOfStuffBits(7) === 1);
+check(BitSequence.maxAmountOfStuffBits(8) === 1);
+check(BitSequence.maxAmountOfStuffBits(9) === 2);
 check(BitSequence.maxAmountOfStuffBits(10) === 2);
 check(BitSequence.maxAmountOfStuffBits(11) === 2);
-check(BitSequence.maxAmountOfStuffBits(14) === 2);
+check(BitSequence.maxAmountOfStuffBits(12) === 2);
+check(BitSequence.maxAmountOfStuffBits(13) === 3);
+check(BitSequence.maxAmountOfStuffBits(14) === 3);
 check(BitSequence.maxAmountOfStuffBits(15) === 3);
 check(BitSequence.maxAmountOfStuffBits(16) === 3);
-check(BitSequence.maxAmountOfStuffBits(21) === 4);
-
+check(BitSequence.maxAmountOfStuffBits(17) === 4);
+check(BitSequence.maxAmountOfStuffBits(18) === 4);
+check(BitSequence.maxAmountOfStuffBits(19) === 4);
+check(BitSequence.maxAmountOfStuffBits(20) === 4);
+check(BitSequence.maxAmountOfStuffBits(21) === 5);
 
 // maxLengthAfterStuffing
 check(BitSequence.maxLengthAfterStuffing(0) === 0);
@@ -36,13 +43,21 @@ check(BitSequence.maxLengthAfterStuffing(3) === 3);
 check(BitSequence.maxLengthAfterStuffing(4) === 4);
 check(BitSequence.maxLengthAfterStuffing(5) === 6);
 check(BitSequence.maxLengthAfterStuffing(6) === 7);
-check(BitSequence.maxLengthAfterStuffing(9) === 10);
+check(BitSequence.maxLengthAfterStuffing(7) === 8);
+check(BitSequence.maxLengthAfterStuffing(8) === 9);
+check(BitSequence.maxLengthAfterStuffing(9) === 11);
 check(BitSequence.maxLengthAfterStuffing(10) === 12);
 check(BitSequence.maxLengthAfterStuffing(11) === 13);
-check(BitSequence.maxLengthAfterStuffing(14) === 16);
+check(BitSequence.maxLengthAfterStuffing(12) === 14);
+check(BitSequence.maxLengthAfterStuffing(13) === 16);
+check(BitSequence.maxLengthAfterStuffing(14) === 17);
 check(BitSequence.maxLengthAfterStuffing(15) === 18);
 check(BitSequence.maxLengthAfterStuffing(16) === 19);
-check(BitSequence.maxLengthAfterStuffing(21) === 25);
+check(BitSequence.maxLengthAfterStuffing(17) === 21);
+check(BitSequence.maxLengthAfterStuffing(18) === 22);
+check(BitSequence.maxLengthAfterStuffing(19) === 23);
+check(BitSequence.maxLengthAfterStuffing(20) === 24);
+check(BitSequence.maxLengthAfterStuffing(21) === 26);
 
 // BitSequence constructor
 let bits;
@@ -161,15 +176,6 @@ check(new BitSequence("0110101").toHexString() === "35");
 check(new BitSequence("0 0001 1111").toHexString() === "01F");
 check(new BitSequence("1 0001 1111").toHexString() === "11F");
 check(new BitSequence("10 1111 1111").toHexString() === "2FF");
-
-// leftPadWithZeros
-check(new BitSequence("").leftZeroPadToLength(0).toBinString() === "");
-check(new BitSequence("").leftZeroPadToLength(1).toBinString() === "0");
-check(new BitSequence("").leftZeroPadToLength(2).toBinString() === "00");
-check(new BitSequence("1").leftZeroPadToLength(1).toBinString() === "1");
-check(new BitSequence("1").leftZeroPadToLength(2).toBinString() === "01");
-check(new BitSequence("01").leftZeroPadToLength(2).toBinString() === "01");
-check(new BitSequence("11").leftZeroPadToLength(6).toBinString() === "000011");
 
 // Extend
 check(new BitSequence("").extend("").toBinString() === "");

@@ -98,11 +98,11 @@ class BitSequence {
      * be added to the sequence
      */
     static maxAmountOfStuffBits(amountOfBits) {
-        // TODO change into maxFrameLengthAfterStuffing()
-        // and use the wikipedia formula
-        // 8*n + 44 + Math.ceil((34+8*n-1)/4) for base frame
-        // 8*n + 64 + Math.ceil((54+8*n-1)/4) for base frame
-        return Math.floor(amountOfBits / 5);
+        if (amountOfBits < 1) {
+            return amountOfBits;
+        } else {
+            return Math.floor((amountOfBits - 1) / 4);
+        }
     }
 
     /**
@@ -173,7 +173,7 @@ class BitSequence {
             // Prevent stuffing twice.
             throw new TypeError("Bits sequence already stuffed.");
         }
-        let bitsAfterStuffing = [];
+        let sequenceAfterStuffing = [];
         let repeatedBits = 1;
         let previousBit = undefined;
         for (let bit of this._sequence) {
@@ -182,20 +182,18 @@ class BitSequence {
             } else {
                 repeatedBits = 1;
             }
+            sequenceAfterStuffing.push(bit);
             if (repeatedBits === 5) {
+                // Apply stuffing bit, opposite of just processed bit
+                let stuffingBit = !bit;
+                sequenceAfterStuffing.push(stuffingBit);
                 repeatedBits = 1;
-                bitsAfterStuffing.push(bit);
-                bitsAfterStuffing.push(!bit);    // Stuffing bit
-                previousBit = !bit;
+                previousBit = stuffingBit;
             } else {
-                bitsAfterStuffing.push(bit);
                 previousBit = bit;
             }
         }
-        // TODO change this object?
-        this._sequence = bitsAfterStuffing;
-        this._isStuffed = true;
-        //return new BitSequence(bitsAfterStuffing, true);
+        return new BitSequence(sequenceAfterStuffing, true);
     }
 
     /**
