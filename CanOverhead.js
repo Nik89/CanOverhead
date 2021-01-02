@@ -18,8 +18,8 @@ class BitSequence {
      *     stuffed
      */
     constructor(bits = [], isStuffed = false) {
-        this.isStuffed = Boolean(isStuffed);
-        this.sequence = [];
+        this._isStuffed = Boolean(isStuffed);
+        this._sequence = [];
         this.extend(bits);
     }
 
@@ -42,16 +42,15 @@ class BitSequence {
     extend(newTail) {
         // Check if it's a single-bit first
         if (newTail === 1 || newTail === true) {
-            this.sequence.push(true);
+            this._sequence.push(true);
         } else if (newTail === 0 || newTail === false) {
-            this.sequence.push(false);
+            this._sequence.push(false);
         } else {
-            // Then it must be an iterable
             for (let bit of newTail) {
                 if (bit === "1" || bit === true || bit === 1) {
-                    this.sequence.push(true);
+                    this._sequence.push(true);
                 } else if (bit === "0" || bit === false || bit === 0) {
-                    this.sequence.push(false);
+                    this._sequence.push(false);
                 } else if (bit.trim() === "") {
                     /* Skip whitespace char */
                 } else {
@@ -67,7 +66,7 @@ class BitSequence {
      * @returns {number} length of the sequence.
      */
     length() {
-        return this.sequence.length;
+        return this._sequence.length;
     }
 
     /**
@@ -80,12 +79,12 @@ class BitSequence {
      * included).
      */
     equal(other) {
-        if (typeof (other.isStuffed) !== "boolean"
-            || other.isStuffed !== this.isStuffed
-            || !Array.isArray(other.sequence)
-            || other.sequence.length !== this.sequence.length) return false;
-        for (let i = 0; i < this.sequence.length; i++) {
-            if (this.sequence[i] !== other.sequence[i]) return false;
+        if (typeof (other._isStuffed) !== "boolean"
+            || other._isStuffed !== this._isStuffed
+            || !Array.isArray(other._sequence)
+            || other._sequence.length !== this._sequence.length) return false;
+        for (let i = 0; i < this._sequence.length; i++) {
+            if (this._sequence[i] !== other._sequence[i]) return false;
         }
         return true;
     }
@@ -99,6 +98,10 @@ class BitSequence {
      * be added to the sequence
      */
     static maxAmountOfStuffBits(amountOfBits) {
+        // TODO change into maxFrameLengthAfterStuffing()
+        // and use the wikipedia formula
+        // 8*n + 44 + Math.ceil((34+8*n-1)/4) for base frame
+        // 8*n + 64 + Math.ceil((54+8*n-1)/4) for base frame
         return Math.floor(amountOfBits / 5);
     }
 
@@ -128,7 +131,7 @@ class BitSequence {
         let amountOfStuffBits = 0;
         let repeatedBits = 1;
         let previousBit = undefined;
-        for (let bit of this.sequence) {
+        for (let bit of this._sequence) {
             if (bit === previousBit) {
                 repeatedBits++;
             } else {
@@ -166,14 +169,14 @@ class BitSequence {
      * @returns {BitSequence} clone of this object with stuff bits applied to it
      */
     applyBitStuffing() {
-        if (this.isStuffed) {
+        if (this._isStuffed) {
             // Prevent stuffing twice.
             throw new TypeError("Bits sequence already stuffed.");
         }
         let bitsAfterStuffing = [];
         let repeatedBits = 1;
         let previousBit = undefined;
-        for (let bit of this.sequence) {
+        for (let bit of this._sequence) {
             if (bit === previousBit) {
                 repeatedBits++;
             } else {
@@ -189,7 +192,10 @@ class BitSequence {
                 previousBit = bit;
             }
         }
-        return new BitSequence(bitsAfterStuffing, true);
+        // TODO change this object?
+        this._sequence = bitsAfterStuffing;
+        this._isStuffed = true;
+        //return new BitSequence(bitsAfterStuffing, true);
     }
 
     /**
@@ -202,7 +208,7 @@ class BitSequence {
      */
     toBinString() {
         let str = "";
-        for (let bit of this.sequence) {
+        for (let bit of this._sequence) {
             if (bit) {
                 str += "1";
             } else {
@@ -223,8 +229,8 @@ class BitSequence {
      */
     toBinStringWithSpaces() {
         let str = "";
-        let count = this.sequence.length;
-        for (let bit of this.sequence) {
+        let count = this._sequence.length;
+        for (let bit of this._sequence) {
             if (bit) {
                 str += "1";
             } else {
@@ -254,8 +260,8 @@ class BitSequence {
         let str = "";
         let nibble_value = 0;
         let bits_in_nibble = 0;
-        for (let i = this.sequence.length - 1; i >= 0; i--) {
-            if (this.sequence[i]) {
+        for (let i = this._sequence.length - 1; i >= 0; i--) {
+            if (this._sequence[i]) {
                 nibble_value |= 1 << bits_in_nibble;
             }
             bits_in_nibble++;
@@ -270,28 +276,6 @@ class BitSequence {
             str = nibble_value.toString(16) + str; // Prepend
         }
         return str.toUpperCase();
-    }
-
-    /**
-     * Adds zeros (falses) on the beginning (left-side) of the sequence until it
-     * reaches the requested length.
-     *
-     * Returns a copy of the sequence unchanged, if the sequence is already
-     * of the requested length or longer.
-     *
-     * @param {number} newLength desired length in bits
-     * @returns {BitSequence} new left-padded sequence
-     */
-    leftZeroPadToLength(newLength) {
-        let clone = new BitSequence(this.sequence, this.isStuffed);
-        if (newLength > clone.length()) {
-            let zeros = [];
-            for (let i = clone.length(); i < newLength; i++) {
-                zeros.push(false);
-            }
-            clone.sequence = zeros.concat(clone.sequence);
-        }
-        return clone;
     }
 }
 
@@ -362,7 +346,7 @@ class CanFrame11Bit {
      * @returns {BitSequence} the DLC padded to 4 bits.
      */
     dataLengthCode() {
-        return new BitSequence(this.payload.length.toString(2)).leftZeroPadToLength(4);
+        return new BitSequence(this.payload.length.toString(2).padStart(4, "0"))
     }
 
     /**
@@ -395,7 +379,9 @@ class CanFrame11Bit {
      * @returns {BitSequence} all the bits in the frame.
      */
     toBitSequence() {
-
+        let frame = new BitSequence();
+        frame.extend(START_OF_FRAME);
+        // TODO complete
     }
 
     /**

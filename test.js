@@ -48,47 +48,47 @@ check(BitSequence.maxLengthAfterStuffing(21) === 25);
 let bits;
 // Default
 bits = new BitSequence();
-check(arrayEqual(bits.sequence, []), bits.sequence);
-check(bits.isStuffed === false);
+check(arrayEqual(bits._sequence, []), bits._sequence);
+check(bits._isStuffed === false);
 // Binart string
 bits = new BitSequence("    1 ")
-check(arrayEqual(bits.sequence, [true]));
-check(bits.isStuffed === false);
+check(arrayEqual(bits._sequence, [true]));
+check(bits._isStuffed === false);
 bits = new BitSequence("      0  1    ");
-check(arrayEqual(bits.sequence, [false, true]));
-check(bits.isStuffed === false);
+check(arrayEqual(bits._sequence, [false, true]));
+check(bits._isStuffed === false);
 bits = new BitSequence("      0  1  101    ");
-check(arrayEqual(bits.sequence, [false, true, true, false, true]));
-check(bits.isStuffed === false);
+check(arrayEqual(bits._sequence, [false, true, true, false, true]));
+check(bits._isStuffed === false);
 bits = new BitSequence("      0  1  101    ", true);
-check(arrayEqual(bits.sequence, [false, true, true, false, true]));
-check(bits.isStuffed === true);
+check(arrayEqual(bits._sequence, [false, true, true, false, true]));
+check(bits._isStuffed === true);
 // Array of ints
 bits = new BitSequence([0, 1, 0]);
-check(arrayEqual(bits.sequence, [false, true, false]));
-check(bits.isStuffed === false);
+check(arrayEqual(bits._sequence, [false, true, false]));
+check(bits._isStuffed === false);
 // Array of booleans
 bits = new BitSequence([false, true, false]);
-check(arrayEqual(bits.sequence, [false, true, false]));
-check(bits.isStuffed === false);
+check(arrayEqual(bits._sequence, [false, true, false]));
+check(bits._isStuffed === false);
 // Hybrid array
 bits = new BitSequence([1, false, "0"]);
-check(arrayEqual(bits.sequence, [true, false, false]));
-check(bits.isStuffed === false);
+check(arrayEqual(bits._sequence, [true, false, false]));
+check(bits._isStuffed === false);
 // Single bit integer
 bits = new BitSequence(0);
-check(arrayEqual(bits.sequence, [false]));
-check(bits.isStuffed === false);
+check(arrayEqual(bits._sequence, [false]));
+check(bits._isStuffed === false);
 bits = new BitSequence(1);
-check(arrayEqual(bits.sequence, [true]));
-check(bits.isStuffed === false);
+check(arrayEqual(bits._sequence, [true]));
+check(bits._isStuffed === false);
 // Single bit boolean
 bits = new BitSequence(false);
-check(arrayEqual(bits.sequence, [false]));
-check(bits.isStuffed === false);
+check(arrayEqual(bits._sequence, [false]));
+check(bits._isStuffed === false);
 bits = new BitSequence(true);
-check(arrayEqual(bits.sequence, [true]));
-check(bits.isStuffed === false);
+check(arrayEqual(bits._sequence, [true]));
+check(bits._isStuffed === false);
 
 // exactAmountOfStuffBits
 check(new BitSequence().exactAmountOfStuffBits()
