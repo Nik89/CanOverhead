@@ -9,63 +9,84 @@
     <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
-<h1 id="main_title">
-    CAN overhead, stuffing and bitrate calculator
-</h1>
-<noscript>
-    <h2 id="noscript_warning">
-        Please enable JavaScript for this website to work.
-    </h2>
-</noscript>
-v0.1 <br/>
-Input: Payload length: form with decimal integer, e.g. [  7 ]
-<br/>
-Output: frame bits min, max
-<br/>----<br/>
-v0.2 <br/>
-Input: CAN ID: form with binary string, e.g. [   100101 ]<br/>
-Input: Payload: form with binary string, e.g. [   00100111001001 ]<br/>
-<br/>
-Output:<br/>
-frame bits min, max<br/>
-whole frame without stuff bits as binary string, e.g. 100101001001...<br/>
-while frame without stuff bits broken down per parts<br/>
-- SOF: 1 <br/>
-- ID: 1001001 <br/>
-- etc.<br/>
-whole frame WITH stuff bits as binary string, e.g. 100101001001...
-(optional, make them bold?)<br/>
-<footer>
-    <div>
-        Made with &#x1f499; by
-        <a href="https://github.com/Nik89">Nicola Furlan</a>
-        and <a href="https://matjaz.it/">Matjaž Guštin</a>
-        &ndash;
-        Version 0.0.0
-        &ndash;
-        <a href="changelog.html">
-            Changelog
-        </a>
-        &ndash;
-        <a href="https://github.com/Nik89/CanOverhead">
-            Source code on GitHub
-        </a>
-        &ndash;
-        <a href="https://github.com/Nik89/CanOverhead/issues">
-            Found a bug?
-        </a>
+    <h1 id="main_title">
+        CAN overhead, stuffing and bitrate calculator
+    </h1>
+    <noscript>
+        <h2 id="noscript_warning">
+            Please enable JavaScript for this website to work.
+        </h2>
+    </noscript>
+    <p>v0.1 - Approximate computation of the frame information</p>
+    <div class="v1">
+        <div class="input">
+            <label for="v1-payload-length">Payload length (from 0 to 8) [byte]:</label>
+            <input id="v1-in-payload-length" name="v1-payload-length" type="number" min="0" max="8"/>
+            <div id="v1-input-error" class="input-error"></div>
+        </div>
+        <div>
+            <button onclick="computeV1()">--- Compute --></button>
+        </div>
+        <div class="output">
+            <label>Frame length (interval) [bit]:</label>
+            <div>[
+                <span id="v1-out-frames-bits-min"></span>,
+                <span id="v1-out-frames-bits-max"></span>
+             ]</div>
+        </div>
     </div>
-    <br>
     <div>
-        This website does not use cookies, does not advertise nor track the
-        users. All calculations happens in your browser, no data is sent
-        to any server.
-        The results of the calculator are provided with best-effort
-        from the authors but with no guarantee of correctness, as stated
-        formally in  the <a href="license.html">source code license</a>.
+        v0.1 <br/>
+        Input: Payload length: form with decimal integer, e.g. [  7 ]
+        <br/>
+        Output: frame bits min, max
+        <br/>----<br/>
+        v0.2 <br/>
+        Input: CAN ID: form with binary string, e.g. [   100101 ]<br/>
+        Input: Payload: form with binary string, e.g. [   00100111001001 ]<br/>
+        <br/>
+        Output:<br/>
+        frame bits min, max<br/>
+        whole frame without stuff bits as binary string, e.g. 100101001001...<br/>
+        while frame without stuff bits broken down per parts<br/>
+        - SOF: 1 <br/>
+        - ID: 1001001 <br/>
+        - etc.<br/>
+        whole frame WITH stuff bits as binary string, e.g. 100101001001...
+        (optional, make them bold?)<br/>
     </div>
-</footer>
-<script type="text/javascript" src="CanOverhead.js" charset="utf-8"></script>
-<script type="text/javascript" src="test.js" charset="utf-8"></script>
-</body>
+    <footer>
+        <div>
+            Made with &#x1f499; by
+            <a href="https://github.com/Nik89">Nicola Furlan</a>
+            and <a href="https://matjaz.it/">Matjaž Guštin</a>
+            &ndash;
+            Version 0.0.0
+            &ndash;
+            <a href="changelog.html">
+                Changelog
+            </a>
+            &ndash;
+            <a href="https://github.com/Nik89/CanOverhead">
+                Source code on GitHub
+            </a>
+            &ndash;
+            <a href="https://github.com/Nik89/CanOverhead/issues">
+                Found a bug?
+            </a>
+        </div>
+        <br>
+        <div>
+            This website does not use cookies, does not advertise nor track the
+            users. All calculations happens in your browser, no data is sent
+            to any server.
+            The results of the calculator are provided with best-effort
+            from the authors but with no guarantee of correctness, as stated
+            formally in  the <a href="license.html">source code license</a>.
+        </div>
+    </footer>
+    <script type="text/javascript" src="CanOverhead.js" charset="utf-8"></script>
+    <script type="text/javascript" src="scripts.js" charset="utf-8"></script>
+    <script type="text/javascript" src="test.js" charset="utf-8"></script>
+    </body>
 </html>
