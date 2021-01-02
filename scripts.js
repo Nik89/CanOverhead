@@ -1,8 +1,11 @@
 let computeV1 = () => {
     // Parse input fields
-    let payloadLengthByte = parseInt(document.getElementById("v1-in-payload-length").value);
+    let payloadLengthByte = parseInt(
+        document.getElementById("v1-in-payload-length").value);
 
-    if (payloadLengthByte < 0 || payloadLengthByte > 8) {
+    if (isNaN(payloadLengthByte)
+        || payloadLengthByte < 0
+        || payloadLengthByte > 8) {// TODO magic numbers
         // Set error and clear existing output
         document.getElementById("v1-input-error").innerHTML = "The value should be between 0 and 8 bytes";
         document.getElementById("v1-out-frames-bits-min").innerHTML = "";
