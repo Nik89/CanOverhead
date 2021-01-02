@@ -37,6 +37,26 @@
              ]</div>
         </div>
     </div>
+    <p>v0.2 - Precise computation of the frame information</p>
+    <div class="v2">
+        <div class="input">
+            <div>
+                <label for="v2-identified">CAN Identifier:</label>
+                <input id="v2-in-identified" name="v2-identified" type="text"/>
+                <div id="v2-input-id-error" class="input-error"></div>
+            </div>
+            <div>
+                <label for="v2-payload">CAN Payload data:</label>
+                <input id="v2-in-payload" name="v2-payload" type="text"/>
+                <div id="v2-input-pl-error" class="input-error"></div>
+            </div>
+        </div>
+        <div>
+            <button onclick="computeV2()">Compute</button>
+        </div>
+        <div class="output">
+        </div>
+    </div>
     <div>
         v0.1 <br/>
         Input: Payload length: form with decimal integer, e.g. [  7 ]
