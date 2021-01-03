@@ -3,3 +3,4 @@ build*/
 *.min.*
 venv
 __pycache__/
+builds
