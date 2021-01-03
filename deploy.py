@@ -3,6 +3,7 @@
 import os
 import shutil
 
+import htmlmin
 import markdown
 
 THIS_FILE_ABS_DIR = os.path.dirname(__file__)
@@ -21,6 +22,14 @@ def md2html(input_file_name: str):
     output_file_name = os.path.join(BUILD_DIR, output_file_name)
     markdown.markdownFromFile(input=input_file_name, output=output_file_name,
                               encoding="UTF-8", output_format="html")
+
+
+def minify_html(input_file_name: str):
+    with open(input_file_name, encoding="UTF-8") as file:
+        html = file.read()
+    minified_html = htmlmin.minify(html)
+    with open(output_file_name, "w", encoding="UTF-8") as file:
+        file.write(minified_html)
 
 
 def deploy():
