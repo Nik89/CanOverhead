@@ -189,3 +189,24 @@ check(new BitSequence("01").extend(0).toBinString() === "010");
 check(new BitSequence("01").extend(1).toBinString() === "011");
 check(new BitSequence("01").extend(false).toBinString() === "010");
 check(new BitSequence("01").extend(true).toBinString() === "011");
+
+
+// CRC
+bits = [1, 1, 1, 1, 0, 0, 0, 1];
+let obtained = crc15(bits);
+let expected = 0x62f6;
+check(obtained === expected,
+    "Expected CRC: " + expected.toString(16)
+    + ", obtained: " + obtained.toString(16));
+bits = [1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1];
+obtained = crc15(bits);
+expected = 0x0474;
+check(obtained === expected,
+    "Expected CRC: " + expected.toString(16)
+    + ", obtained: " + obtained.toString(16));
+bits = [1, 1, 0, 1, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0];
+obtained = crc15(bits);
+expected = 0x22aa; // 0x14ef??
+check(obtained === expected,
+    "Expected CRC: " + expected.toString(16)
+    + ", obtained: " + obtained.toString(16));
