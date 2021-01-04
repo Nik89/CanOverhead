@@ -68,6 +68,7 @@ def deploy():
     minify_html("index.html")
     minify_css("style.css")
     minify_js("CanOverhead.js")
+    minify_js("scripts.js")
     minify_js("test.js")
 
 
