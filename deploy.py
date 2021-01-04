@@ -3,8 +3,8 @@
 import os
 import shutil
 
-import htmlmin
 import markdown
+import css_html_js_minify as mfy
 
 THIS_FILE_ABS_DIR = os.path.dirname(__file__)
 BUILD_DIR = os.path.join(THIS_FILE_ABS_DIR, "builds")
@@ -17,6 +17,11 @@ def cleanup():
 
 
 def md2html(input_file_name: str):
+    """
+    Converts a given Markdown file into an HTML file into the build directory
+    Args:
+        input_file_name: file name of the MD input file
+    """
     output_file_name = input_file_name.lower().rsplit(".", maxsplit=1)[0]
     output_file_name += ".html"
     output_file_name = os.path.join(BUILD_DIR, output_file_name)
@@ -25,11 +30,33 @@ def md2html(input_file_name: str):
 
 
 def minify_html(input_file_name: str):
-    with open(input_file_name, encoding="UTF-8") as file:
-        html = file.read()
-    minified_html = htmlmin.minify(html)
-    with open(output_file_name, "w", encoding="UTF-8") as file:
-        file.write(minified_html)
+    """
+    Minify a given HTML file into the build directory
+    Args:
+        input_file_name: file name of the HTML input file
+    """
+    output_file_name = os.path.join(BUILD_DIR, input_file_name)
+    mfy.process_single_html_file(input_file_name, output_path=output_file_name)
+
+
+def minify_css(input_file_name: str):
+    """
+    Minify a given CSS file into the build directory
+    Args:
+        input_file_name: file name of the CSS input file
+    """
+    output_file_name = os.path.join(BUILD_DIR, input_file_name)
+    mfy.process_single_css_file(input_file_name, output_path=output_file_name)
+
+
+def minify_js(input_file_name: str):
+    """
+    Minify a given JS file into the build directory
+    Args:
+        input_file_name: file name of the JS input file
+    """
+    output_file_name = os.path.join(BUILD_DIR, input_file_name)
+    mfy.process_single_css_file(input_file_name, output_path=output_file_name)
 
 
 def deploy():
@@ -38,6 +65,10 @@ def deploy():
     md2html("LICENSE.md")
     md2html("README.md")
     md2html("ROADMAP.md")
+    minify_html("index.html")
+    minify_css("style.css")
+    minify_js("CanOverhead.js")
+    minify_js("test.js")
 
 
 if __name__ == "__main__":
