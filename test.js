@@ -192,21 +192,25 @@ check(new BitSequence("01").extend(true).toBinString() === "011");
 
 
 // CRC
-bits = [1, 1, 1, 1, 0, 0, 0, 1];
-let obtained = crc15(bits);
-let expected = 0x62f6;
-check(obtained === expected,
-    "Expected CRC: " + expected.toString(16)
-    + ", obtained: " + obtained.toString(16));
-bits = [1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1];
-obtained = crc15(bits);
-expected = 0x0474;
-check(obtained === expected,
-    "Expected CRC: " + expected.toString(16)
-    + ", obtained: " + obtained.toString(16));
-bits = [1, 1, 0, 1, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0];
-obtained = crc15(bits);
-expected = 0x22aa; // 0x14ef??
-check(obtained === expected,
-    "Expected CRC: " + expected.toString(16)
-    + ", obtained: " + obtained.toString(16));
+// The tested values in hex are: 0x0, 0xF1, 0x833, 0x34ec
+// Test expected results are computed with
+// https://www.ghsi.de/pages/subpages/Online%20CRC%20Calculation/index.php
+// CRC 15 bits
+check(crc15([0]) === 0);
+check(crc15([1, 1, 1, 1, 0, 0, 0, 1]) === 0b110001011110110);
+check(crc15([1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1]) === 0b000010001110100);
+check(crc15([1, 1, 0, 1, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0]) === 0b010001010101010);
+
+// CRC 17 bits
+check(crc17([0]) === 0);
+check(crc17([1, 1, 1, 1, 0, 0, 0, 1]) === 0b00000001000111100);
+check(crc17([1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1]) === 0b00100010111100111);
+check(crc17([1, 1, 0, 1, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0])
+    === 0b00000111010101101);
+
+// CRC 21 bits
+check(crc21([0]) === 0);
+check(crc21([1, 1, 1, 1, 0, 0, 0, 1]) === 0b000010111011100111001);
+check(crc21([1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1]) === 0b100110110111010101101);
+check(crc21([1, 1, 0, 1, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0])
+    === 0b001001011010101011100);

@@ -398,7 +398,12 @@ class CanFrame11Bit {
 
 /**
  * Computes a Cyclic Redundancy Check for a sequence of bits with a generic
- * polynomial.
+ * polynomial, bit by bit.
+ *
+ * The polynomial can be provided with or without its most significant bit set.
+ * The function internally needs the version without it being set, as it is
+ * implicitly always 1 for a polynomial of grade n. Just to make sure to accept
+ * both polynomial formats, its most significant bit is cleared before start.
  *
  * @param {boolean[]|number[]} bits - iterable of bits to compute the CRC for
  * @param {number} polynomial - positive integer representation of the
@@ -408,9 +413,14 @@ class CanFrame11Bit {
  */
 function _crc(bits, polynomial, n) {
     let remainder = 0;
+    let mostSignificantBitMask = 1 << n;
+    // Clear the most significant bit of the polynomial, see docstring.
+    polynomial &= ~mostSignificantBitMask;
+    // Now update the mostSignificantBitMask to the new MS bit of the polynomial
+    mostSignificantBitMask >>= 1;
     for (let bit of bits) {
         remainder = remainder ^ (bit << (n - 1));
-        if ((remainder >> (n - 1)) & 1) { // if most sign. bit is set
+        if (remainder & mostSignificantBitMask) {
             remainder = (remainder << 1) ^ polynomial;
         } else {
             remainder <<= 1;
@@ -422,27 +432,39 @@ function _crc(bits, polynomial, n) {
 
 /**
  * Computes the CRC of 15 bits for the classic CAN bus.
+ *
+ * Polynomial:
+ * x^15 + x^14 + x^10 + x^8 + x^7 +x^4 +x^3 + x^0
+ * = 0b1100010110011001 = 0xC599
+ *
  * @param {boolean[]|number[]} bits - iterable of bits to compute the CRC for
  * @returns {number} the output CRC as non-negative integer
  */
 function crc15(bits) {
-    return _crc(bits, 0x4599, 15);
+    return _crc(bits, 0xC599, 15);
 }
 
 /**
  * Computes the CRC of 17 bits for the CAN FD bus.
+ *
+ * Polynomial: x^17 + x^16 + x^14 + x^13 + x^11 + x^6 + x^4 + x^3 + x^1 + x^0
+ * = 0b110110100001011011 = 0x3685B
  * @param {boolean[]|number[]} bits - iterable of bits to compute the CRC for
  * @returns {number} the output CRC as non-negative integer
  */
 function crc17(bits) {
-    return _crc(bits, 0x1685B, 17);
+    return _crc(bits, 0x3685B, 17);
 }
 
 /**
  * Computes the CRC of 21 bits for the CAN FD bus.
+ *
+ * Polynomial: x^21 + x^20 + x^13 + x^11 + x^7 + x^4 + x^3 + x^0
+ * = 0b1100000010100010011001 = 0x302899
+ *
  * @param {boolean[]|number[]} bits - iterable of bits to compute the CRC for
  * @returns {number} the output CRC as non-negative integer
  */
 function crc21(bits) {
-    return _crc(bits, 0x102899, 21);
+    return _crc(bits, 0x302899, 21);
 }
