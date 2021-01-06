@@ -321,6 +321,7 @@ class CanFrame11Bit {
     f10_ackSlot = RECESSIVE;
     f11_ackDelimiter = ACK_DELIMITER;
     f12_endOfFrame = END_OF_FRAME;
+    f13_pauseAfterFrame = PAUSE_AFTER_EOF;
 
     /**
      * Constructs a Classic CAN frame with an 11-bit ID.
@@ -368,6 +369,43 @@ class CanFrame11Bit {
 
         this.f06_dataLengthCode = decimal2ArrayOfBool(this.f02_identifier.length);
         this.f08_crc = [];
+
+
+        // TODO [MG]: inputs are only strings: strip any non-digit character
+        // then just pass them to BitSequence. It explodes if something is
+        // wrong. This avoids the stringOfBits2ArrayOfBool() calls and
+        // additional input validation.
+        this.f02_identifier = id;
+        this.f06_dataLengthCode = this.f07_dataField.length.toString(2).padStart(4, "0");
+        this.f07_dataField = payload;
+
+        this.wholeFrame = new BitSequence();
+        this.wholeFrame.extend(this.f01_startOfFrame);
+        this.wholeFrame.extend(this.f02_identifier);
+        this.wholeFrame.extend(this.f03_remoteTransmissionRequest);
+        this.wholeFrame.extend(this.f04_identifierExtensionBit);
+        this.wholeFrame.extend(this.f05_reservedBit);
+        this.wholeFrame.extend(this.f06_dataLengthCode);
+        this.wholeFrame.extend(this.f07_dataField);
+        // Only now the CRC function can be called onto the rest of the
+        // frame, as it's now constructed as a sequence of bits.
+        this.f08_crc = crc15(this.wholeFrame);
+        this.wholeFrame.extend(this.f08_crc);
+        // At this point, after the CRC, the stuffing could be computed
+        // on all the fields before the CRC delimiter
+        this.wholeFrameAfterStuffing = this.wholeFrame.applyBitStuffing();
+        // Continue the construction of the whole frame after the CRC
+        this.wholeFrame.extend(this.f09_crcDelimiter);
+        this.wholeFrame.extend(this.f10_ackSlot);
+        this.wholeFrame.extend(this.f11_ackDelimiter);
+        this.wholeFrame.extend(this.f12_endOfFrame);
+        this.wholeFrame.extend(this.f13_pauseAfterFrame);
+        // Append the same trailer also to the stuffed frame
+        this.wholeFrameAfterStuffing.extend(this.f09_crcDelimiter);
+        this.wholeFrameAfterStuffing.extend(this.f10_ackSlot);
+        this.wholeFrameAfterStuffing.extend(this.f11_ackDelimiter);
+        this.wholeFrameAfterStuffing.extend(this.f12_endOfFrame);
+        this.wholeFrameAfterStuffing.extend(this.f13_pauseAfterFrame);
     }
 
     /**
@@ -393,59 +431,12 @@ class CanFrame11Bit {
     }
 
     /**
-     * Provides the DLC header field as BitSequence.
-     *
-     * @returns {BitSequence} the DLC padded to 4 bits.
-     */
-    dataLengthCode() {
-        return new BitSequence(this.payload.length.toString(2).padStart(4, "0"))
-    }
-
-    /**
      * Computes the length of the whole frame after the addition of the stuff
      * bits.
      *
      * @returns {number} exact whole frame length in bits, including stuff bits
      */
     exactLengthAfterStuffing() {
-
-    }
-
-
-    /**
-     * Computes the Cyclic Redundancy Check (CRC-15) field of the frame
-     * without the inclusion of any stuff bits.
-     *
-     * Used polynomial: 0xC599 = x^15 + x^14 + x^10 + x^8 + x^7 + x^4 + x^3 + 1
-     *
-     * @returns {BitSequence} CRC-15 sequence of bits.
-     */
-    crc() {
-
-    }
-
-    /**
-     * Concatenates all frame fields together into a contiguous BitSequence
-     * which does not include any stuff bits.
-     *
-     * @returns {BitSequence} all the bits in the frame.
-     */
-    toBitSequence() {
-        let frame = new BitSequence();
-        frame.extend(START_OF_FRAME);
-        // TODO complete
-    }
-
-    /**
-     * Concatenates all frame fields together into a contiguous BitSequence
-     * which does include any stuff bits.
-     *
-     * Stuff bits are not included in the CRC delimiter, ACK field and the end
-     * of frame bits. In other words: anything after the CRC (which is stuffed).
-     *
-     * @returns {BitSequence} all the bits in the frame, including stuff bits.
-     */
-    toBitSequenceAfterStuffing() {
 
     }
 }
@@ -459,7 +450,8 @@ class CanFrame11Bit {
  * implicitly always 1 for a polynomial of grade n. Just to make sure to accept
  * both polynomial formats, its most significant bit is cleared before start.
  *
- * @param {boolean[]|number[]} bits - iterable of bits to compute the CRC for
+ * @param {boolean[]|number[]|BitSequence} bits -
+ *        iterable of bits to compute the CRC for
  * @param {number} polynomial - positive integer representation of the
  *        polynomial
  * @param {number} n - positive integer number of bits of the output
@@ -491,7 +483,8 @@ function _crc(bits, polynomial, n) {
  * x^15 + x^14 + x^10 + x^8 + x^7 +x^4 +x^3 + x^0
  * = 0b1100010110011001 = 0xC599
  *
- * @param {boolean[]|number[]} bits - iterable of bits to compute the CRC for
+ * @param {boolean[]|number[]|BitSequence} bits - iterable of bits to compute
+ *        the CRC for
  * @returns {number} the output CRC as non-negative integer
  */
 function crc15(bits) {
@@ -503,7 +496,8 @@ function crc15(bits) {
  *
  * Polynomial: x^17 + x^16 + x^14 + x^13 + x^11 + x^6 + x^4 + x^3 + x^1 + x^0
  * = 0b110110100001011011 = 0x3685B
- * @param {boolean[]|number[]} bits - iterable of bits to compute the CRC for
+ * @param {boolean[]|number[]|BitSequence} bits - iterable of bits to compute
+ *        the CRC for
  * @returns {number} the output CRC as non-negative integer
  */
 function crc17(bits) {
@@ -516,7 +510,8 @@ function crc17(bits) {
  * Polynomial: x^21 + x^20 + x^13 + x^11 + x^7 + x^4 + x^3 + x^0
  * = 0b1100000010100010011001 = 0x302899
  *
- * @param {boolean[]|number[]} bits - iterable of bits to compute the CRC for
+ * @param {boolean[]|number[]|BitSequence} bits - iterable of bits to compute
+ *        the CRC for
  * @returns {number} the output CRC as non-negative integer
  */
 function crc21(bits) {
@@ -525,7 +520,7 @@ function crc21(bits) {
 
 
 let isArrayOfBits = (array) => {
-    if (typeof(array) === "object" && Array.isArray(array)) {
+    if (typeof (array) === "object" && Array.isArray(array)) {
         let isArrayOfBits = true;
         let i = 0;
         while ((i < array.length) && isArrayOfBits) {
@@ -541,7 +536,7 @@ let isArrayOfBits = (array) => {
 }
 
 let isStringOfBits = (string) => {
-    if (typeof(string) === "string") {
+    if (typeof (string) === "string") {
         let isStringOfBits = true;
         let i = 0;
         while ((i < string.length) && isStringOfBits) {
@@ -583,7 +578,7 @@ let stringOfBits2arrayOfBool = (stringOfBits) => {
 }
 
 let decimal2ArrayOfBool = (decimal) => {
-    if (typeof(decimal) !== "number") {
+    if (typeof (decimal) !== "number") {
         throw Error();
     }
     let stringOfBits = Number(decimal).toString(2);
