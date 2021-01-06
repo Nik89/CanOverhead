@@ -331,18 +331,19 @@ class CanFrame11Bit {
     constructor(id, payload) {
         // Check ID
         let identifierIsStringOfBits;
-        if (typeof(id) === "number") {
+        if (typeof (id) === "number") {
             identifierIsStringOfBits = false;
             if (id < 0 || id > 2047) {
-                throw new RangeError("Identifier not correct");
+                throw new RangeError("Identifier out of bounds.");
             }
         } else if (isStringOfBits(id)) {
             identifierIsStringOfBits = true;
             if (id.length > 11) {
-                throw new RangeError("Identifier not correct");
+                throw new RangeError("Identifier out of bounds.");
             }
         } else {
-            throw new RangeError("Identifier not correct");
+            throw new TypeError(
+                "Identifier must be an integer or a binary string.");
         }
 
         // Check Payload
@@ -350,15 +351,16 @@ class CanFrame11Bit {
         if (isArrayOfBits(payload)) {
             payloadIsStringOfBits = false;
             if (payload.length > 64) {
-                throw new RangeError("Payload not correct");
+                throw new RangeError("Payload too long.");
             }
         } else if (isStringOfBits(payload)) {
             payloadIsStringOfBits = true;
             if (payload.length > 64) {
-                throw new RangeError("Payload not correct");
+                throw new RangeError("Payload too long.");
             }
         } else {
-            throw new RangeError("Payload not correct");
+            throw new TypeError(
+                "Payload must be an array of bits or binary string.");
         }
 
         this.f02_identifier = (identifierIsStringOfBits) ? stringOfBits2arrayOfBool(id) : decimal2ArrayOfBool(id);
