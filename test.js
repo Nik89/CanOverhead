@@ -190,6 +190,20 @@ check(new BitSequence("01").extend(1).toBinString() === "011");
 check(new BitSequence("01").extend(false).toBinString() === "010");
 check(new BitSequence("01").extend(true).toBinString() === "011");
 
+// Iterability
+bits = new BitSequence("");
+for (let b of bits) {
+    check(false, "This should not be executed.");
+}
+bits = new BitSequence("1");
+for (let b of bits) {
+    check(b === true);
+}
+bits = new BitSequence("101");
+for (let b of bits) {
+    check(b === true || b === false);
+}
+
 
 // CRC
 // The tested values in hex are: 0x0, 0xF1, 0x833, 0x34ec
@@ -198,6 +212,7 @@ check(new BitSequence("01").extend(true).toBinString() === "011");
 // CRC 15 bits
 check(crc15([0]) === 0);
 check(crc15([1, 1, 1, 1, 0, 0, 0, 1]) === 0b110001011110110);
+check(crc15([true, true, true, true, 0, 0, false, 1]) === 0b110001011110110);
 check(crc15([1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1]) === 0b000010001110100);
 check(crc15([1, 1, 0, 1, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0]) === 0b010001010101010);
 

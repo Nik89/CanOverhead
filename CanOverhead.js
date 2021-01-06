@@ -275,6 +275,14 @@ class BitSequence {
         }
         return str.toUpperCase();
     }
+
+    /**
+     * Makes this class iterable.
+     * @returns {iterator} iterator of the bits as booleans
+     */
+    [Symbol.iterator]() {
+        return this._sequence.values();
+    }
 }
 
 const RECESSIVE = true;
