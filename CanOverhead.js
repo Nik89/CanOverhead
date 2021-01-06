@@ -300,6 +300,20 @@ const PAUSE_AFTER_EOF = [RECESSIVE, RECESSIVE, RECESSIVE];
  * Data structure representing a Classic CAN frame with 11-bit identifier.
  */
 class CanFrame11Bit {
+
+    f01_startOfFrame = START_OF_FRAME;
+    f02_identifier;
+    f03_remoteTransmissionRequest = RTR_IS_DATA_FRAME;
+    f04_identifierExtensionBit = DOMINANT;
+    f05_reservedBit = R0;
+    f06_dataLengthCode;
+    f07_dataField;
+    f08_crc;
+    f09_crcDelimiter = RECESSIVE;
+    f10_ackSlot = RECESSIVE;
+    f11_ackDelimiter = ACK_DELIMITER;
+    f12_endOfFrame = END_OF_FRAME;
+
     /**
      * Constructs a Classic CAN frame with an 11-bit ID.
      *
@@ -307,13 +321,43 @@ class CanFrame11Bit {
      * @param {number[]|string} payload array of integers or hex string
      */
     constructor(id, payload) {
-        // TODO check ID is 11 bits max
-        this.id = id;
-        this.remoteTransmissionRequest = false; // Hardcoded, for now
-        if (payload.length > 8) {
-            throw new RangeError("Classic CAN supports payloads of up to 8 B.");
+        // Check ID
+        let identifierIsStringOfBits;
+        if (typeof(id) === "number") {
+            identifierIsStringOfBits = false;
+            if (id < 0 || id > 2047) {
+                throw new RangeError("Identifier not correct");
+            }
+        } else if (isStringOfBits(id)) {
+            identifierIsStringOfBits = true;
+            if (id.length > 11) {
+                throw new RangeError("Identifier not correct");
+            }
+        } else {
+            throw new RangeError("Identifier not correct");
         }
-        this.payload = payload;
+
+        // Check Payload
+        let payloadIsStringOfBits;
+        if (isArrayOfBits(payload)) {
+            payloadIsStringOfBits = false;
+            if (payload.length > 64) {
+                throw new RangeError("Payload not correct");
+            }
+        } else if (isStringOfBits(payload)) {
+            payloadIsStringOfBits = true;
+            if (payload.length > 64) {
+                throw new RangeError("Payload not correct");
+            }
+        } else {
+            throw new RangeError("Payload not correct");
+        }
+
+        this.f02_identifier = (identifierIsStringOfBits) ? stringOfBits2arrayOfBool(id) : decimal2ArrayOfBool(id);
+        this.f07_dataField = (payloadIsStringOfBits) ? stringOfBits2arrayOfBool(payload) : arrayOfBits2arrayOfBool(payload);
+
+        this.f06_dataLengthCode = decimal2ArrayOfBool(this.f02_identifier.length);
+        this.f08_crc = [];
     }
 
     /**
@@ -467,4 +511,71 @@ function crc17(bits) {
  */
 function crc21(bits) {
     return _crc(bits, 0x302899, 21);
+}
+
+
+let isArrayOfBits = (array) => {
+    if (typeof(array) === "object" && Array.isArray(array)) {
+        let isArrayOfBits = true;
+        let i = 0;
+        while ((i < array.length) && isArrayOfBits) {
+            if (!(array[i] === 0 || array[i] === 1)) {
+                isArrayOfBits = false;
+            }
+            i++;
+        }
+        return isArrayOfBits;
+    } else {
+        return false;
+    }
+}
+
+let isStringOfBits = (string) => {
+    if (typeof(string) === "string") {
+        let isStringOfBits = true;
+        let i = 0;
+        while ((i < string.length) && isStringOfBits) {
+            let char = string.substr(i, 1);
+            if (!(char === "0" || char === "1")) {
+                isStringOfBits = false;
+            }
+            i++;
+        }
+        return isStringOfBits;
+    } else {
+        return false;
+    }
+}
+
+let arrayOfBits2arrayOfBool = (arrayOfBits) => {
+    if (!isArrayOfBits(arrayOfBits)) {
+        throw Error();
+    }
+    let arrayOfBool = [];
+    arrayOfBits.forEach((el) => {
+        arrayOfBool.push((el === 1));
+    });
+
+    return arrayOfBool;
+}
+
+let stringOfBits2arrayOfBool = (stringOfBits) => {
+    if (!isStringOfBits(stringOfBits)) {
+        throw Error();
+    }
+    let arrayOfBits = str.match(/.{1}/g);
+    let arrayOfBool = [];
+    arrayOfBits.forEach((el) => {
+        arrayOfBool.push((el === "1"));
+    });
+
+    return arrayOfBool;
+}
+
+let decimal2ArrayOfBool = (decimal) => {
+    if (typeof(decimal) !== "number") {
+        throw Error();
+    }
+    let stringOfBits = Number(decimal).toString(2);
+    return stringOfBits2arrayOfBool(stringOfBits);
 }

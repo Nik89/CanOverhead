@@ -1,3 +1,5 @@
 .idea/
 build*/
 *.min.*
+venv
+__pycache__/

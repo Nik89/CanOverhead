@@ -29,7 +29,7 @@ footer {
     width: 60%;
 }
 /* General rules for v1 */
-.v1 {
+.v1, .v2 {
     background-color: #c6c6c67a;
 }
 .input-error {
@@ -49,5 +49,7 @@ footer {
     justify-content: space-between; /*left center space-between*/
     align-items: center; /*center stretch*/
 }
-
-
+.v2 input {
+    width: 550px;
+    font-family: 'Courier New', Courier, monospace;
+}
