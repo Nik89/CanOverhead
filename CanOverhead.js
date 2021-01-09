@@ -330,7 +330,7 @@ const POST_CRC = [
 ];
 
 /**
- * Data structure representing a Classic CAN frame with 11-bit identifier.
+ * Data structure representing a Classic CAN data frame with 11-bit identifier.
  */
 class CanFrame11Bit {
     static MAX_ID_VALUE_11_BIT = 0x7FF;
@@ -345,7 +345,8 @@ class CanFrame11Bit {
      *
      * @param {number} id integer of the CAN ID. Most significant bit is the
      *        first transmitted
-     * @param {Uint8Array} payload array of integers
+     * @param {Uint8Array} payload array of integers. Most significant bit
+     *        of the first byte (at index 0) is the first transmitteds
      */
     constructor(id, payload) {
         // Check ID
@@ -363,6 +364,7 @@ class CanFrame11Bit {
         if (payload.length > CanFrame11Bit.MAX_PAYLOAD_BYTES) {
             throw new RangeError("Payload too long.");
         }
+        // Everything valid
         this.id = id;
         this.payload = payload;
     }
@@ -439,6 +441,7 @@ class CanFrame11Bit {
         ]);
     }
 
+    // TODO document this class
     wholeFrame() {
         let frame = new BitSequence();
         frame.extend(this.f01_startOfFrame());
