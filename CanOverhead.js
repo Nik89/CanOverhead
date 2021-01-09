@@ -302,7 +302,19 @@ const END_OF_FRAME = [
     RECESSIVE, RECESSIVE, RECESSIVE, RECESSIVE,
     RECESSIVE, RECESSIVE, RECESSIVE];
 const PAUSE_AFTER_EOF = [RECESSIVE, RECESSIVE, RECESSIVE];
-
+const POST_CRC = [
+    // CRC Delimiter
+    RECESSIVE,
+    // ACK slot, changed to dominant by any receiver
+    RECESSIVE,
+    // ACK delimiter
+    RECESSIVE,
+    // End of frame
+    RECESSIVE, RECESSIVE, RECESSIVE, RECESSIVE,
+    RECESSIVE, RECESSIVE, RECESSIVE,
+    // Pause after end of frame
+    RECESSIVE, RECESSIVE, RECESSIVE,
+];
 
 /**
  * Data structure representing a Classic CAN frame with 11-bit identifier.
@@ -364,18 +376,18 @@ class CanFrame11Bit {
                 "Payload must be an array of bits or binary string.");
         }
 
-        this.f02_identifier = (identifierIsStringOfBits) ? stringOfBits2arrayOfBool(id) : decimal2ArrayOfBool(id);
-        this.f07_dataField = (payloadIsStringOfBits) ? stringOfBits2arrayOfBool(payload) : arrayOfBits2arrayOfBool(payload);
+        //this.f02_identifier = (identifierIsStringOfBits) ? stringOfBits2arrayOfBool(id) : decimal2ArrayOfBool(id);
+        //this.f07_dataField = (payloadIsStringOfBits) ? stringOfBits2arrayOfBool(payload) : arrayOfBits2arrayOfBool(payload);
 
-        this.f06_dataLengthCode = decimal2ArrayOfBool(this.f02_identifier.length);
-        this.f08_crc = [];
+        //this.f06_dataLengthCode = decimal2ArrayOfBool(this.f02_identifier.length);
+        //this.f08_crc = [];
 
 
         // TODO [MG]: inputs are only strings: strip any non-digit character
         // then just pass them to BitSequence. It explodes if something is
         // wrong. This avoids the stringOfBits2ArrayOfBool() calls and
         // additional input validation.
-        this.f02_identifier = id;
+        this.f02_identifier = id.padStart(11, "0");
         this.f06_dataLengthCode = this.f07_dataField.length.toString(2).padStart(4, "0");
         this.f07_dataField = payload;
 
@@ -391,53 +403,17 @@ class CanFrame11Bit {
         // frame, as it's now constructed as a sequence of bits.
         this.f08_crc = crc15(this.wholeFrame);
         this.wholeFrame.extend(this.f08_crc);
+        // Compute what could be the maximum size of the stuffed part of the
+        // frame, assuming it had different data.
+        this._maxLengthAfterStuffing = BitSequence.maxLengthAfterStuffing(this.wholeFrame);
+        this._maxLengthAfterStuffing += POST_CRC.length;
         // At this point, after the CRC, the stuffing could be computed
         // on all the fields before the CRC delimiter
         this.wholeFrameAfterStuffing = this.wholeFrame.applyBitStuffing();
         // Continue the construction of the whole frame after the CRC
-        this.wholeFrame.extend(this.f09_crcDelimiter);
-        this.wholeFrame.extend(this.f10_ackSlot);
-        this.wholeFrame.extend(this.f11_ackDelimiter);
-        this.wholeFrame.extend(this.f12_endOfFrame);
-        this.wholeFrame.extend(this.f13_pauseAfterFrame);
+        this.wholeFrame.extend(POST_CRC);
         // Append the same trailer also to the stuffed frame
-        this.wholeFrameAfterStuffing.extend(this.f09_crcDelimiter);
-        this.wholeFrameAfterStuffing.extend(this.f10_ackSlot);
-        this.wholeFrameAfterStuffing.extend(this.f11_ackDelimiter);
-        this.wholeFrameAfterStuffing.extend(this.f12_endOfFrame);
-        this.wholeFrameAfterStuffing.extend(this.f13_pauseAfterFrame);
-    }
-
-    /**
-     * Computes the length of the whole frame with a given payload length
-     * without including the stuff bits.
-     *
-     * @param {number} payloadLength - size of the payload in bytes
-     * @returns {number} whole frame length in bits
-     */
-    static exactLengthBeforeStuffing(payloadLength) {
-
-    }
-
-    /**
-     * Computes the maximum possible length of the whole frame with a given
-     * payload length after the addition of the stuff bits.
-     *
-     * @param {number} payloadLength - size of the payload in bytes
-     * @returns {number} max whole frame length in bits, including stuff bits
-     */
-    static maxLengthAfterStuffing(payloadLength) {
-
-    }
-
-    /**
-     * Computes the length of the whole frame after the addition of the stuff
-     * bits.
-     *
-     * @returns {number} exact whole frame length in bits, including stuff bits
-     */
-    exactLengthAfterStuffing() {
-
+        this.wholeFrameAfterStuffing.extend(POST_CRC);
     }
 }
 
