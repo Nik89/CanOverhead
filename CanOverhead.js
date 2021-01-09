@@ -285,137 +285,178 @@ class BitSequence {
     }
 }
 
-const RECESSIVE = true;
-const DOMINANT = false;
-const START_OF_FRAME = DOMINANT;
-const RTR_IS_DATA_FRAME = DOMINANT;
-const RTR_IS_RTR_FRAME = RECESSIVE;
-const SRR = RECESSIVE;
-const IDE_IS_11_BIT = DOMINANT;
-const IDE_IS_29_BIT = RECESSIVE;
-const R0 = DOMINANT;
-const R1 = DOMINANT;
-const CRC_DELIMITER = RECESSIVE;
-const ACK_SLOT = RECESSIVE;
-const ACK_DELIMITER = RECESSIVE;
+
+const idSize = {
+    BASE_11_BIT: 11,
+    EXTENDED_29_BIT: 29,
+}
+const bit = {
+    DOMINANT: false,
+    RECESSIVE: true,
+}
+const fieldStartOfFrame = bit.DOMINANT;
+const fieldRtr = {
+    DATA_FRAME: bit.DOMINANT,
+    RTR_FRAME: bit.RECESSIVE,
+}
+const fieldSrr = bit.RECESSIVE;
+const fieldIde = {
+    BASE_11_BIT: bit.DOMINANT,
+    EXTENDED_29_BIT: bit.RECESSIVE,
+}
+const fieldReserved0 = bit.DOMINANT;
+const fieldReserved1 = bit.DOMINANT;
+// TODO use these constants or just provide the post-crc one?
+const CRC_DELIMITER = bit.RECESSIVE;
+const ACK_SLOT = bit.RECESSIVE;
+const ACK_DELIMITER = bit.RECESSIVE;
 const END_OF_FRAME = [
-    RECESSIVE, RECESSIVE, RECESSIVE, RECESSIVE,
-    RECESSIVE, RECESSIVE, RECESSIVE];
-const PAUSE_AFTER_EOF = [RECESSIVE, RECESSIVE, RECESSIVE];
+    bit.RECESSIVE, bit.RECESSIVE, bit.RECESSIVE, bit.RECESSIVE,
+    bit.RECESSIVE, bit.RECESSIVE, bit.RECESSIVE];
+const PAUSE_AFTER_EOF = [bit.RECESSIVE, bit.RECESSIVE, bit.RECESSIVE];
 const POST_CRC = [
-    // CRC Delimiter
-    RECESSIVE,
-    // ACK slot, changed to dominant by any receiver
-    RECESSIVE,
-    // ACK delimiter
-    RECESSIVE,
-    // End of frame
-    RECESSIVE, RECESSIVE, RECESSIVE, RECESSIVE,
-    RECESSIVE, RECESSIVE, RECESSIVE,
-    // Pause after end of frame
-    RECESSIVE, RECESSIVE, RECESSIVE,
+    // CRC Delimiter:
+    bit.RECESSIVE,
+    // ACK slot, changed to dominant by any receiver:
+    bit.RECESSIVE,
+    // ACK delimiter:
+    bit.RECESSIVE,
+    // End of frame (7 bits):
+    bit.RECESSIVE, bit.RECESSIVE, bit.RECESSIVE, bit.RECESSIVE,
+    bit.RECESSIVE, bit.RECESSIVE, bit.RECESSIVE,
+    // Pause after end of frame, i.e. the minimum amount of silence between two
+    // successive frames (3 bits):
+    bit.RECESSIVE, bit.RECESSIVE, bit.RECESSIVE,
 ];
 
 /**
  * Data structure representing a Classic CAN frame with 11-bit identifier.
  */
 class CanFrame11Bit {
+    static MAX_ID_VALUE_11_BIT = 0x7FF;
+    static MIN_ID_VALUE = 0;
+    static MAX_PAYLOAD_BYTES = 8;
 
-    f01_startOfFrame = START_OF_FRAME;
+    wholeFrame;
+    wholeFrameStuffed;
+    maxLengthAfterStuffing;
+    f01_startOfFrame;
     f02_identifier;
-    f03_remoteTransmissionRequest = RTR_IS_DATA_FRAME;
-    f04_identifierExtensionBit = DOMINANT;
-    f05_reservedBit = R0;
+    f03_remoteTransmissionRequest;
+    f04_identifierExtensionBit;
+    f05_reservedBit;
     f06_dataLengthCode;
     f07_dataField;
     f08_crc;
-    f09_crcDelimiter = RECESSIVE;
-    f10_ackSlot = RECESSIVE;
-    f11_ackDelimiter = ACK_DELIMITER;
-    f12_endOfFrame = END_OF_FRAME;
-    f13_pauseAfterFrame = PAUSE_AFTER_EOF;
+    f09_crcDelimiter;
+    f10_ackSlot;
+    f11_ackDelimiter;
+    f12_endOfFrame;
+    f13_pauseAfterFrame;
 
     /**
      * Constructs a Classic CAN frame with an 11-bit ID.
      *
-     * @param {number|string} id integer of binary string of the CAN ID
-     * @param {number[]|string} payload array of integers or hex string
+     * @param {number} id integer of the CAN ID. Most significant bit is the
+     *        first transmitted
+     * @param {Uint8Array} payload array of integers
      */
     constructor(id, payload) {
         // Check ID
-        let identifierIsStringOfBits;
-        if (typeof (id) === "number") {
-            identifierIsStringOfBits = false;
-            if (id < 0 || id > 2047) {
-                throw new RangeError("Identifier out of bounds.");
-            }
-        } else if (isStringOfBits(id)) {
-            identifierIsStringOfBits = true;
-            if (id.length > 11) {
-                throw new RangeError("Identifier out of bounds.");
-            }
-        } else {
-            throw new TypeError(
-                "Identifier must be an integer or a binary string.");
+        if (typeof (id) !== "number") {
+            throw new TypeError("Identifier must be a number.");
         }
-
+        if (id < CanFrame11Bit.MIN_ID_VALUE
+            || id > CanFrame11Bit.MAX_ID_VALUE_11_BIT) {
+            throw new RangeError("Identifier out of bounds.");
+        }
         // Check Payload
-        let payloadIsStringOfBits;
-        if (isArrayOfBits(payload)) {
-            payloadIsStringOfBits = false;
-            if (payload.length > 64) {
-                throw new RangeError("Payload too long.");
-            }
-        } else if (isStringOfBits(payload)) {
-            payloadIsStringOfBits = true;
-            if (payload.length > 64) {
-                throw new RangeError("Payload too long.");
-            }
-        } else {
-            throw new TypeError(
-                "Payload must be an array of bits or binary string.");
+        if (!(payload instanceof Uint8Array)) {
+            throw new TypeError("Payload must be a Uint8Array.");
         }
-
-        //this.f02_identifier = (identifierIsStringOfBits) ? stringOfBits2arrayOfBool(id) : decimal2ArrayOfBool(id);
-        //this.f07_dataField = (payloadIsStringOfBits) ? stringOfBits2arrayOfBool(payload) : arrayOfBits2arrayOfBool(payload);
-
-        //this.f06_dataLengthCode = decimal2ArrayOfBool(this.f02_identifier.length);
-        //this.f08_crc = [];
-
-
-        // TODO [MG]: inputs are only strings: strip any non-digit character
-        // then just pass them to BitSequence. It explodes if something is
-        // wrong. This avoids the stringOfBits2ArrayOfBool() calls and
-        // additional input validation.
-        this.f02_identifier = id.padStart(11, "0");
-        this.f06_dataLengthCode = this.f07_dataField.length.toString(2).padStart(4, "0");
-        this.f07_dataField = payload;
-
+        if (payload.length > CanFrame11Bit.MAX_PAYLOAD_BYTES) {
+            throw new RangeError("Payload too long.");
+        }
         this.wholeFrame = new BitSequence();
+        this.f01_startOfFrame = new BitSequence(bit.DOMINANT);
         this.wholeFrame.extend(this.f01_startOfFrame);
+        this.f02_identifier = new BitSequence(id.toString(2).padStart(idSize.BASE_11_BIT, "0"));
         this.wholeFrame.extend(this.f02_identifier);
+        this.f03_remoteTransmissionRequest = new BitSequence(fieldRtr.DATA_FRAME);
         this.wholeFrame.extend(this.f03_remoteTransmissionRequest);
+        this.f04_identifierExtensionBit = new BitSequence(bit.DOMINANT);
         this.wholeFrame.extend(this.f04_identifierExtensionBit);
+        this.f05_reservedBit = new BitSequence(bit.DOMINANT);
         this.wholeFrame.extend(this.f05_reservedBit);
+        this.f06_dataLengthCode = new BitSequence(payload.length.toString(2).padStart(4, "0"));
         this.wholeFrame.extend(this.f06_dataLengthCode);
+        this.f07_dataField = new BitSequence();
+        for (let byte of payload) {
+            this.f07_dataField.extend(byte.toString(2).padStart(8, "0"));
+        }
         this.wholeFrame.extend(this.f07_dataField);
-        // Only now the CRC function can be called onto the rest of the
-        // frame, as it's now constructed as a sequence of bits.
-        this.f08_crc = crc15(this.wholeFrame);
+        // Now we can compute the CRC on everything preceding the CRC itself.
+        // That is the this.wholeFrame variable as of this point.
+        let crcAsInteger = CanFrame11Bit._crc15(this.wholeFrame);
+        this.f08_crc = new BitSequence(crcAsInteger.toString(2).padStart(15, "0"));
         this.wholeFrame.extend(this.f08_crc);
-        // Compute what could be the maximum size of the stuffed part of the
-        // frame, assuming it had different data.
-        this._maxLengthAfterStuffing = BitSequence.maxLengthAfterStuffing(this.wholeFrame);
-        this._maxLengthAfterStuffing += POST_CRC.length;
-        // At this point, after the CRC, the stuffing could be computed
-        // on all the fields before the CRC delimiter
-        this.wholeFrameAfterStuffing = this.wholeFrame.applyBitStuffing();
-        // Continue the construction of the whole frame after the CRC
-        this.wholeFrame.extend(POST_CRC);
-        // Append the same trailer also to the stuffed frame
-        this.wholeFrameAfterStuffing.extend(POST_CRC);
+        // Now we can perform the stuffing of everything preceding the
+        // CRC delimiter. That is the this.wholeFrame variable as of this point.
+        this.wholeFrameStuffed = this.wholeFrame.applyBitStuffing();
+        // After we have the CRC calculated, we can also estimate what is the
+        // worst possible stuffing scenario of the stuffable part of the frame.
+        this.maxLengthAfterStuffing = BitSequence.maxLengthAfterStuffing(
+            this.wholeFrame.length);
+        this.f09_crcDelimiter = new BitSequence(bit.RECESSIVE);
+        this.wholeFrame.extend(this.f09_crcDelimiter);
+        this.wholeFrameStuffed.extend(this.f09_crcDelimiter);
+        this.maxLengthAfterStuffing += this.f09_crcDelimiter.length();
+        this.f10_ackSlot = new BitSequence(bit.RECESSIVE);
+        this.wholeFrame.extend(this.f10_ackSlot);
+        this.wholeFrameStuffed.extend(this.f10_ackSlot);
+        this.maxLengthAfterStuffing += this.f10_ackSlot.length();
+        this.f11_ackDelimiter = new BitSequence(bit.RECESSIVE);
+        this.wholeFrame.extend(this.f11_ackDelimiter);
+        this.wholeFrameStuffed.extend(this.f11_ackDelimiter);
+        this.maxLengthAfterStuffing += this.f11_ackDelimiter.length();
+        this.f12_endOfFrame = new BitSequence([
+            bit.RECESSIVE, bit.RECESSIVE, bit.RECESSIVE, bit.RECESSIVE,
+            bit.RECESSIVE, bit.RECESSIVE, bit.RECESSIVE,
+        ]);
+        this.wholeFrame.extend(this.f12_endOfFrame);
+        this.wholeFrameStuffed.extend(this.f12_endOfFrame);
+        this.maxLengthAfterStuffing += this.f12_endOfFrame.length();
+        this.f13_pauseAfterFrame = new BitSequence([
+            bit.RECESSIVE, bit.RECESSIVE, bit.RECESSIVE,
+        ]);
+        this.wholeFrame.extend(this.f13_pauseAfterFrame);
+        this.wholeFrameStuffed.extend(this.f13_pauseAfterFrame);
+        this.maxLengthAfterStuffing += this.f13_pauseAfterFrame.length();
+    }
+
+
+    /**
+     * Computes the CRC of 15 bits for the classic CAN bus.
+     *
+     * Polynomial:
+     * x^15 + x^14 + x^10 + x^8 + x^7 +x^4 +x^3 + x^0
+     * = 0b1100010110011001 = 0xC599
+     *
+     * @param {boolean[]|number[]|BitSequence} bits - iterable of bits to compute
+     *        the CRC for
+     * @returns {number} the output CRC as non-negative integer
+     */
+    static _crc15(bits) {
+        return _crc(bits, 0xC599, 15);
     }
 }
+
+
+class CanFrame29Bit {
+    // As CanFrame11Bit but with 29 bit ID.
+    // or is it better with a settings to switch between 11 and 29 bits?
+}
+
 
 /**
  * Computes a Cyclic Redundancy Check for a sequence of bits with a generic
@@ -453,21 +494,6 @@ function _crc(bits, polynomial, n) {
 }
 
 /**
- * Computes the CRC of 15 bits for the classic CAN bus.
- *
- * Polynomial:
- * x^15 + x^14 + x^10 + x^8 + x^7 +x^4 +x^3 + x^0
- * = 0b1100010110011001 = 0xC599
- *
- * @param {boolean[]|number[]|BitSequence} bits - iterable of bits to compute
- *        the CRC for
- * @returns {number} the output CRC as non-negative integer
- */
-function crc15(bits) {
-    return _crc(bits, 0xC599, 15);
-}
-
-/**
  * Computes the CRC of 17 bits for the CAN FD bus.
  *
  * Polynomial: x^17 + x^16 + x^14 + x^13 + x^11 + x^6 + x^4 + x^3 + x^1 + x^0
@@ -492,71 +518,4 @@ function crc17(bits) {
  */
 function crc21(bits) {
     return _crc(bits, 0x302899, 21);
-}
-
-
-let isArrayOfBits = (array) => {
-    if (typeof (array) === "object" && Array.isArray(array)) {
-        let isArrayOfBits = true;
-        let i = 0;
-        while ((i < array.length) && isArrayOfBits) {
-            if (!(array[i] === 0 || array[i] === 1)) {
-                isArrayOfBits = false;
-            }
-            i++;
-        }
-        return isArrayOfBits;
-    } else {
-        return false;
-    }
-}
-
-let isStringOfBits = (string) => {
-    if (typeof (string) === "string") {
-        let isStringOfBits = true;
-        let i = 0;
-        while ((i < string.length) && isStringOfBits) {
-            let char = string.substr(i, 1);
-            if (!(char === "0" || char === "1")) {
-                isStringOfBits = false;
-            }
-            i++;
-        }
-        return isStringOfBits;
-    } else {
-        return false;
-    }
-}
-
-let arrayOfBits2arrayOfBool = (arrayOfBits) => {
-    if (!isArrayOfBits(arrayOfBits)) {
-        throw Error();
-    }
-    let arrayOfBool = [];
-    arrayOfBits.forEach((el) => {
-        arrayOfBool.push((el === 1));
-    });
-
-    return arrayOfBool;
-}
-
-let stringOfBits2arrayOfBool = (stringOfBits) => {
-    if (!isStringOfBits(stringOfBits)) {
-        throw Error();
-    }
-    let arrayOfBits = str.match(/.{1}/g);
-    let arrayOfBool = [];
-    arrayOfBits.forEach((el) => {
-        arrayOfBool.push((el === "1"));
-    });
-
-    return arrayOfBool;
-}
-
-let decimal2ArrayOfBool = (decimal) => {
-    if (typeof (decimal) !== "number") {
-        throw Error();
-    }
-    let stringOfBits = Number(decimal).toString(2);
-    return stringOfBits2arrayOfBool(stringOfBits);
 }

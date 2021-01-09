@@ -65,7 +65,7 @@ let bits;
 bits = new BitSequence();
 check(arrayEqual(bits._sequence, []), bits._sequence);
 check(bits._isStuffed === false);
-// Binart string
+// Binary string
 bits = new BitSequence("    1 ")
 check(arrayEqual(bits._sequence, [true]));
 check(bits._isStuffed === false);
