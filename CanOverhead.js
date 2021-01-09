@@ -6,7 +6,7 @@ class BitSequence {
      * Constructs an empty array of bits, optionally initialising with a
      * string of bits like " 11 0110".
      *
-     * @param {string|boolean[]|number[]|number|boolean} bits -
+     * @param {string|boolean[]|number[]|number|boolean|BitSequence} bits -
      *     iterable sequence of bits
      *     as binary string ("01 0011", white spaces are skipped)
      *     or boolean array ([true, true, false])
@@ -28,8 +28,8 @@ class BitSequence {
      * to the end (right-side) of this sequence, changing the BitSequence
      * object.
      *
-     * @param {boolean[]|string|number[]|number|boolean} newTail - bits to
-     * append at the end of this sequence:
+     * @param {boolean[]|string|number[]|number|boolean|BitSequence} newTail -
+     *     bits to append at the end of this sequence:
      *     could be an iterable sequence of bits
      *     as binary string ("01 0011", white spaces are skipped)
      *     or boolean array ([true, true, false])
@@ -99,7 +99,7 @@ class BitSequence {
      */
     static maxAmountOfStuffBits(amountOfBits) {
         if (amountOfBits < 1) {
-            return amountOfBits;
+            return 0;
         } else {
             return Math.floor((amountOfBits - 1) / 4);
         }
@@ -337,22 +337,8 @@ class CanFrame11Bit {
     static MIN_ID_VALUE = 0;
     static MAX_PAYLOAD_BYTES = 8;
 
-    wholeFrame;
-    wholeFrameStuffed;
-    maxLengthAfterStuffing;
-    f01_startOfFrame;
-    f02_identifier;
-    f03_remoteTransmissionRequest;
-    f04_identifierExtensionBit;
-    f05_reservedBit;
-    f06_dataLengthCode;
-    f07_dataField;
-    f08_crc;
-    f09_crcDelimiter;
-    f10_ackSlot;
-    f11_ackDelimiter;
-    f12_endOfFrame;
-    f13_pauseAfterFrame;
+    id;
+    payload;
 
     /**
      * Constructs a Classic CAN frame with an 11-bit ID.
@@ -377,63 +363,137 @@ class CanFrame11Bit {
         if (payload.length > CanFrame11Bit.MAX_PAYLOAD_BYTES) {
             throw new RangeError("Payload too long.");
         }
-        this.wholeFrame = new BitSequence();
-        this.f01_startOfFrame = new BitSequence(bit.DOMINANT);
-        this.wholeFrame.extend(this.f01_startOfFrame);
-        this.f02_identifier = new BitSequence(id.toString(2).padStart(idSize.BASE_11_BIT, "0"));
-        this.wholeFrame.extend(this.f02_identifier);
-        this.f03_remoteTransmissionRequest = new BitSequence(fieldRtr.DATA_FRAME);
-        this.wholeFrame.extend(this.f03_remoteTransmissionRequest);
-        this.f04_identifierExtensionBit = new BitSequence(bit.DOMINANT);
-        this.wholeFrame.extend(this.f04_identifierExtensionBit);
-        this.f05_reservedBit = new BitSequence(bit.DOMINANT);
-        this.wholeFrame.extend(this.f05_reservedBit);
-        this.f06_dataLengthCode = new BitSequence(payload.length.toString(2).padStart(4, "0"));
-        this.wholeFrame.extend(this.f06_dataLengthCode);
-        this.f07_dataField = new BitSequence();
-        for (let byte of payload) {
-            this.f07_dataField.extend(byte.toString(2).padStart(8, "0"));
+        this.id = id;
+        this.payload = payload;
+    }
+
+    f01_startOfFrame() {
+        return new BitSequence(bit.DOMINANT);
+    }
+
+    f02_identifier() {
+        return new BitSequence(this.id.toString(2)
+            .padStart(idSize.BASE_11_BIT, "0"));
+    }
+
+    f03_remoteTransmissionRequest() {
+        return new BitSequence(fieldRtr.DATA_FRAME);
+    };
+
+    f04_identifierExtensionBit() {
+        return new BitSequence(bit.DOMINANT);
+    }
+
+    f05_reservedBit() {
+        return new BitSequence(bit.DOMINANT);
+    }
+
+    f06_dataLengthCode() {
+        return new BitSequence(this.payload.length.toString(2)
+            .padStart(4, "0"));
+    }
+
+    f07_dataField() {
+        let payloadBits = new BitSequence();
+        for (let byte of this.payload) {
+            payloadBits.extend(byte.toString(2).padStart(8, "0"));
         }
-        this.wholeFrame.extend(this.f07_dataField);
-        // Now we can compute the CRC on everything preceding the CRC itself.
-        // That is the this.wholeFrame variable as of this point.
-        let crcAsInteger = CanFrame11Bit._crc15(this.wholeFrame);
-        this.f08_crc = new BitSequence(crcAsInteger.toString(2).padStart(15, "0"));
-        this.wholeFrame.extend(this.f08_crc);
-        // Now we can perform the stuffing of everything preceding the
-        // CRC delimiter. That is the this.wholeFrame variable as of this point.
-        this.wholeFrameStuffed = this.wholeFrame.applyBitStuffing();
-        // After we have the CRC calculated, we can also estimate what is the
-        // worst possible stuffing scenario of the stuffable part of the frame.
-        this.maxLengthAfterStuffing = BitSequence.maxLengthAfterStuffing(
-            this.wholeFrame.length);
-        this.f09_crcDelimiter = new BitSequence(bit.RECESSIVE);
-        this.wholeFrame.extend(this.f09_crcDelimiter);
-        this.wholeFrameStuffed.extend(this.f09_crcDelimiter);
-        this.maxLengthAfterStuffing += this.f09_crcDelimiter.length();
-        this.f10_ackSlot = new BitSequence(bit.RECESSIVE);
-        this.wholeFrame.extend(this.f10_ackSlot);
-        this.wholeFrameStuffed.extend(this.f10_ackSlot);
-        this.maxLengthAfterStuffing += this.f10_ackSlot.length();
-        this.f11_ackDelimiter = new BitSequence(bit.RECESSIVE);
-        this.wholeFrame.extend(this.f11_ackDelimiter);
-        this.wholeFrameStuffed.extend(this.f11_ackDelimiter);
-        this.maxLengthAfterStuffing += this.f11_ackDelimiter.length();
-        this.f12_endOfFrame = new BitSequence([
+        return payloadBits;
+    }
+
+    f08_crc() {
+        let preCrc = new BitSequence();
+        preCrc.extend(this.f01_startOfFrame());
+        preCrc.extend(this.f02_identifier());
+        preCrc.extend(this.f03_remoteTransmissionRequest());
+        preCrc.extend(this.f04_identifierExtensionBit());
+        preCrc.extend(this.f05_reservedBit());
+        preCrc.extend(this.f06_dataLengthCode());
+        preCrc.extend(this.f07_dataField());
+        let crcAsInteger = CanFrame11Bit._crc15(preCrc);
+        return new BitSequence(crcAsInteger.toString(2).padStart(15, "0"));
+    }
+
+    f09_crcDelimiter() {
+        return new BitSequence(bit.RECESSIVE);
+    }
+
+    f10_ackSlot() {
+        return new BitSequence(bit.RECESSIVE);
+    }
+
+    f11_ackDelimiter() {
+        return new BitSequence(bit.RECESSIVE);
+    }
+
+    f12_endOfFrame() {
+        return new BitSequence([
             bit.RECESSIVE, bit.RECESSIVE, bit.RECESSIVE, bit.RECESSIVE,
             bit.RECESSIVE, bit.RECESSIVE, bit.RECESSIVE,
         ]);
-        this.wholeFrame.extend(this.f12_endOfFrame);
-        this.wholeFrameStuffed.extend(this.f12_endOfFrame);
-        this.maxLengthAfterStuffing += this.f12_endOfFrame.length();
-        this.f13_pauseAfterFrame = new BitSequence([
-            bit.RECESSIVE, bit.RECESSIVE, bit.RECESSIVE,
-        ]);
-        this.wholeFrame.extend(this.f13_pauseAfterFrame);
-        this.wholeFrameStuffed.extend(this.f13_pauseAfterFrame);
-        this.maxLengthAfterStuffing += this.f13_pauseAfterFrame.length();
     }
 
+    f13_pauseAfterFrame() {
+        return new BitSequence([
+            bit.RECESSIVE, bit.RECESSIVE, bit.RECESSIVE,
+        ]);
+    }
+
+    wholeFrame() {
+        let frame = new BitSequence();
+        frame.extend(this.f01_startOfFrame());
+        frame.extend(this.f02_identifier());
+        frame.extend(this.f03_remoteTransmissionRequest());
+        frame.extend(this.f04_identifierExtensionBit());
+        frame.extend(this.f05_reservedBit());
+        frame.extend(this.f06_dataLengthCode());
+        frame.extend(this.f07_dataField());
+        frame.extend(this.f08_crc());
+        frame.extend(this.f09_crcDelimiter());
+        frame.extend(this.f10_ackSlot());
+        frame.extend(this.f11_ackDelimiter());
+        frame.extend(this.f12_endOfFrame());
+        frame.extend(this.f13_pauseAfterFrame());
+        return frame;
+    }
+
+    wholeFrameStuffed() {
+        let frame = new BitSequence();
+        frame.extend(this.f01_startOfFrame());
+        frame.extend(this.f02_identifier());
+        frame.extend(this.f03_remoteTransmissionRequest());
+        frame.extend(this.f04_identifierExtensionBit());
+        frame.extend(this.f05_reservedBit());
+        frame.extend(this.f06_dataLengthCode());
+        frame.extend(this.f07_dataField());
+        frame.extend(this.f08_crc());
+        frame = frame.applyBitStuffing();
+        frame.extend(this.f09_crcDelimiter());
+        frame.extend(this.f10_ackSlot());
+        frame.extend(this.f11_ackDelimiter());
+        frame.extend(this.f12_endOfFrame());
+        frame.extend(this.f13_pauseAfterFrame());
+        return frame;
+    }
+
+    maxLengthAfterStuffing() {
+        let amountOfStuffableBits = 1; // Start of Frame
+        amountOfStuffableBits += 11; // CAN ID
+        amountOfStuffableBits += 1; // Remote Transmission Request
+        amountOfStuffableBits += 1; // Identifier Extension
+        amountOfStuffableBits += 1; // Reserved bit 0
+        amountOfStuffableBits += 4; // Data Length Code
+        amountOfStuffableBits += this.payload.length * 8; // Payload in bits
+        amountOfStuffableBits += 15; // CRC
+        let amountAfterStuffing =
+            BitSequence.maxLengthAfterStuffing(amountOfStuffableBits);
+        amountAfterStuffing += 1; // CRC delimiter
+        amountAfterStuffing += 1; // ACK slot
+        amountAfterStuffing += 1; // ACK delimiter
+        amountAfterStuffing += 7; // End of frame
+        amountAfterStuffing += 3; // Pause after end of frame
+        return amountAfterStuffing;
+    }
 
     /**
      * Computes the CRC of 15 bits for the classic CAN bus.
