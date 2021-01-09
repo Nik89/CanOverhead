@@ -210,11 +210,11 @@ for (let b of bits) {
 // Test expected results are computed with
 // https://www.ghsi.de/pages/subpages/Online%20CRC%20Calculation/index.php
 // CRC 15 bits
-check(crc15([0]) === 0);
-check(crc15([1, 1, 1, 1, 0, 0, 0, 1]) === 0b110001011110110);
-check(crc15([true, true, true, true, 0, 0, false, 1]) === 0b110001011110110);
-check(crc15([1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1]) === 0b000010001110100);
-check(crc15([1, 1, 0, 1, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0]) === 0b010001010101010);
+check(CanFrame11Bit.crc15([0]) === 0);
+check(CanFrame11Bit.crc15([1, 1, 1, 1, 0, 0, 0, 1]) === 0b110001011110110);
+check(CanFrame11Bit.crc15([true, true, true, true, 0, 0, false, 1]) === 0b110001011110110);
+check(CanFrame11Bit.crc15([1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1]) === 0b000010001110100);
+check(CanFrame11Bit.crc15([1, 1, 0, 1, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0]) === 0b010001010101010);
 
 // CRC 17 bits
 check(crc17([0]) === 0);
