@@ -1,5 +1,17 @@
 /**
- * Wrapper of an array of bits.
+ * @file CAN bus overhead, stuffing and bitrate calculation library.
+ *
+ * This is the core of the CanOverhead project, performing the actual
+ * computations on the bits and bytes. It has no interactions with
+ * any HTML page, so it can be used also as a stand-alone data-processing
+ * library in Node, for example.
+ *
+ * @licence BSD 3-clause license. See LICENSE.md for details.
+ */
+
+/**
+ * Wrapper of an array of bits with the ability to add stuff bits and
+ * format the bits in many ways.
  */
 class BitSequence {
     /**
@@ -329,7 +341,7 @@ class CanFrame11Bit {
      * @param {number} id integer of the CAN ID. Most significant bit is the
      *        first transmitted
      * @param {Uint8Array} payload array of integers. Most significant bit
-     *        of the first byte (at index 0) is the first transmitteds
+     *        of the first byte (at index 0) is the first transmitted
      */
     constructor(id, payload) {
         // Check ID

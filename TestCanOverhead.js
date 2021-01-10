@@ -1,5 +1,10 @@
+/**
+ * @file Unit tests of the CanOverhead.js library using simple console
+ * assertions that point to the failing line.
+ * @licence BSD 3-clause license. See LICENSE.md for details.
+ */
+
 let check = console.assert; // Shorter-name alias
-// TODO make check function write large warning into the HTML in case something
 /**
  * Compares two arrays for equality of type, length and content.
  * @param {Array|Uint8Array} a first array

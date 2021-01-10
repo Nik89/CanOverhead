@@ -1,3 +1,13 @@
+/**
+ * @file This script binds the HTML+CSS UI of the calculator with the
+ * CanOverhead.js library, which performs the actual computation.
+ *
+ * This file performs minor input sanitization and conversion from strings
+ * to the required input format of the library.
+ *
+ * @licence BSD 3-clause license. See LICENSE.md for details.
+ */
+
 let computeV1 = () => {
     // Parse input fields
     let payloadLengthByte = parseInt(

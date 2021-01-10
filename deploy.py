@@ -1,5 +1,21 @@
 #!/usr/bin/env python3
 # coding: utf-8
+#
+# Deployment script to prepare the web pages of CanOverhead project
+# to be published on the GitHub pages.
+#
+# What it does:
+# 1. Creates a "builds/" directory next to this file, deleting any previous one.
+#    Our ready-for-production web pages will end up here.
+# 2. Converts markdown files to HTML. No CSS is being added, but it's still
+#    nicer than reading txt files in the browser. Outputs the html files
+#    in the build directory.
+# 3. Minifies the HTML, CSS and JS files, outputting them into the buil
+#    directory.
+#
+# Published under the terms of the BSD 3-Clause license. See LICENSE.md for
+# details.
+
 import os
 import shutil
 
@@ -68,8 +84,8 @@ def deploy():
     minify_html("index.html")
     minify_css("style.css")
     minify_js("CanOverhead.js")
-    minify_js("scripts.js")
-    minify_js("test.js")
+    minify_js("HtmlToLibAdapter.js")
+    minify_js("TestCanOverhead.js")
 
 
 if __name__ == "__main__":
