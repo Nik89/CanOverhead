@@ -6,7 +6,7 @@ class BitSequence {
      * Constructs an empty array of bits, optionally initialising with a
      * string of bits like " 11 0110".
      *
-     * @param {string|boolean[]|number[]|number|boolean} bits -
+     * @param {string|boolean[]|number[]|number|boolean|BitSequence} bits -
      *     iterable sequence of bits
      *     as binary string ("01 0011", white spaces are skipped)
      *     or boolean array ([true, true, false])
@@ -28,8 +28,8 @@ class BitSequence {
      * to the end (right-side) of this sequence, changing the BitSequence
      * object.
      *
-     * @param {boolean[]|string|number[]|number|boolean} newTail - bits to
-     * append at the end of this sequence:
+     * @param {boolean[]|string|number[]|number|boolean|BitSequence} newTail -
+     *     bits to append at the end of this sequence:
      *     could be an iterable sequence of bits
      *     as binary string ("01 0011", white spaces are skipped)
      *     or boolean array ([true, true, false])
@@ -79,10 +79,15 @@ class BitSequence {
      * included).
      */
     equal(other) {
-        if (typeof (other._isStuffed) !== "boolean"
-            || other._isStuffed !== this._isStuffed
-            || !Array.isArray(other._sequence)
-            || other._sequence.length !== this._sequence.length) return false;
+        if (!(other instanceof BitSequence)) {
+            return false;
+        }
+        if (other._sequence.length !== this._sequence.length) {
+            return false;
+        }
+        if (other._isStuffed !== this._isStuffed) {
+            return false;
+        }
         for (let i = 0; i < this._sequence.length; i++) {
             if (this._sequence[i] !== other._sequence[i]) return false;
         }
@@ -98,11 +103,11 @@ class BitSequence {
      * be added to the sequence
      */
     static maxAmountOfStuffBits(amountOfBits) {
-        // TODO change into maxFrameLengthAfterStuffing()
-        // and use the wikipedia formula
-        // 8*n + 44 + Math.ceil((34+8*n-1)/4) for base frame
-        // 8*n + 64 + Math.ceil((54+8*n-1)/4) for base frame
-        return Math.floor(amountOfBits / 5);
+        if (amountOfBits < 1) {
+            return 0;
+        } else {
+            return Math.floor((amountOfBits - 1) / 4);
+        }
     }
 
     /**
@@ -173,7 +178,7 @@ class BitSequence {
             // Prevent stuffing twice.
             throw new TypeError("Bits sequence already stuffed.");
         }
-        let bitsAfterStuffing = [];
+        let sequenceAfterStuffing = [];
         let repeatedBits = 1;
         let previousBit = undefined;
         for (let bit of this._sequence) {
@@ -182,20 +187,18 @@ class BitSequence {
             } else {
                 repeatedBits = 1;
             }
+            sequenceAfterStuffing.push(bit);
             if (repeatedBits === 5) {
+                // Apply stuffing bit, opposite of just processed bit
+                let stuffingBit = !bit;
+                sequenceAfterStuffing.push(stuffingBit);
                 repeatedBits = 1;
-                bitsAfterStuffing.push(bit);
-                bitsAfterStuffing.push(!bit);    // Stuffing bit
-                previousBit = !bit;
+                previousBit = stuffingBit;
             } else {
-                bitsAfterStuffing.push(bit);
                 previousBit = bit;
             }
         }
-        // TODO change this object?
-        this._sequence = bitsAfterStuffing;
-        this._isStuffed = true;
-        //return new BitSequence(bitsAfterStuffing, true);
+        return new BitSequence(sequenceAfterStuffing, true);
     }
 
     /**
@@ -277,123 +280,419 @@ class BitSequence {
         }
         return str.toUpperCase();
     }
+
+    /**
+     * Makes this class iterable.
+     * @returns {iterator} iterator of the bits as booleans
+     */
+    [Symbol.iterator]() {
+        return this._sequence.values();
+    }
 }
 
-const RECESSIVE = true;
-const DOMINANT = false;
-const START_OF_FRAME = DOMINANT;
-const RTR_IS_DATA_FRAME = DOMINANT;
-const RTR_IS_RTR_FRAME = RECESSIVE;
-const SRR = RECESSIVE;
-const IDE_IS_11_BIT = DOMINANT;
-const IDE_IS_29_BIT = RECESSIVE;
-const R0 = DOMINANT;
-const R1 = DOMINANT;
-const CRC_DELIMITER = RECESSIVE;
-const ACK_SLOT = RECESSIVE;
-const ACK_DELIMITER = RECESSIVE;
-const END_OF_FRAME = [
-    RECESSIVE, RECESSIVE, RECESSIVE, RECESSIVE,
-    RECESSIVE, RECESSIVE, RECESSIVE];
-const PAUSE_AFTER_EOF = [RECESSIVE, RECESSIVE, RECESSIVE];
 
+const idSize = {
+    BASE_11_BIT: 11,
+    EXTENDED_29_BIT: 29,
+}
+const bit = {
+    DOMINANT: false,
+    RECESSIVE: true,
+}
+const fieldRtr = {
+    DATA_FRAME: bit.DOMINANT,
+    RTR_FRAME: bit.RECESSIVE,
+}
+const fieldIde = {
+    BASE_11_BIT: bit.DOMINANT,
+    EXTENDED_29_BIT: bit.RECESSIVE,
+}
 
 /**
- * Data structure representing a Classic CAN frame with 11-bit identifier.
+ * Data structure representing a Classic CAN data frame with 11-bit identifier.
+ *
+ * Provide an ID and the payload, the query the various methods to obtain
+ * the fields of the frame or all of them together (also with stuff bits)
+ * as BitSequences.
  */
 class CanFrame11Bit {
+    static MAX_ID_VALUE_11_BIT = 0x7FF;
+    static MIN_ID_VALUE = 0;
+    static MAX_PAYLOAD_BYTES = 8;
+
+    id;
+    payload;
+
     /**
      * Constructs a Classic CAN frame with an 11-bit ID.
      *
-     * @param {number|string} id integer of binary string of the CAN ID
-     * @param {number[]|string} payload array of integers or hex string
+     * @param {number} id integer of the CAN ID. Most significant bit is the
+     *        first transmitted
+     * @param {Uint8Array} payload array of integers. Most significant bit
+     *        of the first byte (at index 0) is the first transmitteds
      */
     constructor(id, payload) {
-        // TODO check ID is 11 bits max
-        this.id = id;
-        this.remoteTransmissionRequest = false; // Hardcoded, for now
-        if (payload.length > 8) {
-            throw new RangeError("Classic CAN supports payloads of up to 8 B.");
+        // Check ID
+        if (typeof (id) !== "number") {
+            throw new TypeError("Identifier must be a number.");
         }
+        if (id < CanFrame11Bit.MIN_ID_VALUE
+            || id > CanFrame11Bit.MAX_ID_VALUE_11_BIT) {
+            throw new RangeError("Identifier out of bounds.");
+        }
+        // Check Payload
+        if (!(payload instanceof Uint8Array)) {
+            throw new TypeError("Payload must be a Uint8Array.");
+        }
+        if (payload.length > CanFrame11Bit.MAX_PAYLOAD_BYTES) {
+            throw new RangeError("Payload too long.");
+        }
+        // Everything valid
+        this.id = id;
         this.payload = payload;
     }
 
     /**
-     * Computes the length of the whole frame with a given payload length
-     * without including the stuff bits.
+     * Provides the start of frame field wrapped in a BitSequence.
      *
-     * @param {number} payloadLength - size of the payload in bytes
-     * @returns {number} whole frame length in bits
+     * Length: 1 bit. This field is stuffable.
+     *
+     * Always dominant.
+     *
+     * @returns {BitSequence} SOF
      */
-    static exactLengthBeforeStuffing(payloadLength) {
-
+    field01_startOfFrame() {
+        return new BitSequence(bit.DOMINANT);
     }
 
     /**
-     * Computes the maximum possible length of the whole frame with a given
-     * payload length after the addition of the stuff bits.
+     * Provides the identifier field as BitSequence.
      *
-     * @param {number} payloadLength - size of the payload in bytes
-     * @returns {number} max whole frame length in bits, including stuff bits
+     * Length: 11 bits. This field is stuffable.
+     *
+     * @returns {BitSequence} ID
      */
-    static maxLengthAfterStuffing(payloadLength) {
-
+    field02_identifier() {
+        return new BitSequence(this.id.toString(2)
+            .padStart(idSize.BASE_11_BIT, "0"));
     }
 
     /**
-     * Provides the DLC header field as BitSequence.
+     * Provides the remote transmission request field as BitSequence.
      *
-     * @returns {BitSequence} the DLC padded to 4 bits.
+     * Length: 1 bit. This field is stuffable.
+     *
+     * Dominant for data frames, recessive for RTR frames.
+     *
+     * @returns {BitSequence} RTR
      */
-    dataLengthCode() {
-        return new BitSequence(this.payload.length.toString(2).padStart(4, "0"))
+    field03_remoteTransmissionRequest() {
+        return new BitSequence(fieldRtr.DATA_FRAME);
     }
 
     /**
-     * Computes the length of the whole frame after the addition of the stuff
-     * bits.
+     * Provides the identifier extension field as BitSequence.
      *
-     * @returns {number} exact whole frame length in bits, including stuff bits
+     * Length: 1 bit. This field is stuffable.
+     *
+     * Dominant for 11-bit IDs (base frame format), recessive for 29-bit IDs
+     * (extended frame format).
+     *
+     * @returns {BitSequence} IDE
      */
-    exactLengthAfterStuffing() {
-
-    }
-
-
-    /**
-     * Computes the Cyclic Redundancy Check (CRC-15) field of the frame
-     * without the inclusion of any stuff bits.
-     *
-     * Used polynomial: 0xC599 = x^15 + x^14 + x^10 + x^8 + x^7 + x^4 + x^3 + 1
-     *
-     * @returns {BitSequence} CRC-15 sequence of bits.
-     */
-    crc() {
-
+    field04_identifierExtensionBit() {
+        return new BitSequence(fieldIde.BASE_11_BIT);
     }
 
     /**
-     * Concatenates all frame fields together into a contiguous BitSequence
-     * which does not include any stuff bits.
+     * Provides the reserved field #0 as BitSequence.
      *
-     * @returns {BitSequence} all the bits in the frame.
+     * Length: 1 bit. This field is stuffable.
+     *
+     * Always dominant for classic CAN frames.
+     *
+     * @returns {BitSequence} R0
      */
-    toBitSequence() {
+    field05_reservedBit() {
+        return new BitSequence(bit.DOMINANT);
+    }
+
+    /**
+     * Provides the data length code as BitSequence.
+     *
+     * Length: 4 bits. This field is stuffable.
+     *
+     * First bit is the most significant one. Values are limited to [0, 8]
+     * for classic CAN.
+     *
+     * @returns {BitSequence} DLC
+     */
+    field06_dataLengthCode() {
+        return new BitSequence(this.payload.length.toString(2)
+            .padStart(4, "0"));
+    }
+
+    /**
+     * Provides the data field as BitSequence.
+     *
+     * Length: as many bits as in the this.payload field [0, 8, 16, ..., 64],
+     * but always a multiple of 8, as the payload is in bytes.
+     * This field is stuffable.
+     *
+     * @returns {BitSequence} Data
+     */
+    field07_dataField() {
+        let payloadBits = new BitSequence();
+        for (let byte of this.payload) {
+            payloadBits.extend(byte.toString(2).padStart(8, "0"));
+        }
+        return payloadBits;
+    }
+
+    /**
+     * Provides the CRC field as BitSequence, calculated on all the fields
+     * appearing before the CRC itself.
+     *
+     * Length: 15 bits. This field is stuffable.
+     *
+     * @returns {BitSequence} CRC
+     */
+    field08_crc() {
+        let preCrc = new BitSequence();
+        preCrc.extend(this.field01_startOfFrame());
+        preCrc.extend(this.field02_identifier());
+        preCrc.extend(this.field03_remoteTransmissionRequest());
+        preCrc.extend(this.field04_identifierExtensionBit());
+        preCrc.extend(this.field05_reservedBit());
+        preCrc.extend(this.field06_dataLengthCode());
+        preCrc.extend(this.field07_dataField());
+        let crcAsInteger = CanFrame11Bit.crc15(preCrc);
+        return new BitSequence(crcAsInteger.toString(2).padStart(15, "0"));
+    }
+
+    /**
+     * Provides the CRC delimiter field as BitSequence.
+     *
+     * Length: 1 bit. This field is *not* stuffable.
+     *
+     * @returns {BitSequence} CRC Delimiter
+     */
+    field09_crcDelimiter() {
+        return new BitSequence(bit.RECESSIVE);
+    }
+
+    /**
+     * Provides the acknowledgement slot field as BitSequence.
+     *
+     * Length: 1 bit. This field is *not* stuffable.
+     *
+     * Always recessive during transmission, set to dominant by the received to
+     * acknowledge the transmission.s
+     *
+     * @returns {BitSequence} ACK slot
+     */
+    field10_ackSlot() {
+        return new BitSequence(bit.RECESSIVE);
+    }
+
+    /**
+     * Provides the acknowledgement slot delimiter field as BitSequence.
+     *
+     * Length: 1 bit. This field is *not* stuffable.
+     *
+     * Always recessive.
+     *
+     * @returns {BitSequence} ACK delimiter
+     */
+    field11_ackDelimiter() {
+        return new BitSequence(bit.RECESSIVE);
+    }
+
+    /**
+     * Provides the end of frame field as BitSequence.
+     *
+     * Length: 7 bits. This field is *not* stuffable.
+     *
+     * Always recessive bits.
+     *
+     * @returns {BitSequence} EOF
+     */
+    field12_endOfFrame() {
+        return new BitSequence([
+            bit.RECESSIVE, bit.RECESSIVE, bit.RECESSIVE, bit.RECESSIVE,
+            bit.RECESSIVE, bit.RECESSIVE, bit.RECESSIVE,
+        ]);
+    }
+
+    /**
+     * Provides the empty space required between two immediately successive
+     * CAN frames as BitSequence.
+     *
+     * Length: 3 bits. This field is *not* stuffable.
+     *
+     * Always recessive bits.
+     *
+     * @returns {BitSequence} Pause after EOF
+     */
+    field13_pauseAfterFrame() {
+        return new BitSequence([
+            bit.RECESSIVE, bit.RECESSIVE, bit.RECESSIVE,
+        ]);
+    }
+
+    /**
+     * Provides the whole frame as BitSequence, without stuff bits.
+     *
+     * @returns {BitSequence} whole frame
+     */
+    wholeFrame() {
         let frame = new BitSequence();
-        frame.extend(START_OF_FRAME);
-        // TODO complete
+        frame.extend(this.field01_startOfFrame());
+        frame.extend(this.field02_identifier());
+        frame.extend(this.field03_remoteTransmissionRequest());
+        frame.extend(this.field04_identifierExtensionBit());
+        frame.extend(this.field05_reservedBit());
+        frame.extend(this.field06_dataLengthCode());
+        frame.extend(this.field07_dataField());
+        frame.extend(this.field08_crc());
+        frame.extend(this.field09_crcDelimiter());
+        frame.extend(this.field10_ackSlot());
+        frame.extend(this.field11_ackDelimiter());
+        frame.extend(this.field12_endOfFrame());
+        frame.extend(this.field13_pauseAfterFrame());
+        return frame;
     }
 
     /**
-     * Concatenates all frame fields together into a contiguous BitSequence
-     * which does include any stuff bits.
+     * Provides the whole frame as BitSequence, including stuff bits.
      *
-     * Stuff bits are not included in the CRC delimiter, ACK field and the end
-     * of frame bits. In other words: anything after the CRC (which is stuffed).
-     *
-     * @returns {BitSequence} all the bits in the frame, including stuff bits.
+     * @returns {BitSequence} whole frame
      */
-    toBitSequenceAfterStuffing() {
-
+    wholeFrameStuffed() {
+        let frame = new BitSequence();
+        frame.extend(this.field01_startOfFrame());
+        frame.extend(this.field02_identifier());
+        frame.extend(this.field03_remoteTransmissionRequest());
+        frame.extend(this.field04_identifierExtensionBit());
+        frame.extend(this.field05_reservedBit());
+        frame.extend(this.field06_dataLengthCode());
+        frame.extend(this.field07_dataField());
+        frame.extend(this.field08_crc());
+        frame = frame.applyBitStuffing();
+        frame.extend(this.field09_crcDelimiter());
+        frame.extend(this.field10_ackSlot());
+        frame.extend(this.field11_ackDelimiter());
+        frame.extend(this.field12_endOfFrame());
+        frame.extend(this.field13_pauseAfterFrame());
+        return frame;
     }
+
+    /**
+     * Provides the maximum possible (worst case) amount of bits of the whole
+     * frame after stuffing with the same payload length.
+     *
+     * @returns {number} max amount of bits of the whole frame
+     */
+    maxLengthAfterStuffing() {
+        let amountOfStuffableBits = 1; // Start of Frame
+        amountOfStuffableBits += 11; // CAN ID
+        amountOfStuffableBits += 1; // Remote Transmission Request
+        amountOfStuffableBits += 1; // Identifier Extension
+        amountOfStuffableBits += 1; // Reserved bit 0
+        amountOfStuffableBits += 4; // Data Length Code
+        amountOfStuffableBits += this.payload.length * 8; // Payload in bits
+        amountOfStuffableBits += 15; // CRC
+        let amountAfterStuffing =
+            BitSequence.maxLengthAfterStuffing(amountOfStuffableBits);
+        amountAfterStuffing += 1; // CRC delimiter
+        amountAfterStuffing += 1; // ACK slot
+        amountAfterStuffing += 1; // ACK delimiter
+        amountAfterStuffing += 7; // End of frame
+        amountAfterStuffing += 3; // Pause after end of frame
+        return amountAfterStuffing;
+    }
+
+    /**
+     * Computes the CRC of 15 bits for the classic CAN bus.
+     *
+     * Polynomial:
+     * x^15 + x^14 + x^10 + x^8 + x^7 +x^4 +x^3 + x^0
+     * = 0b1100010110011001 = 0xC599
+     *
+     * @param {boolean[]|number[]|BitSequence} bits - iterable of bits to
+     *        compute the CRC for
+     * @returns {number} the output CRC as non-negative integer
+     */
+    static crc15(bits) {
+        return crc(bits, 0xC599, 15);
+    }
+}
+
+
+class CanFrame29Bit {
+    // As CanFrame11Bit but with 29 bit ID.
+    // or is it better with a settings to switch between 11 and 29 bits?
+}
+
+
+/**
+ * Computes a Cyclic Redundancy Check for a sequence of bits with a generic
+ * polynomial, bit by bit.
+ *
+ * The polynomial can be provided with or without its most significant bit set.
+ * The function internally needs the version without it being set, as it is
+ * implicitly always 1 for a polynomial of grade n. Just to make sure to accept
+ * both polynomial formats, its most significant bit is cleared before start.
+ *
+ * @param {boolean[]|number[]|BitSequence} bits -
+ *        iterable of bits to compute the CRC for
+ * @param {number} polynomial - positive integer representation of the
+ *        polynomial
+ * @param {number} n - positive integer number of bits of the output
+ * @returns {number} the output CRC as non-negative integer
+ */
+function crc(bits, polynomial, n) {
+    let remainder = 0;
+    let mostSignificantBitMask = 1 << n;
+    // Clear the most significant bit of the polynomial, see docstring.
+    polynomial &= ~mostSignificantBitMask;
+    // Now update the mostSignificantBitMask to the new MS bit of the polynomial
+    mostSignificantBitMask >>= 1;
+    for (let bit of bits) {
+        remainder = remainder ^ (bit << (n - 1));
+        if (remainder & mostSignificantBitMask) {
+            remainder = (remainder << 1) ^ polynomial;
+        } else {
+            remainder <<= 1;
+        }
+    }
+    let nBitsMask = (1 << n) - 1;
+    return remainder & nBitsMask;
+}
+
+/**
+ * Computes the CRC of 17 bits for the CAN FD bus.
+ *
+ * Polynomial: x^17 + x^16 + x^14 + x^13 + x^11 + x^6 + x^4 + x^3 + x^1 + x^0
+ * = 0b110110100001011011 = 0x3685B
+ * @param {boolean[]|number[]|BitSequence} bits - iterable of bits to compute
+ *        the CRC for
+ * @returns {number} the output CRC as non-negative integer
+ */
+function crc17(bits) {
+    return crc(bits, 0x3685B, 17);
+}
+
+/**
+ * Computes the CRC of 21 bits for the CAN FD bus.
+ *
+ * Polynomial: x^21 + x^20 + x^13 + x^11 + x^7 + x^4 + x^3 + x^0
+ * = 0b1100000010100010011001 = 0x302899
+ *
+ * @param {boolean[]|number[]|BitSequence} bits - iterable of bits to compute
+ *        the CRC for
+ * @returns {number} the output CRC as non-negative integer
+ */
+function crc21(bits) {
+    return crc(bits, 0x302899, 21);
 }
