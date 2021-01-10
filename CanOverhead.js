@@ -79,10 +79,15 @@ class BitSequence {
      * included).
      */
     equal(other) {
-        if (typeof (other._isStuffed) !== "boolean"
-            || other._isStuffed !== this._isStuffed
-            || !Array.isArray(other._sequence)
-            || other._sequence.length !== this._sequence.length) return false;
+        if (!(other instanceof BitSequence)) {
+            return false;
+        }
+        if (other._sequence.length !== this._sequence.length) {
+            return false;
+        }
+        if (other._isStuffed !== this._isStuffed) {
+            return false;
+        }
         for (let i = 0; i < this._sequence.length; i++) {
             if (this._sequence[i] !== other._sequence[i]) return false;
         }
@@ -352,6 +357,8 @@ class CanFrame11Bit {
      *
      * Length: 1 bit. This field is stuffable.
      *
+     * Always dominant.
+     *
      * @returns {BitSequence} SOF
      */
     field01_startOfFrame() {
@@ -375,6 +382,8 @@ class CanFrame11Bit {
      *
      * Length: 1 bit. This field is stuffable.
      *
+     * Dominant for data frames, recessive for RTR frames.
+     *
      * @returns {BitSequence} RTR
      */
     field03_remoteTransmissionRequest() {
@@ -386,16 +395,21 @@ class CanFrame11Bit {
      *
      * Length: 1 bit. This field is stuffable.
      *
+     * Dominant for 11-bit IDs (base frame format), recessive for 29-bit IDs
+     * (extended frame format).
+     *
      * @returns {BitSequence} IDE
      */
     field04_identifierExtensionBit() {
-        return new BitSequence(fieldIde.DOMINANT);
+        return new BitSequence(fieldIde.BASE_11_BIT);
     }
 
     /**
      * Provides the reserved field #0 as BitSequence.
      *
      * Length: 1 bit. This field is stuffable.
+     *
+     * Always dominant for classic CAN frames.
      *
      * @returns {BitSequence} R0
      */
@@ -408,6 +422,9 @@ class CanFrame11Bit {
      *
      * Length: 4 bits. This field is stuffable.
      *
+     * First bit is the most significant one. Values are limited to [0, 8]
+     * for classic CAN.
+     *
      * @returns {BitSequence} DLC
      */
     field06_dataLengthCode() {
@@ -418,7 +435,8 @@ class CanFrame11Bit {
     /**
      * Provides the data field as BitSequence.
      *
-     * Length: as many bits as in the this.payload field [0, 8, 16, ..., 64].
+     * Length: as many bits as in the this.payload field [0, 8, 16, ..., 64],
+     * but always a multiple of 8, as the payload is in bytes.
      * This field is stuffable.
      *
      * @returns {BitSequence} Data
@@ -468,6 +486,9 @@ class CanFrame11Bit {
      *
      * Length: 1 bit. This field is *not* stuffable.
      *
+     * Always recessive during transmission, set to dominant by the received to
+     * acknowledge the transmission.s
+     *
      * @returns {BitSequence} ACK slot
      */
     field10_ackSlot() {
@@ -479,6 +500,8 @@ class CanFrame11Bit {
      *
      * Length: 1 bit. This field is *not* stuffable.
      *
+     * Always recessive.
+     *
      * @returns {BitSequence} ACK delimiter
      */
     field11_ackDelimiter() {
@@ -489,6 +512,8 @@ class CanFrame11Bit {
      * Provides the end of frame field as BitSequence.
      *
      * Length: 7 bits. This field is *not* stuffable.
+     *
+     * Always recessive bits.
      *
      * @returns {BitSequence} EOF
      */
@@ -504,6 +529,8 @@ class CanFrame11Bit {
      * CAN frames as BitSequence.
      *
      * Length: 3 bits. This field is *not* stuffable.
+     *
+     * Always recessive bits.
      *
      * @returns {BitSequence} Pause after EOF
      */
