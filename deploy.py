@@ -17,10 +17,10 @@
 # details.
 
 import os
+import requests
 import shutil
 
 import markdown
-import css_html_js_minify as mfy
 
 THIS_FILE_ABS_DIR = os.path.dirname(__file__)
 BUILD_DIR = os.path.join(THIS_FILE_ABS_DIR, "builds")
@@ -52,7 +52,14 @@ def minify_html(input_file_name: str):
         input_file_name: file name of the HTML input file
     """
     output_file_name = os.path.join(BUILD_DIR, input_file_name)
-    mfy.process_single_html_file(input_file_name, output_path=output_file_name)
+    with open(input_file_name, mode='rb') as file:
+        url = 'https://html-minifier.com/raw'
+        html = file.read()
+    data = {'input': html}
+    response = requests.post(url, data=data)
+    minified_html = response.text
+    with open(output_file_name, "w", encoding="UTF-8") as file:
+        file.write(minified_html)
 
 
 def minify_css(input_file_name: str):
@@ -62,7 +69,14 @@ def minify_css(input_file_name: str):
         input_file_name: file name of the CSS input file
     """
     output_file_name = os.path.join(BUILD_DIR, input_file_name)
-    mfy.process_single_css_file(input_file_name, output_path=output_file_name)
+    with open(input_file_name, mode='rb') as file:
+        url = 'https://cssminifier.com/raw'
+        css = file.read()
+    data = {'input': css}
+    response = requests.post(url, data=data)
+    minified_css = response.text
+    with open(output_file_name, "w", encoding="UTF-8") as file:
+        file.write(minified_css)
 
 
 def minify_js(input_file_name: str):
@@ -72,7 +86,14 @@ def minify_js(input_file_name: str):
         input_file_name: file name of the JS input file
     """
     output_file_name = os.path.join(BUILD_DIR, input_file_name)
-    mfy.process_single_css_file(input_file_name, output_path=output_file_name)
+    with open(input_file_name, mode='rb') as file:
+        url = 'https://javascript-minifier.com/raw'
+        js = file.read()
+    data = {'input': js}
+    response = requests.post(url, data=data)
+    minified_js = response.text
+    with open(output_file_name, "w", encoding="UTF-8") as file:
+        file.write(minified_js)
 
 
 def deploy():
