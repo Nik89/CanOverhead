@@ -62,6 +62,21 @@ def minify_html(input_file_name: str):
         file.write(minified_html)
 
 
+def prepend_comment_in_index_file():
+    """
+    Prepend some comment lines in index.html file
+    """
+    filename = os.path.join(BUILD_DIR, "index.html")
+    line = "<!-- Oh hi there! If you want to see the "
+    line += "non-minified source code, check" + "\n"
+    line += "the project GitHub repository: "
+    line += "https://github.com/Nik89/CanOverhead -->"
+    with open(filename, 'r+', encoding="UTF-8") as file:
+        content = file.read()
+        file.seek(0, 0)
+        file.write(line + '\n' + content)
+
+
 def minify_css(input_file_name: str):
     """
     Minify a given CSS file into the build directory
@@ -107,6 +122,7 @@ def deploy():
     minify_js("CanOverhead.js")
     minify_js("HtmlToLibAdapter.js")
     minify_js("TestCanOverhead.js")
+    prepend_comment_in_index_file()
 
 
 if __name__ == "__main__":
