@@ -1,0 +1,23 @@
+<h1>CAN bus overhead, stuff bits and effective bitrate calculator</h1>
+<h3><a href="https://nik89.github.io/CanOverhead">CLick here to try it in your browser!</a></h3>
+<p>The <a href="https://en.wikipedia.org/wiki/CAN_bus">CAN bus</a>
+is a robust communication bus and protocol used in vehicle,
+allowing frames with 11 or 29-bit identifiers in the header and payload sizes
+of up to 8 bytes for classic CAN and up to 64 for the
+<a href="https://en.m.wikipedia.org/wiki/CAN_FD">CAN FD</a> variant.</p>
+<p>This JavaScript in-browser calculator helps you compute:</p>
+<ul>
+<li>the overhead of a frame in space: size of header and trailer</li>
+<li>the stuff bits: these are bits injected after each streak of 5 bits</li>
+<li>the effective bitrate: compute the transfer speed and time of your data taking
+  into account also the time it takes to transfer the frame overhead.</li>
+</ul>
+<h2>Usage</h2>
+<p>Head over to the
+<a href="https://nik89.github.io/CanOverhead"><strong>website of the calculator</strong></a>
+to use it. Simple as that! The calculator has no backend server, works only
+in your browser locally, no data is transferred. You can verify this by
+setting your browser to stay offline after loading the page and our calculator
+still operates! In Firefox: <em>File &gt; Work Offline</em>.</p>
+<p>A more development-oriented way of using it, is to download or clone the
+repository and simply open the <code>index.html</code> in your favourite browser.</p>

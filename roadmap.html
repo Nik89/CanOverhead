@@ -1,0 +1,80 @@
+<h1>Roadmap</h1>
+<p>All planned changes to this project will be documented in this file.</p>
+<p>The format is based on
+<a href="https://keepachangelog.com/en/1.0.0/">Keep a Changelog</a>,
+and this project adheres to
+<a href="https://semver.org/spec/v2.0.0.html">Semantic Versioning</a>.</p>
+<hr>
+<h2>[0.1.0]</h2>
+<p>Frame size estimate when ID and data are not known.</p>
+<h3>Added</h3>
+<ul>
+<li>Classic CAN with 11-bit IDs with only the payload length known:</li>
+<li>Compute the size in bits of the whole frame (header, payload, trailer)
+    without stuff bits.</li>
+<li>Compute the size range in bits of the whole frame when taking also
+    stuff bits into account (min = no stuff bits applied, max = max stuff
+    bits applied for CAN ID and payload).</li>
+</ul>
+<h2>[0.2.0]</h2>
+<p>Exact frame, CRC and bit stuffing when ID and data are known.</p>
+<h3>Added</h3>
+<ul>
+<li>Classic CAN with 11-bit IDs with the CAN ID and payload content known:</li>
+<li>CAN ID input accepted in binary format, e.g. <code>0010010</code>.</li>
+<li>Payload content input accepted in binary format, e.g. <code>100010011101...</code>.</li>
+<li>Compute and display the whole frame as bits (header, payload, trailer)
+    with format <code>0110 1011 | 1001 1000 | ...</code> without stuff bits.
+    The computation of the <a href="https://www.can-cia.org/can-knowledge/can/crc/">CRC</a>
+    is included in the computation of the trailer.</li>
+<li>Same as previous point but with stuff bits included.</li>
+<li>Compute and display the exact amount of added stuff bits.</li>
+</ul>
+<h2>[0.3.0]</h2>
+<p>More input formats accepted.</p>
+<h3>Added</h3>
+<ul>
+<li>Display of the whole frame also in hexadecimal format, padded with zero-bits
+  to the right to the nearest multiple of 8. Display also the amount of
+  padding bits added (radio button or similar to select input type).</li>
+<li>CAN ID input accepted also in decimal and hexadecimal format,
+  e.g. <code>42</code> or <code>11A</code> (radio button or similar to select input type)</li>
+<li>Payload content input accepted (radio button or similar to select input type)
+  also as comma-separated list of bits,
+  e.g. <code>1,0,1,1</code>, or hexadecimal, e.g. <code>0b12</code>. Case insensitive, zero-padding
+  to the left required so <code>b12</code> is invalid.</li>
+<li>Make stuff bits bold in the provided output</li>
+</ul>
+<h2>[0.4.0]</h2>
+<p>Bitrates and transfer time.</p>
+<h3>Added</h3>
+<ul>
+<li>Bitrates list available: 1 Mbit/s, 800, 500, 250, 125, 50, 20, 10 kbit/s</li>
+<li>Calculation of gross/net (effective) bitrate:</li>
+<li>exact when exact ID and payload is given</li>
+<li>range when the ID and payload are not known</li>
+<li>Calculation of gross/net (effective) transfer time:</li>
+<li>exact when exact ID and payload is given</li>
+<li>range when the ID and payload are not known</li>
+</ul>
+<h2>[0.5.0]</h2>
+<p>29-bit CAN IDs.</p>
+<h3>Added</h3>
+<ul>
+<li>Support for 29-bit CAN IDs (radio button or similar to select between 11
+  and 29 bits). Same features as above.</li>
+</ul>
+<h2>[0.6.0]</h2>
+<p>CAN FD with fixed datarate.</p>
+<h3>Added</h3>
+<ul>
+<li>Support for CAN FD with payload datarate equal to the arbitration
+  datarate.</li>
+</ul>
+<h2>[1.0.0]</h2>
+<p>CAN FD with flexible datarate.</p>
+<h3>Added</h3>
+<ul>
+<li>Support for CAN FD with payload datarate different than then
+  arbitration datarate.</li>
+</ul>
