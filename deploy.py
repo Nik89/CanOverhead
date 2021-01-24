@@ -45,36 +45,28 @@ def md2html(input_file_name: str):
                               encoding="UTF-8", output_format="html")
 
 
+def prepend_comment_in_index_file():
+    """
+    Prepend some comment lines in index.html file
+    """
+    filename = os.path.join(BUILD_DIR, "index.html")
+    line = ("<!-- Oh hi there! If you want to see the "
+            "non-minified source code, check\n"
+            "the project GitHub repository: "
+            "https://github.com/Nik89/CanOverhead -->\n")
+    with open(filename, 'r+', encoding="UTF-8") as file:
+        content = file.read()
+        file.seek(0)
+        file.write(line + content)
+
+
 def minify_html(input_file_name: str):
     """
     Minify a given HTML file into the build directory
     Args:
         input_file_name: file name of the HTML input file
     """
-    output_file_name = os.path.join(BUILD_DIR, input_file_name)
-    with open(input_file_name, mode='rb') as file:
-        url = 'https://html-minifier.com/raw'
-        html = file.read()
-    data = {'input': html}
-    response = requests.post(url, data=data)
-    minified_html = response.text
-    with open(output_file_name, "w", encoding="UTF-8") as file:
-        file.write(minified_html)
-
-
-def prepend_comment_in_index_file():
-    """
-    Prepend some comment lines in index.html file
-    """
-    filename = os.path.join(BUILD_DIR, "index.html")
-    line = "<!-- Oh hi there! If you want to see the "
-    line += "non-minified source code, check" + "\n"
-    line += "the project GitHub repository: "
-    line += "https://github.com/Nik89/CanOverhead -->"
-    with open(filename, 'r+', encoding="UTF-8") as file:
-        content = file.read()
-        file.seek(0, 0)
-        file.write(line + '\n' + content)
+    _minify(input_file_name, 'https://html-minifier.com/raw')
 
 
 def minify_css(input_file_name: str):
@@ -83,15 +75,7 @@ def minify_css(input_file_name: str):
     Args:
         input_file_name: file name of the CSS input file
     """
-    output_file_name = os.path.join(BUILD_DIR, input_file_name)
-    with open(input_file_name, mode='rb') as file:
-        url = 'https://cssminifier.com/raw'
-        css = file.read()
-    data = {'input': css}
-    response = requests.post(url, data=data)
-    minified_css = response.text
-    with open(output_file_name, "w", encoding="UTF-8") as file:
-        file.write(minified_css)
+    _minify(input_file_name, 'https://cssminifier.com/raw')
 
 
 def minify_js(input_file_name: str):
@@ -100,15 +84,25 @@ def minify_js(input_file_name: str):
     Args:
         input_file_name: file name of the JS input file
     """
+    _minify(input_file_name, 'https://javascript-minifier.com/raw')
+
+
+def _minify(input_file_name: str, web_api_url: str) -> None:
+    """
+    Minify a given file into the build directory using the given
+    web API.
+    Args:
+        input_file_name: file name of the JS input file
+        web_api_url: URL of the compression web API
+    """
     output_file_name = os.path.join(BUILD_DIR, input_file_name)
-    with open(input_file_name, mode='rb') as file:
-        url = 'https://javascript-minifier.com/raw'
-        js = file.read()
-    data = {'input': js}
-    response = requests.post(url, data=data)
-    minified_js = response.text
-    with open(output_file_name, "w", encoding="UTF-8") as file:
-        file.write(minified_js)
+    file_content = open(input_file_name, mode='rb').read()
+    response = requests.post(web_api_url, data={'input': file_content})
+    minified = response.text
+    if minified.startswith('// Error'):
+        raise RuntimeError(
+            'File cannot be compressed correctly:\n' + minified)
+    open(output_file_name, "w", encoding="UTF-8").write(minified)
 
 
 def deploy():
