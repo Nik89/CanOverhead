@@ -111,7 +111,8 @@ def _minify(input_file_name: str, web_api_url: str) -> None:
 
 def shell(cmd: str) -> str:
     """Launches a simple shell command as a subprocess, returning its stdout."""
-    return sub.run(cmd, shell=True, check=True).stdout.decode('UTF-8')
+    return sub.run(cmd, shell=True, check=True, stdout=sub.PIPE).stdout.decode(
+        'UTF-8')
 
 
 def build_dir_to_gh_pages():
