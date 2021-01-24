@@ -320,6 +320,10 @@ const fieldIde = {
     EXTENDED_29_BIT: bit.RECESSIVE,
 }
 
+const MAX_ID_VALUE_11_BIT = 0x7FF;
+const MIN_ID_VALUE = 0;
+const MAX_PAYLOAD_BYTES = 8;
+
 /**
  * Data structure representing a Classic CAN data frame with 11-bit identifier.
  *
@@ -328,13 +332,6 @@ const fieldIde = {
  * as BitSequences.
  */
 class CanFrame11Bit {
-    static MAX_ID_VALUE_11_BIT = 0x7FF;
-    static MIN_ID_VALUE = 0;
-    static MAX_PAYLOAD_BYTES = 8;
-
-    id;
-    payload;
-
     /**
      * Constructs a Classic CAN frame with an 11-bit ID.
      *
@@ -348,15 +345,14 @@ class CanFrame11Bit {
         if (typeof (id) !== "number") {
             throw new TypeError("Identifier must be a number.");
         }
-        if (id < CanFrame11Bit.MIN_ID_VALUE
-            || id > CanFrame11Bit.MAX_ID_VALUE_11_BIT) {
+        if (id < MIN_ID_VALUE || id > MAX_ID_VALUE_11_BIT) {
             throw new RangeError("Identifier out of bounds.");
         }
         // Check Payload
         if (!(payload instanceof Uint8Array)) {
             throw new TypeError("Payload must be a Uint8Array.");
         }
-        if (payload.length > CanFrame11Bit.MAX_PAYLOAD_BYTES) {
+        if (payload.length > MAX_PAYLOAD_BYTES) {
             throw new RangeError("Payload too long.");
         }
         // Everything valid
