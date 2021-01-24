@@ -146,7 +146,7 @@ def build_dir_to_gh_pages():
         os.remove(file)
     for file in os.listdir(BUILD_DIR):
         shutil.copy2(os.path.join(BUILD_DIR, file), os.curdir)
-    shell('git commit -m"Minified and deployed"')
+    shell('git commit -a -m"Minified and deployed"')
     shell('git checkout develop')
 
 
