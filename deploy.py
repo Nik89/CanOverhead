@@ -134,6 +134,7 @@ def build_dir_to_gh_pages():
     if len(shell('git status --porcelain').strip()) > 0:
         raise RuntimeError("Git status is not clean. "
                            "Cannot deploy to GH Pages branch.")
+    git_head_hash = shell('git rev-parse HEAD').strip()
     shell('git checkout gh-pages')
     os.remove('.editorconfig')
     to_remove = glob.glob('*.html')
@@ -146,7 +147,8 @@ def build_dir_to_gh_pages():
         os.remove(file)
     for file in os.listdir(BUILD_DIR):
         shutil.copy2(os.path.join(BUILD_DIR, file), os.curdir)
-    shell('git commit -a -m"Minified and deployed"')
+    commit_msg = 'Minified and deployed commit {}'.format(git_head_hash[:10])
+    shell('git commit -a -m"{}"'.format(commit_msg))
     shell('git checkout develop')
 
 
