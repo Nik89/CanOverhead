@@ -61,34 +61,27 @@ let computeV2 = () => {
 
     // Parse input fields
     let identifierStr = document.getElementById("v2-in-identified").value;
-    identifierStr = identifierStr.padStart(11, "0");
+    let identifier = parseInt(identifierStr, 16);
     let payloadStr = document.getElementById("v2-in-payload").value;
-    payloadStr = payloadStr.padStart(nearestLargerMultipleOf8(payloadStr.length), "0");
+    let payload; // TODO convert from payloadStr (expected hex string) to Uint8Array
 
-    if (identifierStr.length > 11) {
-        // Set error and clear existing output
-        document.getElementById("v2-input-id-error").innerHTML = "The identifier should be of 11 bits at most";
-        //document.getElementById("").innerHTML = "";
-        //document.getElementById("").innerHTML = "";
-    } else if (payloadStr.length > 64 || (payloadStr.length % 8 !== 0)) {
-        // Set error and clear existing output
-        document.getElementById("v2-input-pl-error").innerHTML = "Payload should be less than 64 bits and should be N bites long";
-    } else {
+    try {
+        let canFrame = new CanFrame11Bit(identifier, payload);
         // Clear errors
         document.getElementById("v2-input-id-error").innerHTML = "";
         document.getElementById("v2-input-pl-error").innerHTML = "";
 
-        // Calculate
-        let payloadLengthBit = payloadLengthByte * 8;
-        let payloadLengthBitMax = BitSequence.maxLengthAfterStuffing(payloadLengthBit);
+        // Get output
+        canFrame.wholeFrame();
+        canFrame.wholeFrameStuffed();
 
         // Set outputs
-        document.getElementById("v1-out-frames-bits-min").innerHTML = payloadLengthBit;
-        document.getElementById("v1-out-frames-bits-max").innerHTML = payloadLengthBitMax;
+        document.getElementById("v1-out-frames-bits-min").innerHTML = ""; // TODO
+        document.getElementById("v1-out-frames-bits-max").innerHTML = ""; // TODO
+    } catch {
+        // TODO print good error messages
+        // TODO clean inputs
+        document.getElementById("v2-input-id-error").innerHTML = ""; // TODO depends on error
+        document.getElementById("v2-input-pl-error").innerHTML = ""; // TODO depends on error
     }
-}
-
-
-function nearestLargerMultipleOf8(x) {
-    return Math.floor((x + 7) / 8) * 8;
 }
