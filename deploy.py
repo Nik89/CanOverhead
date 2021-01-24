@@ -19,10 +19,14 @@
 import os
 import requests
 import shutil
+import subprocess as sub
+import glob
 
 import markdown
 
 THIS_FILE_ABS_DIR = os.path.dirname(__file__)
+# Force working dir to be the one where this file is
+os.chdir(THIS_FILE_ABS_DIR)
 BUILD_DIR = os.path.join(THIS_FILE_ABS_DIR, "builds")
 
 
@@ -105,6 +109,46 @@ def _minify(input_file_name: str, web_api_url: str) -> None:
     open(output_file_name, "w", encoding="UTF-8").write(minified)
 
 
+def shell(cmd: str) -> str:
+    """Launches a simple shell command as a subprocess, returning its stdout."""
+    return sub.run(cmd, shell=True, check=True).stdout.decode('UTF-8')
+
+
+def build_dir_to_gh_pages():
+    """
+    Move built files to root level on the gh-pages branch.
+
+    - Check that git status is clean
+    - Git checkout gh-pages
+    - Remove the following files from the project root: .editorconfig, *.html,
+      *.css, *.js, *.md
+    - copy the whole content of the builds dir into project root
+    - commit with message "Minified and deployed ${git hash of the minified}"
+    - Git checkout develop
+    - No pushing performed (that must be done manually for security reasons)
+    """
+    if not os.path.isdir('.git'):
+        raise RuntimeError("Deployment to GH Pages can only be performed "
+                           "when in the repository root directory.")
+    if len(shell('git status --porcelain').strip()) > 0:
+        raise RuntimeError("Git status is not clean. "
+                           "Cannot deploy to GH Pages branch.")
+    shell('git checkout gh-pages')
+    os.remove('.editorconfig')
+    to_remove = glob.glob('*.html')
+    to_remove.extend(glob.glob('*.css'))
+    to_remove.extend(glob.glob('*.js'))
+    to_remove.extend(glob.glob('*.md'))
+    to_remove.extend(glob.glob('*.py'))
+    to_remove.extend(glob.glob('*.txt'))
+    for file in to_remove:
+        os.remove(file)
+    for file in os.listdir(BUILD_DIR):
+        shutil.copy2(file, os.curdir)
+    shell('git commit -m"Minified and deployed"')
+    shell('git checkout develop')
+
+
 def deploy():
     cleanup()
     md2html("CHANGELOG.md")
@@ -117,6 +161,7 @@ def deploy():
     minify_js("HtmlToLibAdapter.js")
     minify_js("TestCanOverhead.js")
     prepend_comment_in_index_file()
+    build_dir_to_gh_pages()
 
 
 if __name__ == "__main__":
