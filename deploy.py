@@ -115,6 +115,13 @@ def shell(cmd: str) -> str:
         'UTF-8')
 
 
+def _remove_ignore_if_non_existing(filename:str):
+    try:
+        os.remove(filename)
+    except FileNotFoundError:
+        pass
+
+
 def build_dir_to_gh_pages():
     """
     Move built files to root level on the gh-pages branch.
@@ -136,7 +143,7 @@ def build_dir_to_gh_pages():
                            "Cannot deploy to GH Pages branch.")
     git_head_hash = shell('git rev-parse HEAD').strip()
     shell('git checkout gh-pages')
-    os.remove('.editorconfig')
+    _remove_ignore_if_non_existing('.editorconfig')
     to_remove = glob.glob('*.html')
     to_remove.extend(glob.glob('*.css'))
     to_remove.extend(glob.glob('*.js'))
@@ -144,7 +151,7 @@ def build_dir_to_gh_pages():
     to_remove.extend(glob.glob('*.py'))
     to_remove.extend(glob.glob('*.txt'))
     for file in to_remove:
-        os.remove(file)
+        _remove_ignore_if_non_existing(file)
     for file in os.listdir(BUILD_DIR):
         shutil.copy2(os.path.join(BUILD_DIR, file), os.curdir)
     commit_msg = 'Minified and deployed commit {}'.format(git_head_hash[:10])
