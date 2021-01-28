@@ -235,14 +235,14 @@ class BitSequence {
 
     /**
      * Binary string representation of the sequence of bits with spaces every
-     * 4 bits for better readability.
+     * 4 bits for better readability, aligned to the right.
      *
      * Example: "0 0011 0010 0110". Left-most bit is the first found in the
      * bit sequence, right-most one is the last.
      *
      * @returns {string} string with only "1", "0" and " " characters
      */
-    toBinStringWithSpaces() {
+    toBinStringWithSpacesRightAlign() {
         let str = "";
         let count = this._sequence.length;
         for (let bit of this._sequence) {
@@ -255,6 +255,33 @@ class BitSequence {
             if (count % 4 === 0 && count > 0) {
                 str += " ";
             }
+        }
+        return str;
+    }
+
+    /**
+     * Binary string representation of the sequence of bits with spaces every
+     * 4 bits for better readability, aligned to the left.
+     *
+     * Example: "0011 0010 0110 11". Left-most bit is the first found in the
+     * bit sequence, right-most one is the last.
+     *
+     * @returns {string} string with only "1", "0" and " " characters
+     */
+    toBinStringWithSpacesLeftAlign() {
+        let str = "";
+        let count = 0;
+        for (let bit of this._sequence) {
+            if (count === 4) {
+                str += " ";
+                count = 0;
+            }
+            if (bit) {
+                str += "1";
+            } else {
+                str += "0";
+            }
+            count++;
         }
         return str;
     }

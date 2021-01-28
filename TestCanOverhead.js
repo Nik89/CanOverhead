@@ -174,13 +174,21 @@ check(new BitSequence("10").toBinString() === "10");
 check(new BitSequence("0010").toBinString() === "0010");
 check(new BitSequence("0110101").toBinString() === "0110101");
 
-// toBinStringWithSpaces
-check(new BitSequence("").toBinStringWithSpaces() === "");
-check(new BitSequence("0").toBinStringWithSpaces() === "0");
-check(new BitSequence("10").toBinStringWithSpaces() === "10");
-check(new BitSequence("0010").toBinStringWithSpaces() === "0010");
-check(new BitSequence("0110101").toBinStringWithSpaces() === "011 0101");
-check(new BitSequence("010110101").toBinStringWithSpaces() === "0 1011 0101");
+// toBinStringWithSpacesRightAlign
+check(new BitSequence("").toBinStringWithSpacesRightAlign() === "");
+check(new BitSequence("0").toBinStringWithSpacesRightAlign() === "0");
+check(new BitSequence("10").toBinStringWithSpacesRightAlign() === "10");
+check(new BitSequence("0010").toBinStringWithSpacesRightAlign() === "0010");
+check(new BitSequence("0110101").toBinStringWithSpacesRightAlign() === "011 0101");
+check(new BitSequence("010110101").toBinStringWithSpacesRightAlign() === "0 1011 0101");
+
+// toBinStringWithSpacesLeftAlign
+check(new BitSequence("").toBinStringWithSpacesLeftAlign() === "");
+check(new BitSequence("0").toBinStringWithSpacesLeftAlign() === "0");
+check(new BitSequence("10").toBinStringWithSpacesLeftAlign() === "10");
+check(new BitSequence("0010").toBinStringWithSpacesLeftAlign() === "0010");
+check(new BitSequence("0110101").toBinStringWithSpacesLeftAlign() === "0110 101");
+check(new BitSequence("010110101").toBinStringWithSpacesLeftAlign() === "0101 1010 1");
 
 // toHexString
 check(new BitSequence("").toHexString() === "");

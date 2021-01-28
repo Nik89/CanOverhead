@@ -46,16 +46,16 @@ function printUnknownError(msg) {
 
 function displayCanFrame11BitFields(canFrame) {
     // TODO use bits with spaces aligned to the left!
-    document.getElementById("output_can_whole_frame").innerHTML = canFrame.wholeFrame().toBinStringWithSpaces();
-    document.getElementById("output_can_whole_frame_stuffed").innerHTML = canFrame.wholeFrameStuffed().toBinStringWithSpaces();
+    document.getElementById("output_can_whole_frame").innerHTML = canFrame.wholeFrame().toBinStringWithSpacesLeftAlign();
+    document.getElementById("output_can_whole_frame_stuffed").innerHTML = canFrame.wholeFrameStuffed().toBinStringWithSpacesLeftAlign();
     document.getElementById("output_can_field01").innerHTML = canFrame.field01_startOfFrame().toBinString();
-    document.getElementById("output_can_field02").innerHTML = canFrame.field02_identifier().toBinStringWithSpaces();
+    document.getElementById("output_can_field02").innerHTML = canFrame.field02_identifier().toBinStringWithSpacesRightAlign();
     document.getElementById("output_can_field03").innerHTML = canFrame.field03_remoteTransmissionRequest().toBinString();
     document.getElementById("output_can_field04").innerHTML = canFrame.field04_identifierExtensionBit().toBinString();
     document.getElementById("output_can_field05").innerHTML = canFrame.field05_reservedBit().toBinString();
     document.getElementById("output_can_field06").innerHTML = canFrame.field06_dataLengthCode().toBinString();
-    document.getElementById("output_can_field07").innerHTML = canFrame.field07_dataField().toBinStringWithSpaces();
-    document.getElementById("output_can_field08").innerHTML = canFrame.field08_crc().toBinStringWithSpaces();
+    document.getElementById("output_can_field07").innerHTML = canFrame.field07_dataField().toBinStringWithSpacesRightAlign();
+    document.getElementById("output_can_field08").innerHTML = canFrame.field08_crc().toBinStringWithSpacesRightAlign();
     document.getElementById("output_can_field09").innerHTML = canFrame.field09_crcDelimiter().toBinString();
     document.getElementById("output_can_field10").innerHTML = canFrame.field10_ackSlot().toBinString();
     document.getElementById("output_can_field11").innerHTML = canFrame.field11_ackDelimiter().toBinString();

@@ -34,7 +34,7 @@
     <div class="input">
         <div>
             <label for="input_can_identifier">
-                CAN Identifier (dec, "0x" for hex, "0b" for bin):</label>
+                CAN Identifier [dec, "0x" for hex, "0b" for bin]:</label>
             <input id="input_can_identifier" name="input_can_identifier"
                    type="text"/>
             <div id="input_can_identifier_error" class="input-error"></div>
@@ -52,15 +52,22 @@
         <button onclick="calculate()">Compute</button>
     </div>
     <div class="output">
-        <label for="output_can_whole_frame">
-            Whole CAN frame (bin):
-        </label>
-        <div id="output_can_whole_frame"></div>
-        <label for="output_can_whole_frame_stuffed">
-            Whole CAN frame with stuff bits (bin):
-        </label>
+        Whole frame [binary]:
+        <ul>
+            <li>
+                <label for="output_can_whole_frame">
+                    Without stuff bits:
+                </label>
+                <div id="output_can_whole_frame"></div>
+            </li>
+            <li>
+                <label for="output_can_whole_frame_stuffed">
+                    With stuff bits (as appears on bus):
+                </label>
+            </li>
         <div id="output_can_whole_frame_stuffed"></div>
-        CAN frame fields:
+        </ul>
+        CAN frame fields without stuff bits [binary]:
         <ol>
             <li>
                 <label for="output_can_field01">
