@@ -66,10 +66,26 @@ function printUnknownError(msg) {
  * @param {CanFrame11Bit} canFrame
  */
 function displayCanFrame11BitFields(canFrame) {
+    // Whole frame
+    let bits = canFrame.wholeFrame();
     document.getElementById("output_can_whole_frame").innerHTML =
-        canFrame.wholeFrame().toBinStringWithSpacesLeftAlign();
+        "["
+        + bits.length().toString()
+        + " bits]<br/>"
+        + bits.toBinStringWithSpacesLeftAlign();
+    let bitsWithStuffs = canFrame.wholeFrameStuffed();
+    let stuffBitsAmount = bitsWithStuffs.length() - bits.length();
     document.getElementById("output_can_whole_frame_stuffed").innerHTML =
-        canFrame.wholeFrameStuffed().toBinStringWithSpacesLeftAlign();
+        "["
+        + bitsWithStuffs.length().toString()
+        + " bits, of which "
+        + stuffBitsAmount
+        + " stuff bits]<br/>"
+        + bitsWithStuffs.toBinStringWithSpacesLeftAlign();
+    document.getElementById("output_max_length").innerHTML =
+        canFrame.maxLengthAfterStuffing().toString(10)
+        + " bits, assuming same Identifier and Payload length";
+    // Field by field
     document.getElementById("output_can_field01").innerHTML =
         canFrame.field01_startOfFrame().toBinString();
     document.getElementById("output_can_field02").innerHTML =
@@ -96,7 +112,6 @@ function displayCanFrame11BitFields(canFrame) {
         canFrame.field12_endOfFrame().toBinString();
     document.getElementById("output_can_field13").innerHTML =
         canFrame.field13_pauseAfterFrame().toBinString();
-    // TODO add max frame length and other fields
     // TODO add amount of stuff bits added + exact length
     // TODO add estimated max length for arbitrary ID and payload?
 }
