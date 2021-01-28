@@ -22,53 +22,32 @@
             Please enable JavaScript for this website to work.
         </h2>
     </noscript>
-    <p>v0.1 - Approximate computation of the frame information</p>
-    <div class="v1">
-        <div class="input">
-            <label for="v1-in-payload-length">
-                Payload length (from 0 to 8) [byte]:
-            </label>
-            <input id="v1-in-payload-length" type="number" min="0" max="8"/>
-            <div id="v1-input-error" class="input-error"></div>
-        </div>
-        <div>
-            <button onclick="computeV1()">--- Compute --></button>
-        </div>
-        <div class="output">
-            <label>Frame length (interval) [bit]:</label>
-            <div>[
-                <span id="v1-out-frames-bits-min"></span>,
-                <span id="v1-out-frames-bits-max"></span>
-             ]</div>
-        </div>
-    </div>
-    <p>v0.2 - Precise computation of the frame information</p>
-    <div class="v2">
+    <div id="input_form">
         <div class="input">
             <div>
-                <label for="v2-identified">CAN Identifier:</label>
-                <input id="v2-in-identified" name="v2-identified" type="text"/>
-                <div id="v2-input-id-error" class="input-error"></div>
+                <label for="input_can_identifier">CAN Identifier (dec, "0x" for hex, "0b" for bin):</label>
+                <input id="input_can_identifier" name="input_can_identifier" type="text"/>
+                <div id="input_can_identifier_error" class="input-error"></div>
             </div>
             <div>
-                <label for="v2-payload">CAN Payload data:</label>
-                <input id="v2-in-payload" name="v2-payload" type="text"/>
-                <div id="v2-input-pl-error" class="input-error"></div>
+                <label for="input_can_payload">CAN Payload data (hex):</label>
+                <input id="input_can_payload" name="input_can_payload" type="text"/>
+                <div id="input_can_payload_error" class="input-error"></div>
             </div>
         </div>
-        <div>
-            <button onclick="computeV2()">Compute</button>
+        <div class="buttons">
+            <button onclick="compute()">Compute</button>
         </div>
         <div class="output">
+            <label for="output_can_whole_frame">Whole CAN frame (bin):</label>
+            <div id="output_can_whole_frame"></div>
+            <label for="output_can_whole_frame_stuffed">Whole CAN frame with stuff bits (bin):</label>
+            <div id="output_can_whole_frame_stuffed"></div>
         </div>
     </div>
     <div>
-        v0.1 <br/>
-        Input: Payload length: form with decimal integer, e.g. [  7 ]
         <br/>
-        Output: frame bits min, max
-        <br/>----<br/>
-        v0.2 <br/>
+        -----<br/>
         Input: CAN ID: form with binary string, e.g. [   100101 ]<br/>
         Input: Payload: form with binary string, e.g. [   00100111001001 ]<br/>
         <br/>

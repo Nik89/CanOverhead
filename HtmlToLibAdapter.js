@@ -8,80 +8,69 @@
  * @licence BSD 3-clause license. See LICENSE.md for details.
  */
 
-let computeV1 = () => {
+let compute = () => {
+    // Clear errors
+    document.getElementById("input_can_identifier_error").innerHTML = "";
+    document.getElementById("input_can_payload_error").innerHTML = "";
     // Parse input fields
-    let payloadLengthByte = parseInt(
-        document.getElementById("v1-in-payload-length").value);
-
-    if (isNaN(payloadLengthByte)
-        || payloadLengthByte < 0
-        || payloadLengthByte > 8) {// TODO magic numbers
-        // Set error and clear existing output
-        document.getElementById("v1-input-error").innerHTML = "The value should be between 0 and 8 bytes";
-        document.getElementById("v1-out-frames-bits-min").innerHTML = "";
-        document.getElementById("v1-out-frames-bits-max").innerHTML = "";
-    } else {
-        // Clear errors
-        document.getElementById("v1-input-error").innerHTML = "";
-
-        // Calculate
-        let payloadLengthBit = payloadLengthByte * 8;
-        let payloadLengthBitMax = BitSequence.maxLengthAfterStuffing(payloadLengthBit);
-
-        // Set outputs
-        document.getElementById("v1-out-frames-bits-min").innerHTML = payloadLengthBit;
-        document.getElementById("v1-out-frames-bits-max").innerHTML = payloadLengthBitMax;
+    const identifierStr = document.getElementById("input_can_identifier").value;
+    const identifier = Number(identifierStr);
+    if (isNaN(identifier)) {
+        document.getElementById("input_can_identifier_error").innerHTML = "Incorrect identifier format."; // TODO better msg
+        return;
     }
-}
-document.getElementById("v2-in-payload").value = "1111111111000000000011111111110000000000111111111100000000001111";
-let computeV2 = () => {
-    // TODO inputs reading, cleanup and conversion
-    // ID in hex format as a number. Examples:
-    // - 1F
-    // - 0x1F
-    // - 0X1F
-    // - 0x1f
-    // - f
-    // - F
-    // - 0xF
-    // Idea: strip "0x"/"0X", uppercase, convert to Number
-    //
-    // Payload in hex format as a hex string. Examples:
-    // - AA
-    // - 0xAA
-    // - 0Xaa
-    // - A
-    // - AA, BB, CC
-    // - 0xAA, 0xBB, 0xCC
-    // (As above)
-    // Idea: strip same as above, convert to Uint8Array
-
-    // TODO pass inputs to CanOverhead.js::CanFrame11Bit
-    // TODO print CanFrame11Bit method results in pretty manner
-
-    // Parse input fields
-    let identifierStr = document.getElementById("v2-in-identified").value;
-    let identifier = parseInt(identifierStr, 16);
-    let payloadStr = document.getElementById("v2-in-payload").value;
-    let payload; // TODO convert from payloadStr (expected hex string) to Uint8Array
-
+    let payloadStr = document.getElementById("input_can_payload").value;
+    // Strip any whitespace and some common separators
+    const nonHexChars = /[^0-9a-fA-F]/g;
+    payloadStr = payloadStr.replaceAll(/0[xX]/g, "").replaceAll(nonHexChars, "");
+    if (payloadStr.length % 2 !== 0) {
+        document.getElementById("input_can_payload_error").innerHTML = "Payload must have an even amount of hex characters.";
+        return;
+    }
+    payloadStr = payloadStr.match(/../g);
+    // Add "0x" to all bytes
+    payloadStr.forEach(byteStr => byteStr = "0x" + byteStr);
+    const payload = new Uint8Array(payloadStr.map(byteStr => Number(byteStr)));
+    // Pass everything to the CanOverhead library
     try {
         let canFrame = new CanFrame11Bit(identifier, payload);
-        // Clear errors
-        document.getElementById("v2-input-id-error").innerHTML = "";
-        document.getElementById("v2-input-pl-error").innerHTML = "";
-
-        // Get output
-        canFrame.wholeFrame();
-        canFrame.wholeFrameStuffed();
-
         // Set outputs
-        document.getElementById("v1-out-frames-bits-min").innerHTML = ""; // TODO
-        document.getElementById("v1-out-frames-bits-max").innerHTML = ""; // TODO
-    } catch {
-        // TODO print good error messages
-        // TODO clean inputs
-        document.getElementById("v2-input-id-error").innerHTML = ""; // TODO depends on error
-        document.getElementById("v2-input-pl-error").innerHTML = ""; // TODO depends on error
+        document.getElementById("output_can_whole_frame").innerHTML = canFrame.wholeFrame().toBinStringWithSpaces();
+        document.getElementById("output_can_whole_frame_stuffed").innerHTML = canFrame.wholeFrameStuffed().toBinStringWithSpaces();
+    } catch (err) {
+        if (err instanceof RangeError && err.message.startsWith("Identifier")) {
+            // Error of the identifier
+            document.getElementById("input_can_identifier_error").innerHTML = err.message;
+        } else if (err instanceof RangeError && err.message.startsWith("Payload")) {
+            // Error of the payload
+            document.getElementById("input_can_payload_error").innerHTML = err.message;
+        } else {
+            // Other errors explode, but they should never happen.
+            console.error(err);
+        }
     }
+    /*
+        // DRAFT BUT MORE COMPLETE
+        // Split at any whitespace or some common separators
+        const separators = /[,;'"|\s]/g;
+        // "0xA, BB 0X0c" => ["0xA", "", "BB", "0X0c"]
+        let bytesStrings = payloadStr.split(separators);
+        // Remove empty strings from array of strings
+        // ["0xA", "", "BB", "0x0c"] => ["0xA", "BB", "0x0c"]
+        bytesStrings = bytesStrings.filter(byteStr => byteStr.length !== 0);
+        // Add "0x" to bytes that don't have it to parse them with Number() in hex
+        // ["0xA", "BB", "0X0c"] => ["0xA", "0xBB", "0X0c"]
+        // If input did not have any separators, thus looks like "AABBCC", then
+        // split it every 2 characters.
+        bytesStrings.forEach(byteStr => {
+            if (!byteStr.toLowerCase().startsWith("0x")) {
+                byteStr = "0x" + byteStr;
+            }
+            return byteStr;
+        });
+        // Convert to Uint8Array
+        // ["0xA", "0xBB", "0X0c"] => [10, 187, 12]
+        const payload = bytesStrings =>
+            new Uint8Array(bytesStrings.map(byteStr => Number(byteStr)));
+    */
 }
