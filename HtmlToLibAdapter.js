@@ -7,8 +7,13 @@
  *
  * @licence BSD 3-clause license. See LICENSE.md for details.
  */
+
 // TODO press enter to run compute
 
+/**
+ * Erases the text on the page displaying any error messages and any
+ * output from the previous calculation.
+ */
 function clearErrorsAndOutputs() {
     // Clear errors
     document.getElementById("input_can_identifier_error").innerHTML = "";
@@ -32,20 +37,34 @@ function clearErrorsAndOutputs() {
     document.getElementById("output_can_field13").innerHTML = "";
 }
 
+/**
+ * Prints the error message related to an invalid input of the CAN identifier.
+ * @param {string} msg
+ */
 function displayCanIdentifierError(msg) {
-    document.getElementById("input_can_identifier_error").innerHTML
-        = msg;
+    document.getElementById("input_can_identifier_error").innerHTML = msg;
 }
 
-function displayPayloadError(msg) {
-    document.getElementById("input_can_payload_error").innerHTML
-        = msg;
+/**
+ * Prints the error message related to an invalid input of the CAN payload.
+ * @param {string} msg
+ */
+function displayCanPayloadError(msg) {
+    document.getElementById("input_can_payload_error").innerHTML = msg;
 }
 
+/**
+ * Prints a generic error message related to an invalid input.
+ * @param {string} msg
+ */
 function printUnknownError(msg) {
     document.getElementById("input_unknown_error").innerHTML = msg;
 }
 
+/**
+ * Computes and prints all fields of the CAN frame with 11 bit ID.
+ * @param {CanFrame11Bit} canFrame
+ */
 function displayCanFrame11BitFields(canFrame) {
     document.getElementById("output_can_whole_frame").innerHTML =
         canFrame.wholeFrame().toBinStringWithSpacesLeftAlign();
@@ -82,6 +101,9 @@ function displayCanFrame11BitFields(canFrame) {
     // TODO add estimated max length for arbitrary ID and payload?
 }
 
+/**
+ * Obtains, parses and validates the user input for the CAN identifier.
+ */
 function parseCanIdentifierFromInputForm() {
     const identifierStr =
         document.getElementById("input_can_identifier").value;
@@ -93,7 +115,10 @@ function parseCanIdentifierFromInputForm() {
     return identifier;
 }
 
-function parsePayloadFromInputForm() {
+/**
+ * Obtains, parses and validates the user input for the CAN Payload.
+ */
+function parseCanPayloadFromInputForm() {
     let payloadStr = document.getElementById("input_can_payload").value;
     // Strip hex prefixes, any whitespace and some common separators
     const hexPrefixOrNonHexChars = /0[xX]|[^0-9a-fA-F]/g;
@@ -107,6 +132,10 @@ function parsePayloadFromInputForm() {
     return new Uint8Array(payloadStr.map(byteStr => parseInt(byteStr, 16)));
 }
 
+/**
+ * Main function, triggering the construction of the CAN frame, stuffing etc.
+ * and displaying all of the output fields or errors.
+ */
 function calculate() {
     clearErrorsAndOutputs();
     // Parse input fields
@@ -117,21 +146,20 @@ function calculate() {
             "The input is in base 10 by default. " +
             "For base 16, use the '0x' prefix; " +
             "for base 2 use the '0b' prefix.");
-        return;
+        return; // Early exit
     }
-    const payload = parsePayloadFromInputForm();
+    const payload = parseCanPayloadFromInputForm();
     if (payload === null) {
-        displayPayloadError(
+        displayCanPayloadError(
             "Payload must have an even amount of hex characters.");
-        return;
+        return; // Early exit
     }
     // Pass everything to the CanOverhead library
     try {
-        // Successful conversion and output
         let canFrame = new CanFrame11Bit(identifier, payload);
         displayCanFrame11BitFields(canFrame);
+        // Successful conversion and output
     } catch (err) {
-        //
         if (err instanceof RangeError
             && err.message.startsWith("Identifier")) {
             // Error of the identifier
@@ -139,7 +167,7 @@ function calculate() {
         } else if (err instanceof RangeError
             && err.message.startsWith("Payload")) {
             // Error of the identifier
-            displayPayloadError(err.message);
+            displayCanPayloadError(err.message);
         } else {
             // Other errors, but they "should never happen".
             printUnknownError(
