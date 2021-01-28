@@ -21,6 +21,7 @@ import requests
 import shutil
 import subprocess as sub
 import glob
+import sys
 
 import markdown
 
@@ -109,13 +110,15 @@ def _minify(input_file_name: str, web_api_url: str) -> None:
     open(output_file_name, "w", encoding="UTF-8").write(minified)
 
 
-def shell(cmd: str) -> str:
+def _shell(cmd: str) -> str:
+    # TODO make it internal
     """Launches a simple shell command as a subprocess, returning its stdout."""
     return sub.run(cmd, shell=True, check=True, stdout=sub.PIPE).stdout.decode(
         'UTF-8')
 
 
-def _remove_ignore_if_non_existing(filename:str):
+def _remove_ignore_if_non_existing(filename: str):
+    # TODO docstring
     try:
         os.remove(filename)
     except FileNotFoundError:
@@ -138,11 +141,11 @@ def build_dir_to_gh_pages():
     if not os.path.isdir('.git'):
         raise RuntimeError("Deployment to GH Pages can only be performed "
                            "when in the repository root directory.")
-    if len(shell('git status --porcelain').strip()) > 0:
+    if len(_shell('git status --porcelain').strip()) > 0:
         raise RuntimeError("Git status is not clean. "
                            "Cannot deploy to GH Pages branch.")
-    git_head_hash = shell('git rev-parse HEAD').strip()
-    shell('git checkout gh-pages')
+    git_head_hash = _shell('git rev-parse HEAD').strip()
+    _shell('git checkout gh-pages')
     _remove_ignore_if_non_existing('.editorconfig')
     to_remove = glob.glob('*.html')
     to_remove.extend(glob.glob('*.css'))
@@ -155,12 +158,13 @@ def build_dir_to_gh_pages():
     for file in os.listdir(BUILD_DIR):
         shutil.copy2(os.path.join(BUILD_DIR, file), os.curdir)
     commit_msg = 'Minified and deployed commit {}'.format(git_head_hash[:10])
-    shell('git add --all *.{html,js,css}')
-    shell('git commit -a -m"{}"'.format(commit_msg))
-    shell('git checkout develop')
+    _shell('git add --all *.{html,js,css}')
+    _shell('git commit -a -m"{}"'.format(commit_msg))
+    _shell('git checkout develop')
 
 
-def deploy():
+def build():
+    # TODO docstring
     cleanup()
     md2html("CHANGELOG.md")
     md2html("LICENSE.md")
@@ -172,8 +176,14 @@ def deploy():
     minify_js("HtmlToLibAdapter.js")
     minify_js("TestCanOverhead.js")
     prepend_comment_in_index_file()
-    build_dir_to_gh_pages()
 
 
 if __name__ == "__main__":
-    deploy()
+    # TODO documentation
+    build()
+    try:
+        if sys.argv[1].strip() == '--commit':
+            build_dir_to_gh_pages()
+    except IndexError:
+        # No main args
+        pass
