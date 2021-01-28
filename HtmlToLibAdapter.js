@@ -62,17 +62,18 @@ function printUnknownError(msg) {
 }
 
 /**
- * Computes and prints all fields of the CAN frame with 11 bit ID.
+ * Computes and prints the whole CAN frame with 11 bit ID as bit sequence.
  * @param {CanFrame11Bit} canFrame
  */
-function displayCanFrame11BitFields(canFrame) {
-    // Whole frame
+function displayCanFrame11BitWholeFrame(canFrame) {
+    // Without stuffing
     let bits = canFrame.wholeFrame();
     document.getElementById("output_can_whole_frame").innerHTML =
         "["
         + bits.length().toString()
         + " bits]<br/>"
         + bits.toBinStringWithSpacesLeftAlign();
+    // With stuffing
     let bitsWithStuffs = canFrame.wholeFrameStuffed();
     let stuffBitsAmount = bitsWithStuffs.length() - bits.length();
     document.getElementById("output_can_whole_frame_stuffed").innerHTML =
@@ -82,10 +83,17 @@ function displayCanFrame11BitFields(canFrame) {
         + stuffBitsAmount
         + " stuff bits]<br/>"
         + bitsWithStuffs.toBinStringWithSpacesLeftAlign();
+    // Max theoretical length
     document.getElementById("output_max_length").innerHTML =
         canFrame.maxLengthAfterStuffing().toString(10)
         + " bits, assuming same Identifier and Payload length";
-    // Field by field
+}
+
+/**
+ * Computes and prints all fields of a CAN frame with 11 bit ID.
+ * @param {CanFrame11Bit} canFrame
+ */
+function displayCanFrame11BitFields(canFrame) {
     document.getElementById("output_can_field01").innerHTML =
         canFrame.field01_startOfFrame().toBinString();
     document.getElementById("output_can_field02").innerHTML =
@@ -112,8 +120,6 @@ function displayCanFrame11BitFields(canFrame) {
         canFrame.field12_endOfFrame().toBinString();
     document.getElementById("output_can_field13").innerHTML =
         canFrame.field13_pauseAfterFrame().toBinString();
-    // TODO add amount of stuff bits added + exact length
-    // TODO add estimated max length for arbitrary ID and payload?
 }
 
 /**
@@ -172,6 +178,7 @@ function calculate() {
     // Pass everything to the CanOverhead library
     try {
         let canFrame = new CanFrame11Bit(identifier, payload);
+        displayCanFrame11BitWholeFrame(canFrame);
         displayCanFrame11BitFields(canFrame);
         // Successful conversion and output
     } catch (err) {
