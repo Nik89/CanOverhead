@@ -14,99 +14,169 @@
     <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
-    <h1 id="main_title">
-        CAN overhead, stuffing and bitrate calculator
-    </h1>
-    <noscript>
-        <h2 id="noscript_warning">
-            Please enable JavaScript for this website to work.
-        </h2>
-    </noscript>
-    <div id="input_form">
-        <div class="input">
-            <div>
-                <label for="input_can_identifier">CAN Identifier (dec, "0x" for hex, "0b" for bin):</label>
-                <input id="input_can_identifier" name="input_can_identifier" type="text"/>
-                <div id="input_can_identifier_error" class="input-error"></div>
-            </div>
-            <div>
-                <label for="input_can_payload">CAN Payload data (hex):</label>
-                <input id="input_can_payload" name="input_can_payload" type="text"/>
-                <div id="input_can_payload_error" class="input-error"></div>
-            </div>
-            <div id="input_unknown_error" class="input-error"></div>
+<h1 id="main_title">
+    CAN overhead, stuffing and bitrate calculator
+</h1>
+<noscript>
+    <h2 id="noscript_warning">
+        Please enable JavaScript for this website to work.
+        <br/>
+        If you don't trust the code (some paranoia is always good!),
+        you can inspect it first on
+        <a href="https://github.com/Nik89/CanOverhead">
+            GitHub
+        </a>.
+        The page works also offline, so you can download the files and
+        open the <i>index.html</i> file in your browser.
+    </h2>
+</noscript>
+<div id="input_form">
+    <div class="input">
+        <div>
+            <label for="input_can_identifier">
+                CAN Identifier (dec, "0x" for hex, "0b" for bin):</label>
+            <input id="input_can_identifier" name="input_can_identifier"
+                   type="text"/>
+            <div id="input_can_identifier_error" class="input-error"></div>
         </div>
-        <div class="buttons">
-            <button onclick="calculate()">Compute</button>
+        <div>
+            <label for="input_can_payload">
+                CAN Payload data (hex):
+            </label>
+            <input id="input_can_payload" name="input_can_payload" type="text"/>
+            <div id="input_can_payload_error" class="input-error"></div>
         </div>
-        <div class="output">
-            <label for="output_can_whole_frame">Whole CAN frame (bin):</label>
-            <div id="output_can_whole_frame"></div>
-            <label for="output_can_whole_frame_stuffed">Whole CAN frame with stuff bits (bin):</label>
-            <div id="output_can_whole_frame_stuffed"></div>
-            CAN frame fields:
-            <ol>
-            <li><label for="output_can_field01">Start of Frame (SOF):</label>
-            <div id="output_can_field01"></div></li>
-            <li><label for="output_can_field02">Identifier (ID):</label> // TODO fix names
-            <div id="output_can_field02"></div></li>
-            <li><label for="output_can_field02">Remote Transfer Request (RTR):</label>
-            <div id="output_can_field03"></div></li>
-            <li><label for="output_can_field04">Identifier Extension (IDE):</label>
-            <div id="output_can_field04"></div></li>
-            <li><label for="output_can_field05">Reserved 0 (R0):</label>
-            <div id="output_can_field05"></div></li>
-            <li><label for="output_can_field06">Data Length Code (DLC):</label>
-            <div id="output_can_field06"></div></li>
-            <li><label for="output_can_field07">Data (Payload):</label>
-            <div id="output_can_field07"></div></li>
-            <li><label for="output_can_field08">Cyclic Redundancy Check (CRC):</label>
-            <div id="output_can_field08"></div></li>
-            <li><label for="output_can_field09">CRC Delimiter:</label>
-            <div id="output_can_field09"></div></li>
-            <li><label for="output_can_field10">Acknowledgement (ACK) Slot:</label>
-            <div id="output_can_field10"></div></li>
-            <li><label for="output_can_field11">Acknowledgement Delimiter:</label>
-            <div id="output_can_field11"></div></li>
-            <li><label for="output_can_field12">End of Frame (EOF):</label>
-            <div id="output_can_field12"></div></li>
-            <li><label for="output_can_field13">Pause After Frame:</label>
-            <div id="output_can_field13"></div></li>
-            </ol>
-        </div>
+        <div id="input_unknown_error" class="input-error"></div>
     </div>
-    <footer>
-        <div>
-            Made with &#x1f499; by
-            <a href="https://github.com/Nik89">Nicola Furlan</a>
-            and <a href="https://matjaz.it/">Matjaž Guštin</a>
-            &ndash;
-            Version 0.0.0
-            &ndash;
-            <a href="changelog.html">
-                Changelog
-            </a>
-            &ndash;
-            <a href="https://github.com/Nik89/CanOverhead">
-                Source code on GitHub
-            </a>
-            &ndash;
-            <a href="https://github.com/Nik89/CanOverhead/issues">
-                Found a bug?
-            </a>
-        </div>
-        <br>
-        <div>
-            This website does not use cookies, does not advertise nor track the
-            users. All calculations happens in your browser, no data is sent
-            to any server.
-            The results of the calculator are provided with best-effort
-            from the authors but with no guarantee of correctness, as stated
-            formally in  the <a href="license.html">source code license</a>.
-        </div>
-    </footer>
-    <script type="text/javascript" src="CanOverhead.js" charset="utf-8"></script>
-    <script type="text/javascript" src="HtmlToLibAdapter.js" charset="utf-8"></script>
-    <script type="text/javascript" src="TestCanOverhead.js" charset="utf-8"></script>
-    </body>
+    <div class="buttons">
+        <button onclick="calculate()">Compute</button>
+    </div>
+    <div class="output">
+        <label for="output_can_whole_frame">
+            Whole CAN frame (bin):
+        </label>
+        <div id="output_can_whole_frame"></div>
+        <label for="output_can_whole_frame_stuffed">
+            Whole CAN frame with stuff bits (bin):
+        </label>
+        <div id="output_can_whole_frame_stuffed"></div>
+        CAN frame fields:
+        <ol>
+            <li>
+                <label for="output_can_field01">
+                    Start of Frame (SOF):
+                </label>
+                <div id="output_can_field01"></div>
+            </li>
+            <li>
+                <label for="output_can_field02">
+                    Identifier (ID):
+                </label>
+                <div id="output_can_field02"></div>
+            </li>
+            <li>
+                <label for="output_can_field02">
+                    Remote Transfer Request (RTR):
+                </label>
+                <div id="output_can_field03"></div>
+            </li>
+            <li>
+                <label for="output_can_field04">
+                    Identifier Extension (IDE):
+                </label>
+                <div id="output_can_field04"></div>
+            </li>
+            <li>
+                <label for="output_can_field05">
+                    Reserved 0 (R0):
+                </label>
+                <div id="output_can_field05"></div>
+            </li>
+            <li>
+                <label for="output_can_field06">
+                    Data Length Code (DLC):
+                </label>
+                <div id="output_can_field06"></div>
+            </li>
+            <li>
+                <label for="output_can_field07">
+                    Data (Payload):
+                </label>
+                <div id="output_can_field07"></div>
+            </li>
+            <li>
+                <label for="output_can_field08">
+                    Cyclic Redundancy Check (CRC):
+                </label>
+                <div id="output_can_field08"></div>
+            </li>
+            <li>
+                <label for="output_can_field09">
+                    CRC Delimiter:
+                </label>
+                <div id="output_can_field09"></div>
+            </li>
+            <li>
+                <label for="output_can_field10">
+                    Acknowledgement (ACK) Slot:
+                </label>
+                <div id="output_can_field10"></div>
+            </li>
+            <li>
+                <label for="output_can_field11">
+                    Acknowledgement Delimiter:
+                </label>
+                <div id="output_can_field11"></div>
+            </li>
+            <li>
+                <label for="output_can_field12">
+                    End of Frame (EOF):
+                </label>
+                <div id="output_can_field12"></div>
+            </li>
+            <li>
+                <label for="output_can_field13">
+                    Pause After Frame:
+                </label>
+                <div id="output_can_field13"></div>
+            </li>
+        </ol>
+    </div>
+</div>
+<footer>
+    <div>
+        Made with &#x1f499; by
+        <a href="https://github.com/Nik89">Nicola Furlan</a>
+        and <a href="https://matjaz.it/">Matjaž Guštin</a>
+        &ndash;
+        Version 0.0.0
+        &ndash;
+        <a href="changelog.html">
+            Changelog
+        </a>
+        &ndash;
+        <a href="https://github.com/Nik89/CanOverhead">
+            Source code on GitHub
+        </a>
+        &ndash;
+        <a href="https://github.com/Nik89/CanOverhead/issues">
+            Found a bug?
+        </a>
+    </div>
+    <br>
+    <div>
+        This website does not use cookies, does not advertise nor track the
+        users. All calculations happens in your browser, no data is sent
+        to any server.
+        The results of the calculator are provided with best-effort
+        from the authors but with no guarantee of correctness, as stated
+        formally in the <a href="license.html">source code license</a>.
+    </div>
+</footer>
+<script type="text/javascript" src="CanOverhead.js" charset="utf-8"></script>
+<script type="text/javascript" src="HtmlToLibAdapter.js"
+        charset="utf-8"></script>
+<script type="text/javascript" src="TestCanOverhead.js"
+        charset="utf-8"></script>
+</body>
 </html>
