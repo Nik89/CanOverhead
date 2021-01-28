@@ -7,11 +7,33 @@
  *
  * @licence BSD 3-clause license. See LICENSE.md for details.
  */
+// TODO press enter to run compute
+// TODO use bits with spaces alighned to the left!
 
-let compute = () => {
+function clear() {
     // Clear errors
     document.getElementById("input_can_identifier_error").innerHTML = "";
     document.getElementById("input_can_payload_error").innerHTML = "";
+    // Clear outputs
+    document.getElementById("output_can_whole_frame").innerHTML = "";
+    document.getElementById("output_can_whole_frame_stuffed").innerHTML = "";
+    document.getElementById("output_can_field01").innerHTML = "";
+    document.getElementById("output_can_field02").innerHTML = "";
+    document.getElementById("output_can_field03").innerHTML = "";
+    document.getElementById("output_can_field04").innerHTML = "";
+    document.getElementById("output_can_field05").innerHTML = "";
+    document.getElementById("output_can_field06").innerHTML = "";
+    document.getElementById("output_can_field07").innerHTML = "";
+    document.getElementById("output_can_field08").innerHTML = "";
+    document.getElementById("output_can_field09").innerHTML = "";
+    document.getElementById("output_can_field10").innerHTML = "";
+    document.getElementById("output_can_field11").innerHTML = "";
+    document.getElementById("output_can_field12").innerHTML = "";
+    document.getElementById("output_can_field13").innerHTML = "";
+}
+
+function compute() {
+    clear();
     // Parse input fields
     const identifierStr = document.getElementById("input_can_identifier").value;
     const identifier = Number(identifierStr);
@@ -37,6 +59,22 @@ let compute = () => {
         // Set outputs
         document.getElementById("output_can_whole_frame").innerHTML = canFrame.wholeFrame().toBinStringWithSpaces();
         document.getElementById("output_can_whole_frame_stuffed").innerHTML = canFrame.wholeFrameStuffed().toBinStringWithSpaces();
+        document.getElementById("output_can_field01").innerHTML = canFrame.field01_startOfFrame().toBinString();
+        document.getElementById("output_can_field02").innerHTML = canFrame.field02_identifier().toBinStringWithSpaces();
+        document.getElementById("output_can_field03").innerHTML = canFrame.field03_remoteTransmissionRequest().toBinString();
+        document.getElementById("output_can_field04").innerHTML = canFrame.field04_identifierExtensionBit().toBinString();
+        document.getElementById("output_can_field05").innerHTML = canFrame.field05_reservedBit().toBinString();
+        document.getElementById("output_can_field06").innerHTML = canFrame.field06_dataLengthCode().toBinString();
+        document.getElementById("output_can_field07").innerHTML = canFrame.field07_dataField().toBinStringWithSpaces();
+        document.getElementById("output_can_field08").innerHTML = canFrame.field08_crc().toBinStringWithSpaces();
+        document.getElementById("output_can_field09").innerHTML = canFrame.field09_crcDelimiter().toBinString();
+        document.getElementById("output_can_field10").innerHTML = canFrame.field10_ackSlot().toBinString();
+        document.getElementById("output_can_field11").innerHTML = canFrame.field11_ackDelimiter().toBinString();
+        document.getElementById("output_can_field12").innerHTML = canFrame.field12_endOfFrame().toBinString();
+        document.getElementById("output_can_field13").innerHTML = canFrame.field13_pauseAfterFrame().toBinString();
+        // TODO add max frame length and other fields
+        // TODO add amount of stuff bits added + exact length
+        // TODO add estimated max length for arbitrary ID and payload?
     } catch (err) {
         if (err instanceof RangeError && err.message.startsWith("Identifier")) {
             // Error of the identifier
@@ -49,28 +87,4 @@ let compute = () => {
             console.error(err);
         }
     }
-    /*
-        // DRAFT BUT MORE COMPLETE
-        // Split at any whitespace or some common separators
-        const separators = /[,;'"|\s]/g;
-        // "0xA, BB 0X0c" => ["0xA", "", "BB", "0X0c"]
-        let bytesStrings = payloadStr.split(separators);
-        // Remove empty strings from array of strings
-        // ["0xA", "", "BB", "0x0c"] => ["0xA", "BB", "0x0c"]
-        bytesStrings = bytesStrings.filter(byteStr => byteStr.length !== 0);
-        // Add "0x" to bytes that don't have it to parse them with Number() in hex
-        // ["0xA", "BB", "0X0c"] => ["0xA", "0xBB", "0X0c"]
-        // If input did not have any separators, thus looks like "AABBCC", then
-        // split it every 2 characters.
-        bytesStrings.forEach(byteStr => {
-            if (!byteStr.toLowerCase().startsWith("0x")) {
-                byteStr = "0x" + byteStr;
-            }
-            return byteStr;
-        });
-        // Convert to Uint8Array
-        // ["0xA", "0xBB", "0X0c"] => [10, 187, 12]
-        const payload = bytesStrings =>
-            new Uint8Array(bytesStrings.map(byteStr => Number(byteStr)));
-    */
 }

@@ -43,23 +43,36 @@
             <div id="output_can_whole_frame"></div>
             <label for="output_can_whole_frame_stuffed">Whole CAN frame with stuff bits (bin):</label>
             <div id="output_can_whole_frame_stuffed"></div>
+            CAN frame fields:
+            <ol>
+            <li><label for="output_can_field01">Start of Frame (SOF):</label>
+            <div id="output_can_field01"></div></li>
+            <li><label for="output_can_field02">Identifier (ID):</label> // TODO fix names
+            <div id="output_can_field02"></div></li>
+            <li><label for="output_can_field02">Remote Transfer Request (RTR):</label>
+            <div id="output_can_field03"></div></li>
+            <li><label for="output_can_field04">Identifier Extension (IDE):</label>
+            <div id="output_can_field04"></div></li>
+            <li><label for="output_can_field05">Reserved 0 (R0):</label>
+            <div id="output_can_field05"></div></li>
+            <li><label for="output_can_field06">Data Length Code (DLC):</label>
+            <div id="output_can_field06"></div></li>
+            <li><label for="output_can_field07">Data (Payload):</label>
+            <div id="output_can_field07"></div></li>
+            <li><label for="output_can_field08">Cyclic Redundancy Check (CRC):</label>
+            <div id="output_can_field08"></div></li>
+            <li><label for="output_can_field09">CRC Delimiter:</label>
+            <div id="output_can_field09"></div></li>
+            <li><label for="output_can_field10">Acknowledgement (ACK) Slot:</label>
+            <div id="output_can_field10"></div></li>
+            <li><label for="output_can_field11">Acknowledgement Delimiter:</label>
+            <div id="output_can_field11"></div></li>
+            <li><label for="output_can_field12">End of Frame (EOF):</label>
+            <div id="output_can_field12"></div></li>
+            <li><label for="output_can_field13">Pause After Frame:</label>
+            <div id="output_can_field13"></div></li>
+            </ol>
         </div>
-    </div>
-    <div>
-        <br/>
-        -----<br/>
-        Input: CAN ID: form with binary string, e.g. [   100101 ]<br/>
-        Input: Payload: form with binary string, e.g. [   00100111001001 ]<br/>
-        <br/>
-        Output:<br/>
-        frame bits min, max<br/>
-        whole frame without stuff bits as binary string, e.g. 100101001001...<br/>
-        while frame without stuff bits broken down per parts<br/>
-        - SOF: 1 <br/>
-        - ID: 1001001 <br/>
-        - etc.<br/>
-        whole frame WITH stuff bits as binary string, e.g. 100101001001...
-        (optional, make them bold?)<br/>
     </div>
     <footer>
         <div>
