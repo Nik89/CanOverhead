@@ -33,11 +33,13 @@ function clearErrorsAndOutputs() {
 }
 
 function displayCanIdentifierError(msg) {
-    document.getElementById("input_can_identifier_error").innerHTML = msg;
+    document.getElementById("input_can_identifier_error").innerHTML
+        = msg;
 }
 
 function displayPayloadError(msg) {
-    document.getElementById("input_can_payload_error").innerHTML = msg;
+    document.getElementById("input_can_payload_error").innerHTML
+        = msg;
 }
 
 function printUnknownError(msg) {
@@ -45,29 +47,44 @@ function printUnknownError(msg) {
 }
 
 function displayCanFrame11BitFields(canFrame) {
-    // TODO use bits with spaces aligned to the left!
-    document.getElementById("output_can_whole_frame").innerHTML = canFrame.wholeFrame().toBinStringWithSpacesLeftAlign();
-    document.getElementById("output_can_whole_frame_stuffed").innerHTML = canFrame.wholeFrameStuffed().toBinStringWithSpacesLeftAlign();
-    document.getElementById("output_can_field01").innerHTML = canFrame.field01_startOfFrame().toBinString();
-    document.getElementById("output_can_field02").innerHTML = canFrame.field02_identifier().toBinStringWithSpacesRightAlign();
-    document.getElementById("output_can_field03").innerHTML = canFrame.field03_remoteTransmissionRequest().toBinString();
-    document.getElementById("output_can_field04").innerHTML = canFrame.field04_identifierExtensionBit().toBinString();
-    document.getElementById("output_can_field05").innerHTML = canFrame.field05_reservedBit().toBinString();
-    document.getElementById("output_can_field06").innerHTML = canFrame.field06_dataLengthCode().toBinString();
-    document.getElementById("output_can_field07").innerHTML = canFrame.field07_dataField().toBinStringWithSpacesRightAlign();
-    document.getElementById("output_can_field08").innerHTML = canFrame.field08_crc().toBinStringWithSpacesRightAlign();
-    document.getElementById("output_can_field09").innerHTML = canFrame.field09_crcDelimiter().toBinString();
-    document.getElementById("output_can_field10").innerHTML = canFrame.field10_ackSlot().toBinString();
-    document.getElementById("output_can_field11").innerHTML = canFrame.field11_ackDelimiter().toBinString();
-    document.getElementById("output_can_field12").innerHTML = canFrame.field12_endOfFrame().toBinString();
-    document.getElementById("output_can_field13").innerHTML = canFrame.field13_pauseAfterFrame().toBinString();
+    document.getElementById("output_can_whole_frame").innerHTML =
+        canFrame.wholeFrame().toBinStringWithSpacesLeftAlign();
+    document.getElementById("output_can_whole_frame_stuffed").innerHTML =
+        canFrame.wholeFrameStuffed().toBinStringWithSpacesLeftAlign();
+    document.getElementById("output_can_field01").innerHTML =
+        canFrame.field01_startOfFrame().toBinString();
+    document.getElementById("output_can_field02").innerHTML =
+        canFrame.field02_identifier().toBinStringWithSpacesRightAlign();
+    document.getElementById("output_can_field03").innerHTML =
+        canFrame.field03_remoteTransmissionRequest().toBinString();
+    document.getElementById("output_can_field04").innerHTML =
+        canFrame.field04_identifierExtensionBit().toBinString();
+    document.getElementById("output_can_field05").innerHTML =
+        canFrame.field05_reservedBit().toBinString();
+    document.getElementById("output_can_field06").innerHTML =
+        canFrame.field06_dataLengthCode().toBinString();
+    document.getElementById("output_can_field07").innerHTML =
+        canFrame.field07_dataField().toBinStringWithSpacesRightAlign();
+    document.getElementById("output_can_field08").innerHTML =
+        canFrame.field08_crc().toBinStringWithSpacesRightAlign();
+    document.getElementById("output_can_field09").innerHTML =
+        canFrame.field09_crcDelimiter().toBinString();
+    document.getElementById("output_can_field10").innerHTML =
+        canFrame.field10_ackSlot().toBinString();
+    document.getElementById("output_can_field11").innerHTML =
+        canFrame.field11_ackDelimiter().toBinString();
+    document.getElementById("output_can_field12").innerHTML =
+        canFrame.field12_endOfFrame().toBinString();
+    document.getElementById("output_can_field13").innerHTML =
+        canFrame.field13_pauseAfterFrame().toBinString();
     // TODO add max frame length and other fields
     // TODO add amount of stuff bits added + exact length
     // TODO add estimated max length for arbitrary ID and payload?
 }
 
 function parseCanIdentifierFromInputForm() {
-    const identifierStr = document.getElementById("input_can_identifier").value;
+    const identifierStr =
+        document.getElementById("input_can_identifier").value;
     // Parse decimal, 0x hex input and 0b binary input
     const identifier = Number(identifierStr);
     if (isNaN(identifier)) {
@@ -95,12 +112,17 @@ function calculate() {
     // Parse input fields
     const identifier = parseCanIdentifierFromInputForm();
     if (identifier === null) {
-        displayCanIdentifierError("Incorrect identifier format."); // TODO better msg
+        displayCanIdentifierError(
+            "Incorrect identifier format. " +
+            "The input is in base 10 by default. " +
+            "For base 16, use the '0x' prefix; " +
+            "for base 2 use the '0b' prefix.");
         return;
     }
     const payload = parsePayloadFromInputForm();
     if (payload === null) {
-        displayPayloadError("Payload must have an even amount of hex characters.");
+        displayPayloadError(
+            "Payload must have an even amount of hex characters.");
         return;
     }
     // Pass everything to the CanOverhead library
@@ -110,15 +132,20 @@ function calculate() {
         displayCanFrame11BitFields(canFrame);
     } catch (err) {
         //
-        if (err instanceof RangeError && err.message.startsWith("Identifier")) {
+        if (err instanceof RangeError
+            && err.message.startsWith("Identifier")) {
             // Error of the identifier
             displayCanIdentifierError(err.message);
-        } else if (err instanceof RangeError && err.message.startsWith("Payload")) {
+        } else if (err instanceof RangeError
+            && err.message.startsWith("Payload")) {
             // Error of the identifier
             displayPayloadError(err.message);
         } else {
             // Other errors, but they "should never happen".
-            printUnknownError("An unexpected error occurred :( Please <a href=\"https://github.com/Nik89/CanOverhead/issues\">report</a> the conditions leading to your bug!");
+            printUnknownError(
+                "An unexpected error occurred :( Please " +
+                "<a href=\"https://github.com/Nik89/CanOverhead/issues\">" +
+                "report</a> the conditions leading to your bug!");
             console.error(err);
         }
     }
