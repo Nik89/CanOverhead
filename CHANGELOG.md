@@ -9,12 +9,29 @@ and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 *******************************************************************************
+
 [UNRELEASED] - 2021-01-xx
 ----------------------------------------
 
-First version.
+First version, minimum sets of features.
+Classic CAN 11-bit ID supported, listing all fields, whole frame as bits pre
+and post-stuffing, max worst-case theoretical frame length.
 
 ### Added
 
-- TBD
-
+- Classic CAN with 11-bit IDs with the CAN ID and payload content known:
+  - CAN ID input accepted in binary, hex and decimal format, e.g. `0b0010010`,
+    `0xAA`, `42`.
+  - Payload content input accepted in hex format, e.g. `AA, 0x0C...`.
+  - Compute and display the whole frame as bits (header, payload, trailer)
+    with format `0110 1011 1001 1000 ...` without stuff bits.
+    The computation of the
+    [CRC-15](https://www.can-cia.org/can-knowledge/can/crc/)
+    is included in the computation of the trailer.
+  - Same as previous point but with stuff bits included.
+  - Compute and display the exact amount of added stuff bits.
+  - Compute the size in bits of the whole frame (header, payload, trailer)
+    without stuff bits.
+  - Compute the size range in bits of the whole frame when taking also
+    stuff bits into account (min = no stuff bits applied, max = max stuff
+    bits applied for CAN ID and payload).
