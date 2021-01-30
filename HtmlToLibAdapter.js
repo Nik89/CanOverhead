@@ -85,8 +85,7 @@ function displayCanFrame11BitWholeFrame(canFrame) {
         + bitsWithStuffs.toBinStringWithSpacesLeftAlign();
     // Max theoretical length
     document.getElementById("output_max_length").innerHTML =
-        canFrame.maxLengthAfterStuffing().toString(10)
-        + " bits, assuming same Identifier and Payload length";
+        canFrame.maxLengthAfterStuffing().toString(10) + " bits";
 }
 
 /**
