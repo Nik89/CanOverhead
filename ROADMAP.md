@@ -35,26 +35,13 @@ and post-stuffing, max worst-case theoretical frame length.
     bits applied for CAN ID and payload).
 
 
-[0.3.0]
+[0.2.0]
 ----------------------------------------
 
-More input formats accepted.
-
-### Added
-
-- Display of the whole frame also in hexadecimal format, padded with zero-bits
-  to the right to the nearest multiple of 8. Display also the amount of
-  padding bits added (radio button or similar to select input type).
-- CAN ID input accepted also in decimal and hexadecimal format,
-  e.g. `42` or `11A` (radio button or similar to select input type)
-- Payload content input accepted (radio button or similar to select input type)
-  also as comma-separated list of bits,
-  e.g. `1,0,1,1`, or hexadecimal, e.g. `0b12`. Case insensitive, zero-padding
-  to the left required so `b12` is invalid.
-- Make stuff bits bold in the provided output
+Support for RTR frames (1 bit differs in header, no payload).
 
 
-[0.4.0]
+[0.3.0]
 ----------------------------------------
 
 Bitrates and transfer time.
@@ -68,10 +55,10 @@ Bitrates and transfer time.
 - Calculation of gross/net (effective) transfer time:
   - exact when exact ID and payload is given
   - range when the ID and payload are not known
+- Display stuff bits in bold
 
 
-
-[0.5.0]
+[0.4.0]
 ----------------------------------------
 
 29-bit CAN IDs.
@@ -83,7 +70,7 @@ Bitrates and transfer time.
 
 
 
-[0.6.0]
+[0.5.0]
 ----------------------------------------
 
 CAN FD with fixed datarate.
@@ -104,3 +91,18 @@ CAN FD with flexible datarate.
 
 - Support for CAN FD with payload datarate different than then
   arbitration datarate.
+
+
+
+Other ideas
+----------------------------------------
+
+- Display of the whole frame also in hexadecimal format, padded with zero-bits
+  to the right to the nearest multiple of 8. Display also the amount of
+  padding bits added radio button or similar to select input type).
+- CAN ID input accepted also in decimal and hexadecimal format,
+  e.g. `42` or `11A` (radio button or similar to select input type)
+- Payload content input accepted (radio button or similar to select input type)
+  also as comma-separated list of bits,
+  e.g. `1,0,1,1`, or hexadecimal, e.g. `0b12`. Case insensitive, zero-padding
+  to the left required so `b12` is invalid.
