@@ -19,6 +19,8 @@ and this project adheres to
 - Autofocus on CAN ID input field.
 - Display a generic error message in case of unknown and uncaught errors
   at any level in the execution of the code instead of silently doing nothing.
+- Default values for input forms with some example data to let the user
+  quickly run the calculator immediately after loading the page.
 
 
 ### Fixed
