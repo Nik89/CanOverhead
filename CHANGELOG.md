@@ -10,6 +10,15 @@ and this project adheres to
 
 *******************************************************************************
 
+[UNRELEASED]
+----------------------------------------
+
+### Fixed
+
+- Broken links in readme to the deployed web page (missing "/" at URL end)
+
+
+
 [1.0.0] - 2021-01-31
 ----------------------------------------
 
