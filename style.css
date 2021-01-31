@@ -1,0 +1,66 @@
+/*
+ * Style sheet of the the CAN overhead calculator.
+ * Published under the terms of the BSD 3-Clause license.
+ * See LICENSE.md for details.
+ */
+body {
+    margin: 0.5rem;
+    padding: 0.5rem;
+    font-family: Source Code Pro, Menlo, Consolas, Lucida Console, monospace;
+    font-size: 1.5rem;
+    background-color: #f8f8f8; /* Slightly less bright white-gray */
+}
+
+a {
+    color: #1EAEDB;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #0F90BE;
+}
+
+#main_title {
+    text-align: center;
+    font-size: 2.5rem;
+}
+
+#noscript_warning {
+    text-align: center;
+    font-size: 1.5rem;
+}
+
+footer {
+    height: 2rem;
+    font-size: x-small;
+    text-align: left;
+    padding-top: 2rem;
+    margin: auto;
+    width: 60%;
+}
+
+.input_form {
+    background-color: #c6c6c67a;
+}
+
+.input-error {
+    color: red;
+    font-size: 1rem;
+}
+
+#input_can_identifier {
+    width: 20em; /* Enough for 31 chars: 0b111... with 29 bits. */
+}
+
+#input_can_payload {
+    width: 90em; /* Enough for 128 hex chars, covering 64 bytes. */
+}
+
+.buttons {
+    margin: 1rem;
+}
+
+.output {
+    margin-left: 2rem;
+    font-size: 1.2rem;
+}
