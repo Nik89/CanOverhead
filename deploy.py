@@ -160,7 +160,7 @@ def build_dir_to_gh_pages():
     for file in os.listdir(BUILD_DIR):
         shutil.copy2(os.path.join(BUILD_DIR, file), os.curdir)
     commit_msg = 'Minified and deployed commit {}'.format(git_head_hash[:10])
-    _shell('git add --all *.{html,js,css,gz,py,txt}')
+    _shell('git add --all')
     _shell('git commit -a -m"{}"'.format(commit_msg))
     _shell('git checkout develop')
 
