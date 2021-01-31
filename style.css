@@ -26,8 +26,14 @@ a:hover {
 }
 
 #noscript_warning {
-    text-align: center;
+    margin: 2rem;
+    padding: 1rem;
     font-size: 1.5rem;
+}
+
+#noscript_warning h3 {
+    color: darkred;
+    font-style: italic;
 }
 
 footer {

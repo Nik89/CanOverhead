@@ -30,6 +30,10 @@ and this project adheres to
 - Handle empty or whitespace-only payloads as valid input (no data).
 - Footer's too small bottom margin
 - Typo in footer disclaimer
+- noscript-message about JavaScript being required is not all-h2 anymore.
+  Additional styling is added for it to make it at least slightly decent
+  looking.
+
 
 
 [1.0.0] - 2021-01-31
