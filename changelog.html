@@ -5,9 +5,28 @@
 and this project adheres to
 <a href="https://semver.org/spec/v2.0.0.html">Semantic Versioning</a>.</p>
 <hr>
-<h2>[UNRELEASED] - 2021-01-xx</h2>
-<p>First version.</p>
+<h2>[1.0.0] - 2021-01-31</h2>
+<p>First version, minimum sets of features.
+Classic CAN 11-bit ID supported, listing all fields, whole frame as bits pre
+and post-stuffing, max worst-case theoretical frame length.</p>
 <h3>Added</h3>
 <ul>
-<li>TBD</li>
+<li>Classic CAN with 11-bit IDs with the CAN ID and payload content known:</li>
+<li>CAN ID input accepted in binary, hex and decimal format, e.g. <code>0b0010010</code>,
+    <code>0xAA</code>, <code>42</code>.</li>
+<li>Payload content input accepted in hex format, e.g. <code>AA, 0x0C...</code>.</li>
+<li>Compute and display the whole frame as bits (header, payload, trailer)
+    with format <code>0110 1011 1001 1000 ...</code> without stuff bits.
+    The computation of the
+    <a href="https://www.can-cia.org/can-knowledge/can/crc/">CRC-15</a>
+    is included in the computation of the trailer.</li>
+<li>Same as previous point but with stuff bits included.</li>
+<li>Compute and display the exact amount of added stuff bits.</li>
+<li>Compute the size in bits of the whole frame (header, payload, trailer)
+    without stuff bits.</li>
+<li>Compute the size range in bits of the whole frame when taking also
+    stuff bits into account (min = no stuff bits applied, max = max stuff
+    bits applied for CAN ID and payload).</li>
+<li>Deployment script that prepares and minifies all the files and compresses
+    them in <code>.gz</code> format</li>
 </ul>

@@ -18,73 +18,144 @@ CAN overhead, stuffing and bitrate calculator
 <noscript>
 <h2 id=noscript_warning>
 Please enable JavaScript for this website to work.
+<br>
+If you don't trust the code (some paranoia is always good!), you can inspect it first on
+<a href=https://github.com/Nik89/CanOverhead>
+GitHub
+</a>. The page works also offline, so you can download the files and open the <i>index.html</i> file in your browser.
 </h2>
 </noscript>
-<p>v0.1 - Approximate computation of the frame information</p>
-<div class=v1>
+<div id=input_form>
 <div class=input>
-<label for=v1-in-payload-length>
-Payload length (from 0 to 8) [byte]:
+<div>
+<label for=input_can_identifier>
+CAN Identifier [dec, "0x" for hex, "0b" for bin]:</label>
+<input id=input_can_identifier name=input_can_identifier>
+<div id=input_can_identifier_error class=input-error></div>
+</div>
+<div>
+<label for=input_can_payload>
+CAN Payload data (hex):
 </label>
-<input id=v1-in-payload-length type=number min=0 max=8>
-<div id=v1-input-error class=input-error></div>
+<input id=input_can_payload name=input_can_payload>
+<div id=input_can_payload_error class=input-error></div>
 </div>
-<div>
-<button onclick=computeV1()>--- Compute --></button>
+<div id=input_unknown_error class=input-error></div>
 </div>
-<div class=output>
-<label>Frame length (interval) [bit]:</label>
-<div>[
-<span id=v1-out-frames-bits-min></span>,
-<span id=v1-out-frames-bits-max></span>
-]</div>
-</div>
-</div>
-<p>v0.2 - Precise computation of the frame information</p>
-<div class=v2>
-<div class=input>
-<div>
-<label for=v2-identified>CAN Identifier:</label>
-<input id=v2-in-identified name=v2-identified>
-<div id=v2-input-id-error class=input-error></div>
-</div>
-<div>
-<label for=v2-payload>CAN Payload data:</label>
-<input id=v2-in-payload name=v2-payload>
-<div id=v2-input-pl-error class=input-error></div>
-</div>
-</div>
-<div>
-<button onclick=computeV2()>Compute</button>
+<div class=buttons>
+<button onclick=calculate()>Compute</button>
 </div>
 <div class=output>
+Whole frame [binary]:
+<ul>
+<li>
+<label for=output_can_whole_frame>
+Without stuff bits:
+</label>
+<div id=output_can_whole_frame></div>
+</li>
+<li>
+<label for=output_can_whole_frame_stuffed>
+With stuff bits (as appears on bus):
+</label>
+<div id=output_can_whole_frame_stuffed></div>
+</li>
+<li>
+<label for=output_max_length>
+Worst-case frame length after stuffing, assuming same ID and payload lengths:
+</label>
+<div id=output_max_length></div>
+</li>
+</ul>
+CAN frame fields without stuff bits [binary]:
+<ol>
+<li>
+<label for=output_can_field01>
+Start of Frame (SOF):
+</label>
+<div id=output_can_field01></div>
+</li>
+<li>
+<label for=output_can_field02>
+Identifier (ID):
+</label>
+<div id=output_can_field02></div>
+</li>
+<li>
+<label for=output_can_field02>
+Remote Transfer Request (RTR):
+</label>
+<div id=output_can_field03></div>
+</li>
+<li>
+<label for=output_can_field04>
+Identifier Extension (IDE):
+</label>
+<div id=output_can_field04></div>
+</li>
+<li>
+<label for=output_can_field05>
+Reserved 0 (R0):
+</label>
+<div id=output_can_field05></div>
+</li>
+<li>
+<label for=output_can_field06>
+Data Length Code (DLC):
+</label>
+<div id=output_can_field06></div>
+</li>
+<li>
+<label for=output_can_field07>
+Data (Payload):
+</label>
+<div id=output_can_field07></div>
+</li>
+<li>
+<label for=output_can_field08>
+Cyclic Redundancy Check (CRC):
+</label>
+<div id=output_can_field08></div>
+</li>
+<li>
+<label for=output_can_field09>
+CRC Delimiter:
+</label>
+<div id=output_can_field09></div>
+</li>
+<li>
+<label for=output_can_field10>
+Acknowledgement (ACK) Slot:
+</label>
+<div id=output_can_field10></div>
+</li>
+<li>
+<label for=output_can_field11>
+Acknowledgement Delimiter:
+</label>
+<div id=output_can_field11></div>
+</li>
+<li>
+<label for=output_can_field12>
+End of Frame (EOF):
+</label>
+<div id=output_can_field12></div>
+</li>
+<li>
+<label for=output_can_field13>
+Pause After Frame:
+</label>
+<div id=output_can_field13></div>
+</li>
+</ol>
 </div>
-</div>
-<div>
-v0.1 <br>
-Input: Payload length: form with decimal integer, e.g. [ 7 ]
-<br>
-Output: frame bits min, max
-<br>----<br>
-v0.2 <br>
-Input: CAN ID: form with binary string, e.g. [ 100101 ]<br>
-Input: Payload: form with binary string, e.g. [ 00100111001001 ]<br>
-<br>
-Output:<br>
-frame bits min, max<br>
-whole frame without stuff bits as binary string, e.g. 100101001001...<br>
-while frame without stuff bits broken down per parts<br>
-- SOF: 1 <br>
-- ID: 1001001 <br>
-- etc.<br>
-whole frame WITH stuff bits as binary string, e.g. 100101001001... (optional, make them bold?)<br>
 </div>
 <footer>
 <div>
 Made with &#x1f499; by
 <a href=https://github.com/Nik89>Nicola Furlan</a>
 and <a href=https://matjaz.it/ >Matjaž Guštin</a>
-&ndash; Version 0.0.0 &ndash;
+&ndash; Version 1.0.0 &ndash;
 <a href=changelog.html>
 Changelog
 </a>
