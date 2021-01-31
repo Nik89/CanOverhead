@@ -22,6 +22,7 @@ import shutil
 import subprocess as sub
 import glob
 import sys
+import gzip
 
 import markdown
 
@@ -153,6 +154,7 @@ def build_dir_to_gh_pages():
     to_remove.extend(glob.glob('*.md'))
     to_remove.extend(glob.glob('*.py'))
     to_remove.extend(glob.glob('*.txt'))
+    to_remove.extend(glob.glob('*.gz'))
     for file in to_remove:
         _remove_ignore_if_non_existing(file)
     for file in os.listdir(BUILD_DIR):
@@ -161,6 +163,19 @@ def build_dir_to_gh_pages():
     _shell('git add --all *.{html,js,css}')
     _shell('git commit -a -m"{}"'.format(commit_msg))
     _shell('git checkout develop')
+
+
+def compress_file(input_file_name: str):
+    """
+    Compress input file in GZIP format
+    Args:
+        input_file_name: Input file path
+    """
+    input_file_name_in_build_dir = os.path.join(BUILD_DIR, input_file_name)
+    output_file_name_in_build_dir = input_file_name_in_build_dir + '.gz'
+    with open(input_file_name_in_build_dir, 'rb') as file_in,\
+            gzip.open(output_file_name_in_build_dir, 'wb') as file_out:
+        shutil.copyfileobj(file_in, file_out)
 
 
 def build():
@@ -176,6 +191,15 @@ def build():
     minify_js("HtmlToLibAdapter.js")
     minify_js("TestCanOverhead.js")
     prepend_comment_in_index_file()
+    compress_file("index.html")
+    compress_file("style.css")
+    compress_file("CanOverhead.js")
+    compress_file("HtmlToLibAdapter.js")
+    compress_file("TestCanOverhead.js")
+    compress_file("changelog.html")
+    compress_file("license.html")
+    compress_file("readme.html")
+    compress_file("roadmap.html")
 
 
 if __name__ == "__main__":
