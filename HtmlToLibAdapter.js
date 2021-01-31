@@ -136,7 +136,8 @@ function displayCanFrame11BitFields(canFrame) {
         `[${field.length()} bits] ${field.toBinString()}`);
     field = canFrame.field07_dataField();
     display("output_can_field07",
-        `[${field.length()} bits] ${field.toBinStringWithSpacesRightAlign()}`);
+        `[${field.length() / 8} bytes] `
+        + `${field.toBinStringWithSpacesRightAlign()}`);
     field = canFrame.field08_crc();
     display("output_can_field08",
         `[${field.length()} bits] ${field.toBinStringWithSpacesRightAlign()}`);
@@ -193,45 +194,47 @@ function parseCanPayloadFromInputForm() {
  * and displaying all of the output fields or errors.
  */
 function calculate() {
-    clearErrorsAndOutputs();
-    // Parse input fields
-    const identifier = parseCanIdentifierFromInputForm();
-    if (identifier === null) {
-        displayCanIdentifierError(
-            "Incorrect identifier format. "
-            + "The input is in base 10 by default. "
-            + "For base 16, use the '0x' prefix; "
-            + "for base 2 use the '0b' prefix.");
-        return; // Early exit
-    }
-    const payload = parseCanPayloadFromInputForm();
-    if (payload === null) {
-        displayCanPayloadError(
-            "Payload must have an even amount of hex characters.");
-        return; // Early exit
-    }
-    // Pass everything to the CanOverhead library
     try {
-        let canFrame = new CanFrame11Bit(identifier, payload);
-        displayCanFrame11BitWholeFrame(canFrame);
-        displayCanFrame11BitFields(canFrame);
-        // Successful conversion and output
-    } catch (err) {
-        if (err instanceof RangeError
-            && err.message.startsWith("Identifier")) {
-            // Error of the identifier
-            displayCanIdentifierError(err.message);
-        } else if (err instanceof RangeError
-            && err.message.startsWith("Payload")) {
-            // Error of the identifier
-            displayCanPayloadError(err.message);
-        } else {
-            // Other errors, but they "should never happen".
-            displayUnknownError(
-                "An unexpected error occurred :( Please " +
-                "<a href=\"https://github.com/Nik89/CanOverhead/issues\">" +
-                "report</a> the conditions leading to your bug!");
-            console.error(err);
+        clearErrorsAndOutputs();
+        // Parse input fields
+        const identifier = parseCanIdentifierFromInputForm();
+        if (identifier === null) {
+            displayCanIdentifierError(
+                "Incorrect identifier format. "
+                + "The input is in base 10 by default. "
+                + "For base 16, use the '0x' prefix; "
+                + "for base 2 use the '0b' prefix.");
+            return; // Early exit
         }
+        const payload = parseCanPayloadFromInputForm();
+        if (payload === null) {
+            displayCanPayloadError(
+                "Payload must have an even amount of hex characters.");
+            return; // Early exit
+        }
+        // Pass everything to the CanOverhead library
+        try {
+            let canFrame = new CanFrame11Bit(identifier, payload);
+            displayCanFrame11BitWholeFrame(canFrame);
+            displayCanFrame11BitFields(canFrame);
+            // Successful conversion and output
+        } catch (err) {
+            if (err instanceof RangeError
+                && err.message.startsWith("Identifier")) {
+                // Error of the identifier
+                displayCanIdentifierError(err.message);
+            } else if (err instanceof RangeError
+                && err.message.startsWith("Payload")) {
+                // Error of the identifier
+                displayCanPayloadError(err.message);
+            }
+        }
+    } catch (err) {
+        // Other errors, but they "should never happen".
+        displayUnknownError(
+            "An unexpected error occurred :( Please " +
+            "<a href=\"https://github.com/Nik89/CanOverhead/issues\">" +
+            "report</a> the conditions leading to your bug!");
+        console.error(err);
     }
 }

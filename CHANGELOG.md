@@ -13,9 +13,14 @@ and this project adheres to
 [UNRELEASED]
 ----------------------------------------
 
+### Changed
+
+- Show payload (data field) length in bytes instead of bits.
+
+
 ### Fixed
 
-- Broken links in readme to the deployed web page (missing "/" at URL end)
+- Broken links in readme to the deployed web page (missing "/" at URL end).
 
 
 
