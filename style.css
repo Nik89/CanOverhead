@@ -31,10 +31,9 @@ a:hover {
 }
 
 footer {
-    height: 2rem;
     font-size: x-small;
-    text-align: left;
-    padding-top: 2rem;
+    text-align: center;
+    padding: 1.5rem;
     margin: auto;
     width: 60%;
 }

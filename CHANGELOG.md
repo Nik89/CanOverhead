@@ -28,6 +28,8 @@ and this project adheres to
 - Broken links in readme to the deployed web page (missing "/" at URL end).
 - Display error msg in case of empty CAN ID instead of assuming the ID == 0.
 - Handle empty or whitespace-only payloads as valid input (no data).
+- Footer's too small bottom margin
+- Typo in footer disclaimer
 
 
 [1.0.0] - 2021-01-31
