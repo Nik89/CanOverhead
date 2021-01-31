@@ -22,8 +22,6 @@ improvements
   - Radio button input to select data frame vs RTR frame. The payload text
     input gets disabled for RTR and is not used.
 - UX improvements
-  - Radio button for base of ID to avoid the user typing `0b` or `0x`.
-    Default to hex, preselected.
   - Display stuff bits in bold
 - Deploy script improvements
   - Merges all minified files into one html file, compresses only that

@@ -57,6 +57,10 @@ footer {
     width: 20em; /* Enough for 31 chars: 0b111... with 29 bits. */
 }
 
+.dropdown_menu_label {
+    font-size: 0.8rem;
+}
+
 #input_can_payload {
     width: 90em; /* Enough for 128 hex chars, covering 64 bytes. */
 }

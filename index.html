@@ -36,16 +36,21 @@
 <div id="input_form">
     <div class="input">
         <div>
-            <label for="input_can_identifier">
-                CAN Identifier [dec, "0x" for hex, "0b" for bin]:</label>
+            <label for="input_can_identifier">CAN Identifier:</label>
             <input id="input_can_identifier" name="input_can_identifier"
                    type="text" value="42" autofocus/>
+            <label for="input_can_identifier_base"
+                   class="dropdown_menu_label">in base</label>
+            <select name="input_can_identifier_base"
+                    id="input_can_identifier_base">
+                <option value="0b">Bin</option>
+                <option value="">Dec</option>
+                <option value="0x" selected>Hex</option>
+            </select>
             <div id="input_can_identifier_error" class="input-error"></div>
         </div>
         <div>
-            <label for="input_can_payload">
-                CAN Payload data (hex):
-            </label>
+            <label for="input_can_payload">CAN Payload data (hex):</label>
             <input id="input_can_payload" name="input_can_payload"
                    type="text" value="43 41 4E"/>
             <div id="input_can_payload_error" class="input-error"></div>

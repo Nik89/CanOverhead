@@ -13,6 +13,13 @@ and this project adheres to
 [UNRELEASED]
 ----------------------------------------
 
+### Added
+
+- Dropdown menu to select the base of the CAN ID to avoid the user typing
+  "0x" or "0b".  Defaults to hex. If the user also types the prefix "0x" or "0b"
+  and it matches with the selected base, then the prefix is ignored.
+
+
 ### Changed
 
 - Show payload (data field) length in bytes instead of bits.
