@@ -10,7 +10,7 @@ and this project adheres to
 
 *******************************************************************************
 
-[UNRELEASED] - 2021-01-xx
+[1.0.0] - 2021-01-31
 ----------------------------------------
 
 First version, minimum sets of features.
@@ -35,3 +35,5 @@ and post-stuffing, max worst-case theoretical frame length.
   - Compute the size range in bits of the whole frame when taking also
     stuff bits into account (min = no stuff bits applied, max = max stuff
     bits applied for CAN ID and payload).
+  - Deployment script that prepares and minifies all the files and compresses
+    them in `.gz` format

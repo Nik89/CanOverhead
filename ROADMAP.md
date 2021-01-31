@@ -10,7 +10,7 @@ and this project adheres to
 
 *******************************************************************************
 
-[0.2.0]
+[1.1.0]
 ----------------------------------------
 
 Support for RTR frames (1 bit differs in header, no payload), minor UX
@@ -28,14 +28,10 @@ improvements
   - Radio button for base of ID to avoid the user typing `0b` or `0x`.
     Default to hex, preselected.
   - Display stuff bits in bold
-- Deployment script also provides compressed `.gz` versions of the file.
-  The files are static, thus can be pre-compressed and a web server configured
-  to do so may simply provide the pre-compressed version when a compressed
-  file is requested instead of performing the compression online.
 
 
 
-[0.3.0]
+[1.2.0]
 ----------------------------------------
 
 Bitrates and transfer time.
@@ -52,7 +48,7 @@ Bitrates and transfer time.
 
 
 
-[0.4.0]
+[1.3.0]
 ----------------------------------------
 
 Extended CAN frames with 29-bit IDs.
@@ -65,7 +61,7 @@ Extended CAN frames with 29-bit IDs.
 
 
 
-[0.5.0]
+[1.4.0]
 ----------------------------------------
 
 CAN FD frames with only one bitrate.
@@ -81,7 +77,7 @@ CAN FD frames with only one bitrate.
 
 
 
-[1.0.0]
+[1.5.0]
 ----------------------------------------
 
 CAN FD with flexible datarate.
