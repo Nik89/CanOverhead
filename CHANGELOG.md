@@ -16,13 +16,16 @@ and this project adheres to
 ### Changed
 
 - Show payload (data field) length in bytes instead of bits.
-- Autofocus on CAN ID input field
+- Autofocus on CAN ID input field.
+- Display a generic error message in case of unknown and uncaught errors
+  at any level in the execution of the code instead of silently doing nothing.
 
 
 ### Fixed
 
 - Broken links in readme to the deployed web page (missing "/" at URL end).
-
+- Display error msg in case of empty CAN ID instead of assuming the ID == 0.
+- Handle empty or whitespace-only payloads as valid input (no data).
 
 
 [1.0.0] - 2021-01-31

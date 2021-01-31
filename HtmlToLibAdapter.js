@@ -164,9 +164,14 @@ function displayCanFrame11BitFields(canFrame) {
 function parseCanIdentifierFromInputForm() {
     const identifierStr =
         document.getElementById("input_can_identifier").value;
+    if (identifierStr.trim().length === 0) {
+        // Empty or whitespace-only user input
+        return null;
+    }
     // Parse decimal, 0x hex input and 0b binary input
     const identifier = Number(identifierStr);
     if (isNaN(identifier)) {
+        // Not a number: user typed other characters or words
         return null;
     }
     return identifier;
@@ -177,6 +182,10 @@ function parseCanIdentifierFromInputForm() {
  */
 function parseCanPayloadFromInputForm() {
     let payloadStr = document.getElementById("input_can_payload").value;
+    if (payloadStr.trim().length === 0) {
+        // Empty or whitespace-only user input. This is an empty payload.
+        return new Uint8Array();
+    }
     // Strip hex prefixes, any whitespace and some common separators
     const hexPrefixOrNonHexChars = /0[xX]|[^0-9a-fA-F]/g;
     payloadStr = payloadStr.replaceAll(hexPrefixOrNonHexChars, "");
