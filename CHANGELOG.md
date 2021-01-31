@@ -16,6 +16,7 @@ and this project adheres to
 ### Changed
 
 - Show payload (data field) length in bytes instead of bits.
+- Autofocus on CAN ID input field
 
 
 ### Fixed
