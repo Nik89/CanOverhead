@@ -21,6 +21,7 @@ and this project adheres to
   and it matches with the selected base, then the prefix is ignored.
 - Default values for input forms with some example data to let the user
   quickly run the calculator immediately after loading the page.
+- Run computation when pressing Enter keyboard key.
 
 
 ### Changed

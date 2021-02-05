@@ -8,8 +8,6 @@
  * @licence BSD 3-clause license. See LICENSE.md for details.
  */
 
-// TODO press enter to run compute
-
 /**
  * Writes (thus displays) the inner HTML into a div with the given ID.
  *
@@ -302,3 +300,16 @@ function calculate() {
         console.error(err);
     }
 }
+
+/**
+ * Runs the computation when pressing the Enter key anywhere on the page.
+ * @param {KeyboardEvent} keyBoardEvent event
+ * @private
+ */
+function _onKeyPress(keyBoardEvent) {
+    if (keyBoardEvent.key === "Enter") {
+        calculate();
+    }
+}
+
+document.onkeydown = _onKeyPress;
