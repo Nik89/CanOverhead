@@ -1,7 +1,7 @@
 CAN bus overhead, stuff bits and effective bitrate calculator
 ===============================================================================
 
-### [CLick here to try it in your browser!](https://nik89.github.io/CanOverhead)
+### [Click here to try it in your browser!](https://nik89.github.io/CanOverhead/)
 
 The [CAN bus](https://en.wikipedia.org/wiki/CAN_bus)
 is a robust communication bus and protocol used in vehicle,
@@ -21,7 +21,7 @@ Usage
 ---------------------------------------
 
 Head over to the
-[**website of the calculator**](https://nik89.github.io/CanOverhead)
+[**website of the calculator**](https://nik89.github.io/CanOverhead/)
 to use it. Simple as that! The calculator has no backend server, works only
 in your browser locally, no data is transferred. You can verify this by
 setting your browser to stay offline after loading the page and our calculator

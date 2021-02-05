@@ -10,6 +10,22 @@
  */
 
 /**
+ * @private
+ * Enumeration of internal representation of bits in a BitSequence,
+ * distinguishing between regular and stuff bits.
+ * The enum entries are designed in such way that the least significant bit
+ * (entry & 0b01) represents the bit value, while the immediately higher bit
+ * represents the stuffing (entry & 0b10).
+ * @type {{ZERO: number, ONE_STUFF: number, ONE: number, ZERO_STUFF: number}}
+ */
+const _Seqbit = {
+    ZERO: 0,
+    ONE: 1,
+    ZERO_STUFF: 2,
+    ONE_STUFF: 3,
+}
+
+/**
  * Wrapper of an array of bits with the ability to add stuff bits and
  * format the bits in many ways.
  */
@@ -49,28 +65,56 @@ class BitSequence {
      *     or a hybrid array ([true, "1", 0])
      *     or also a plain single bit, expressed as boolean or integer
      *     like 0, 1 or false, true.
+     *     Other values of SeqBit are also acceptable for both single-bit and
+     *     sequences, indicating the bits are stuff bits.
      * @returns {BitSequence} self useful to method concatenation
      */
     extend(newTail) {
-        // Check if it's a single-bit first
-        if (newTail === 1 || newTail === true) {
-            this._sequence.push(true);
-        } else if (newTail === 0 || newTail === false) {
-            this._sequence.push(false);
-        } else {
+        try {
+            // Check if it's a single-bit first
+            this._appendOneBit(newTail);
+        } catch (RangeError) {
+            // Fallback to iterating the tail
             for (let bit of newTail) {
-                if (bit === "1" || bit === true || bit === 1) {
-                    this._sequence.push(true);
-                } else if (bit === "0" || bit === false || bit === 0) {
-                    this._sequence.push(false);
-                } else if (bit.trim() === "") {
+                if (typeof bit === "string" && bit.trim() === "") {
                     /* Skip whitespace char */
                 } else {
-                    throw new RangeError("Unsupported character: " + bit);
+                    this._appendOneBit(bit);
                 }
             }
         }
         return this;
+    }
+
+    /**
+     * @private
+     * Append one single bit to the sequence.
+     * @param {string|number|boolean} bit a single bit, expressed as boolean
+     *     or integer from SeqBit, indicating also if the bit is a stuff bit.
+     */
+    _appendOneBit(bit) {
+        switch (bit) {
+            case _Seqbit.ZERO:
+            case false:
+            case "0":
+                this._sequence.push(_Seqbit.ZERO);
+                break;
+            case _Seqbit.ONE:
+            case true:
+            case "1":
+                this._sequence.push(_Seqbit.ONE);
+                break;
+            case _Seqbit.ZERO_STUFF:
+            case "2":
+                this._sequence.push(_Seqbit.ZERO_STUFF);
+                break;
+            case _Seqbit.ONE_STUFF:
+            case "3":
+                this._sequence.push(_Seqbit.ONE_STUFF);
+                break;
+            default:
+                throw new RangeError("Unsupported character: " + bit);
+        }
     }
 
     /**
@@ -95,9 +139,6 @@ class BitSequence {
             return false;
         }
         if (other._sequence.length !== this._sequence.length) {
-            return false;
-        }
-        if (other._isStuffed !== this._isStuffed) {
             return false;
         }
         for (let i = 0; i < this._sequence.length; i++) {
@@ -135,53 +176,18 @@ class BitSequence {
     }
 
     /**
-     * Provides the exact amount of stuff bits that would be added to the Bits.
-     *
-     * Example (using 0 and 1 instead of true and false):
-     *     Before:    11111 0000
-     *     Stuffing:       0    1 => returns 2
-     *
-     * @returns {number} exact amount of stuff bits for the given sequence of
-     * bits
-     */
-    exactAmountOfStuffBits() {
-        let amountOfStuffBits = 0;
-        let repeatedBits = 1;
-        let previousBit = undefined;
-        for (let bit of this._sequence) {
-            if (bit === previousBit) {
-                repeatedBits++;
-            } else {
-                repeatedBits = 1;
-            }
-            if (repeatedBits === 5) {
-                amountOfStuffBits++;
-                repeatedBits = 1;
-                previousBit = !bit;
-            } else {
-                previousBit = bit;
-            }
-        }
-        return amountOfStuffBits;
-    }
-
-    /**
-     * Provides the exact length of the sequence after the addition
-     * of the stuff bits to it
-     *
-     * @returns {number} exact length
-     */
-    exactLengthAfterStuffing() {
-        return this.length() + this.exactAmountOfStuffBits();
-    }
-
-    /**
      * Provides a copy of a sequence of bits with stuff bits added to it.
      *
-     * Example (using 0 and 1 instead of true and false):
+     * Example:
      *     Input:    11111 0000
      *     Stuffing:      0    1
      *     Output:   11111000001
+     *
+     * Note that the internal encoding of the sequence uses different values
+     * than 0 and 1 for stuff bits, so internally it looks like this:
+     *     Input:    11111 0000
+     *     Stuffing:      2    3
+     *     Output:   11111200003
      *
      * @returns {BitSequence} clone of this object with stuff bits applied to it
      */
@@ -202,10 +208,18 @@ class BitSequence {
             sequenceAfterStuffing.push(bit);
             if (repeatedBits === 5) {
                 // Apply stuffing bit, opposite of just processed bit
-                let stuffingBit = !bit;
+                // The previous bit is the stuffing one, but without stuffing
+                // info, to allow easier comparison.
+                let stuffingBit;
+                if (bit === _Seqbit.ZERO) {
+                    stuffingBit = _Seqbit.ONE_STUFF;
+                    previousBit = _Seqbit.ONE;
+                } else {
+                    stuffingBit = _Seqbit.ZERO_STUFF;
+                    previousBit = _Seqbit.ZERO;
+                }
                 sequenceAfterStuffing.push(stuffingBit);
                 repeatedBits = 1;
-                previousBit = stuffingBit;
             } else {
                 previousBit = bit;
             }
@@ -214,21 +228,75 @@ class BitSequence {
     }
 
     /**
+     * Provides a copy of a sequence of bits with stuff bits removed from it.
+     *
+     * Example:
+     *     Input:    11111000001
+     *     Stuffing:      0    1
+     *     Output:   11111 0000
+     *
+     * Note that the internal encoding of the sequence uses different values
+     * than 0 and 1 for stuff bits, so internally it looks like this:
+     *     Input:    11111200003
+     *     Stuffing:      2    3
+     *     Output:   11111 0000
+     *
+     * @returns {BitSequence} clone of this object without stuff bits applied
+     *     to it
+     */
+    removeBitStuffing() {
+        if (!this._isStuffed) {
+            // Prevent de-stuffing twice.
+            throw new TypeError("Bits sequence already de-stuffed.");
+        }
+        // Copy over only the non-stuff bits
+        const sequenceWithoutStuffing = this._sequence.filter(
+            bit => bit === _Seqbit.ZERO || bit === _Seqbit.ONE);
+        return new BitSequence(sequenceWithoutStuffing, false);
+    }
+
+    /**
+     * @private
+     * Converts a sequence bit (SeqBit) to string, with optional formatting
+     * for stuff bits
+     * @param {number} bit to convert
+     * @param {string} stuffBitPrefix string prepended to the stuff bit string
+     *     representation
+     * @param {string} stuffBitSuffix string appended to the stuff bit string
+     *     representation
+     */
+    static _seqBitToString(bit, stuffBitPrefix = "", stuffBitSuffix = "") {
+        switch (bit) {
+            case _Seqbit.ZERO:
+                return "0";
+            case _Seqbit.ONE:
+                return "1";
+            case _Seqbit.ZERO_STUFF:
+                return stuffBitPrefix + "0" + stuffBitSuffix;
+            case _Seqbit.ONE_STUFF:
+                return stuffBitPrefix + "1" + stuffBitSuffix;
+            default:
+                throw new RangeError("Unsupported sequence bit: " + bit);
+        }
+    }
+
+    /**
      * Binary string representation of the sequence of bits.
      *
      * Example: "0001100100110". Left-most bit is the first found in the
      * bit sequence, right-most one is the last.
      *
+     * @param {string} stuffBitPrefix string prepended to the stuff bit string
+     *     representation
+     * @param {string} stuffBitSuffix string appended to the stuff bit string
+     *     representation
      * @returns {string} string with only "1" and "0" characters
      */
-    toBinString() {
+    toBinString(stuffBitPrefix = "", stuffBitSuffix = "") {
         let str = "";
         for (let bit of this._sequence) {
-            if (bit) {
-                str += "1";
-            } else {
-                str += "0";
-            }
+            str += BitSequence._seqBitToString(
+                bit, stuffBitPrefix, stuffBitSuffix);
         }
         return str;
     }
@@ -240,17 +308,19 @@ class BitSequence {
      * Example: "0 0011 0010 0110". Left-most bit is the first found in the
      * bit sequence, right-most one is the last.
      *
+     * @param {string} stuffBitPrefix string prepended to the stuff bit string
+     *     representation
+     * @param {string} stuffBitSuffix string appended to the stuff bit string
+     *     representation
+     *
      * @returns {string} string with only "1", "0" and " " characters
      */
-    toBinStringWithSpacesRightAlign() {
+    toBinStringWithSpacesRightAlign(stuffBitPrefix = "", stuffBitSuffix = "") {
         let str = "";
         let count = this._sequence.length;
         for (let bit of this._sequence) {
-            if (bit) {
-                str += "1";
-            } else {
-                str += "0";
-            }
+            str += BitSequence._seqBitToString(
+                bit, stuffBitPrefix, stuffBitSuffix);
             count--;
             if (count % 4 === 0 && count > 0) {
                 str += " ";
@@ -266,9 +336,14 @@ class BitSequence {
      * Example: "0011 0010 0110 11". Left-most bit is the first found in the
      * bit sequence, right-most one is the last.
      *
+     * @param {string} stuffBitPrefix string prepended to the stuff bit string
+     *     representation
+     * @param {string} stuffBitSuffix string appended to the stuff bit string
+     *     representation
+     *
      * @returns {string} string with only "1", "0" and " " characters
      */
-    toBinStringWithSpacesLeftAlign() {
+    toBinStringWithSpacesLeftAlign(stuffBitPrefix = "", stuffBitSuffix = "") {
         let str = "";
         let count = 0;
         for (let bit of this._sequence) {
@@ -276,11 +351,7 @@ class BitSequence {
                 str += " ";
                 count = 0;
             }
-            if (bit) {
-                str += "1";
-            } else {
-                str += "0";
-            }
+            str += BitSequence._seqBitToString(bit, stuffBitPrefix, stuffBitSuffix);
             count++;
         }
         return str;
@@ -303,7 +374,8 @@ class BitSequence {
         let nibble_value = 0;
         let bits_in_nibble = 0;
         for (let i = this._sequence.length - 1; i >= 0; i--) {
-            if (this._sequence[i]) {
+            if (this._sequence[i] === _Seqbit.ONE
+                || this._sequence[i] === _Seqbit.ONE_STUFF) {
                 nibble_value |= 1 << bits_in_nibble;
             }
             bits_in_nibble++;

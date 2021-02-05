@@ -8,8 +8,6 @@
  * @licence BSD 3-clause license. See LICENSE.md for details.
  */
 
-// TODO press enter to run compute
-
 /**
  * Writes (thus displays) the inner HTML into a div with the given ID.
  *
@@ -94,17 +92,18 @@ function clearErrorsAndOutputs() {
  */
 function displayCanFrame11BitWholeFrame(canFrame) {
     // Without stuffing
-    let bits = canFrame.wholeFrame();
-    let frameAsString = `[${bits.length()} bits]<br/>`
-        + bits.toBinStringWithSpacesLeftAlign();
-    display("output_can_whole_frame", frameAsString);
+    const bits = canFrame.wholeFrame();
+    display("output_can_whole_frame_len", `[${bits.length()} bits]`);
+    display("output_can_whole_frame", bits.toBinStringWithSpacesLeftAlign());
     // With stuffing
-    let bitsWithStuffs = canFrame.wholeFrameStuffed();
-    let stuffBitsAmount = bitsWithStuffs.length() - bits.length();
-    frameAsString = `[${bitsWithStuffs.length()} bits, `
-        + `of which ${stuffBitsAmount} stuff bits]<br/>`
-        + bitsWithStuffs.toBinStringWithSpacesLeftAlign();
-    display("output_can_whole_frame_stuffed", frameAsString);
+    let stuffedBits = canFrame.wholeFrameStuffed();
+    let stuffBitsAmount = stuffedBits.length() - bits.length();
+    display("output_can_whole_frame_stuffed_len",
+        `[${stuffedBits.length()} bits, of which `
+        + `<span class="stuff_bit">${stuffBitsAmount} stuff bits</span>]`);
+    display("output_can_whole_frame_stuffed",
+        stuffedBits.toBinStringWithSpacesLeftAlign(
+            "<span class=\"stuff_bit\">", "</span>"));
     // Max theoretical length
     display("output_max_length", `${canFrame.maxLengthAfterStuffing()} bits`);
 }
@@ -117,55 +116,117 @@ function displayCanFrame11BitWholeFrame(canFrame) {
 function displayCanFrame11BitFields(canFrame) {
     let field;
     field = canFrame.field01_startOfFrame();
-    display("output_can_field01",
-        `[${field.length()} bits] ${field.toBinString()}`);
+    display("output_can_field01_len", field.length().toString());
+    display("output_can_field01", field.toBinString());
+    display("output_can_field01_hex", field.toHexString());
     field = canFrame.field02_identifier();
-    display("output_can_field02",
-        `[${field.length()} bits] ${field.toBinStringWithSpacesRightAlign()}`);
+    display("output_can_field02_len", field.length().toString());
+    display("output_can_field02", field.toBinStringWithSpacesRightAlign());
+    display("output_can_field02_hex", field.toHexString());
     field = canFrame.field03_remoteTransmissionRequest();
-    display("output_can_field03",
-        `[${field.length()} bits] ${field.toBinString()}`);
+    display("output_can_field03_len", field.length().toString());
+    display("output_can_field03", field.toBinString());
+    display("output_can_field03_hex", field.toHexString());
     field = canFrame.field04_identifierExtensionBit();
-    display("output_can_field04",
-        `[${field.length()} bits] ${field.toBinString()}`);
+    display("output_can_field04_len", field.length().toString());
+    display("output_can_field04", field.toBinString());
+    display("output_can_field04_hex", field.toHexString());
     field = canFrame.field05_reservedBit();
-    display("output_can_field05",
-        `[${field.length()} bits] ${field.toBinString()}`);
+    display("output_can_field05_len", field.length().toString());
+    display("output_can_field05", field.toBinString());
+    display("output_can_field05_hex", field.toHexString());
     field = canFrame.field06_dataLengthCode();
-    display("output_can_field06",
-        `[${field.length()} bits] ${field.toBinString()}`);
+    display("output_can_field06_len", field.length().toString());
+    display("output_can_field06", field.toBinString());
+    display("output_can_field06_hex", field.toHexString());
     field = canFrame.field07_dataField();
-    display("output_can_field07",
-        `[${field.length()} bits] ${field.toBinStringWithSpacesRightAlign()}`);
+    display("output_can_field07_len", field.length().toString());
+    display("output_can_field07", field.toBinStringWithSpacesRightAlign());
+    display("output_can_field07_hex", field.toHexString());
     field = canFrame.field08_crc();
-    display("output_can_field08",
-        `[${field.length()} bits] ${field.toBinStringWithSpacesRightAlign()}`);
+    display("output_can_field08_len", field.length().toString());
+    display("output_can_field08", field.toBinStringWithSpacesRightAlign());
+    display("output_can_field08_hex", field.toHexString());
     field = canFrame.field09_crcDelimiter();
-    display("output_can_field09",
-        `[${field.length()} bits] ${field.toBinString()}`);
+    display("output_can_field09_len", field.length().toString());
+    display("output_can_field09", field.toBinString());
+    display("output_can_field09_hex", field.toHexString());
     field = canFrame.field10_ackSlot();
-    display("output_can_field10",
-        `[${field.length()} bits] ${field.toBinString()}`);
+    display("output_can_field10_len", field.length().toString());
+    display("output_can_field10", field.toBinString());
+    display("output_can_field10_hex", field.toHexString());
     field = canFrame.field11_ackDelimiter();
-    display("output_can_field11",
-        `[${field.length()} bits] ${field.toBinString()}`);
+    display("output_can_field11_len", field.length().toString());
+    display("output_can_field11", field.toBinString());
+    display("output_can_field11_hex", field.toHexString());
     field = canFrame.field12_endOfFrame();
-    display("output_can_field12",
-        `[${field.length()} bits] ${field.toBinString()}`);
+    display("output_can_field12_len", field.length().toString());
+    display("output_can_field12", field.toBinString());
+    display("output_can_field12_hex", field.toHexString());
     field = canFrame.field13_pauseAfterFrame();
-    display("output_can_field13",
-        `[${field.length()} bits] ${field.toBinString()}`);
+    display("output_can_field13_len", field.length().toString());
+    display("output_can_field13", field.toBinString());
+    display("output_can_field13_hex", field.toHexString());
 }
 
 /**
  * Obtains, parses and validates the user input for the CAN identifier.
+ *
+ * Takes care of reading the base of the value from the dropdown value
+ * and clears any base prefix "0b" / "0x" from the number if it defines
+ * the same base as in the dropdown menu.
  */
 function parseCanIdentifierFromInputForm() {
-    const identifierStr =
-        document.getElementById("input_can_identifier").value;
-    // Parse decimal, 0x hex input and 0b binary input
-    const identifier = Number(identifierStr);
+    // Get ID
+    let identifierStr = document.getElementById("input_can_identifier").value;
+    identifierStr = identifierStr.trim().toLowerCase();
+    if (identifierStr.length === 0) {
+        // Empty or whitespace-only user input
+        return null;
+    }
+    // Get the base of the ID
+    const basePrefix =
+        document.getElementById("input_can_identifier_base").value;
+    // Remove any existing "0x"/"0b" prefix from the identifier
+    // in the cases where it makes sense.
+    switch (basePrefix) {
+        case "0b":
+            // Binary. Strip any "0b" prefix, which defines the base again.
+            // Hex prefixes are not acceptable.
+            if (identifierStr.startsWith("0b")) {
+                identifierStr = identifierStr.substring(2);
+            } else if (identifierStr.startsWith("0x")) {
+                return null;
+            }
+            break;
+        case "":
+            // Decimal. Any base prefix is not acceptable
+            if (identifierStr.startsWith("0b")
+                || identifierStr.startsWith("0x")) {
+                return null;
+            }
+            break;
+        case "0x":
+            // Hexadecimal. Strip any "0x" prefix, which defines the base again.
+            // "0b" prefixes are acceptable, as they could be a valid part
+            // of the hex number.
+            if (identifierStr.startsWith("0x")) {
+                identifierStr = identifierStr.substring(2);
+            }
+            break;
+    }
+    // Prepend "0x" or "0b" to the ID to enforce its base.
+    // Note: we are NOT using parseInt(), which may seem as the most logical
+    // solution as it does stop at the first character that is not valid for
+    // the used base. E.g. parseInt("123A", 10) returns 123. The behaviour we
+    // want here is for the function to complain in case an invalid character
+    // is present ANYWHERE in the string, to avoid the user thinking that their
+    // input was correctly parsed. Number() does this but has no base (radix)
+    // parameter, so we need to prepend "0x" or "0b" to the string to explicitly
+    // state the base.
+    const identifier = Number(basePrefix + identifierStr);
     if (isNaN(identifier)) {
+        // Not a number: user typed other characters or words
         return null;
     }
     return identifier;
@@ -176,6 +237,10 @@ function parseCanIdentifierFromInputForm() {
  */
 function parseCanPayloadFromInputForm() {
     let payloadStr = document.getElementById("input_can_payload").value;
+    if (payloadStr.trim().length === 0) {
+        // Empty or whitespace-only user input. This is an empty payload, 0 B.
+        return new Uint8Array(0);
+    }
     // Strip hex prefixes, any whitespace and some common separators
     const hexPrefixOrNonHexChars = /0[xX]|[^0-9a-fA-F]/g;
     payloadStr = payloadStr.replaceAll(hexPrefixOrNonHexChars, "");
@@ -193,45 +258,58 @@ function parseCanPayloadFromInputForm() {
  * and displaying all of the output fields or errors.
  */
 function calculate() {
-    clearErrorsAndOutputs();
-    // Parse input fields
-    const identifier = parseCanIdentifierFromInputForm();
-    if (identifier === null) {
-        displayCanIdentifierError(
-            "Incorrect identifier format. "
-            + "The input is in base 10 by default. "
-            + "For base 16, use the '0x' prefix; "
-            + "for base 2 use the '0b' prefix.");
-        return; // Early exit
-    }
-    const payload = parseCanPayloadFromInputForm();
-    if (payload === null) {
-        displayCanPayloadError(
-            "Payload must have an even amount of hex characters.");
-        return; // Early exit
-    }
-    // Pass everything to the CanOverhead library
     try {
-        let canFrame = new CanFrame11Bit(identifier, payload);
-        displayCanFrame11BitWholeFrame(canFrame);
-        displayCanFrame11BitFields(canFrame);
-        // Successful conversion and output
-    } catch (err) {
-        if (err instanceof RangeError
-            && err.message.startsWith("Identifier")) {
-            // Error of the identifier
-            displayCanIdentifierError(err.message);
-        } else if (err instanceof RangeError
-            && err.message.startsWith("Payload")) {
-            // Error of the identifier
-            displayCanPayloadError(err.message);
-        } else {
-            // Other errors, but they "should never happen".
-            displayUnknownError(
-                "An unexpected error occurred :( Please " +
-                "<a href=\"https://github.com/Nik89/CanOverhead/issues\">" +
-                "report</a> the conditions leading to your bug!");
-            console.error(err);
+        clearErrorsAndOutputs();
+        // Parse input fields
+        const identifier = parseCanIdentifierFromInputForm();
+        if (identifier === null) {
+            displayCanIdentifierError(
+                "Incorrect identifier format.");
+            return; // Early exit
         }
+        const payload = parseCanPayloadFromInputForm();
+        if (payload === null) {
+            displayCanPayloadError(
+                "Payload must have an even amount of hex characters.");
+            return; // Early exit
+        }
+        // Pass everything to the CanOverhead library
+        try {
+            let canFrame = new CanFrame11Bit(identifier, payload);
+            displayCanFrame11BitWholeFrame(canFrame);
+            displayCanFrame11BitFields(canFrame);
+            // Successful conversion and output
+        } catch (err) {
+            if (err instanceof RangeError
+                && err.message.startsWith("Identifier")) {
+                // Error of the identifier
+                displayCanIdentifierError(err.message);
+            } else if (err instanceof RangeError
+                && err.message.startsWith("Payload")) {
+                // Error of the identifier
+                displayCanPayloadError(err.message);
+            }
+        }
+    } catch (err) {
+        // Other errors, but they "should never happen".
+        displayUnknownError(
+            "An unexpected error occurred :( Please " +
+            "<a href=\"https://github.com/Nik89/CanOverhead/issues\">" +
+            "report</a> the conditions leading to your bug! " +
+            "Here is some debug information: " + err.message);
+        console.error(err);
     }
 }
+
+/**
+ * Runs the computation when pressing the Enter key anywhere on the page.
+ * @param {KeyboardEvent} keyBoardEvent event
+ * @private
+ */
+function _onKeyPress(keyBoardEvent) {
+    if (keyBoardEvent.key === "Enter") {
+        calculate();
+    }
+}
+
+document.onkeydown = _onKeyPress;

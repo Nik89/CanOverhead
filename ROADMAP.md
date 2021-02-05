@@ -21,13 +21,11 @@ improvements
 - RTR frame support
   - Radio button input to select data frame vs RTR frame. The payload text
     input gets disabled for RTR and is not used.
-- UX improvements
-  - Default values for input forms with some example data to let the user
-    quickly run the calculator.
-  - CAN ID input in the form is autoselected at page load.
-  - Radio button for base of ID to avoid the user typing `0b` or `0x`.
-    Default to hex, preselected.
-  - Display stuff bits in bold
+- Deploy script improvements
+  - Merges all minified files into one html file, compresses only that
+  - Removed moving to gh-pages as GitHub supports also the deployment from other
+    branches. Now the released script is put into `release/` and not commited
+    onto gh-pages.
 
 
 

@@ -10,6 +10,47 @@ and this project adheres to
 
 *******************************************************************************
 
+[UNRELEASED]
+----------------------------------------
+
+### Added
+
+- Highlight stuff bit: underlined and with a different color.
+- Dropdown menu to select the base of the CAN ID to avoid the user typing
+  "0x" or "0b".  Defaults to hex. If the user also types the prefix "0x" or "0b"
+  and it matches with the selected base, then the prefix is ignored.
+- Default values for input forms with some example data to let the user
+  quickly run the calculator immediately after loading the page.
+- Run computation when pressing Enter keyboard key.
+
+
+### Changed
+
+- Autofocus on CAN ID input field.
+- Improved style of the following parts into a more modern look-and-feel
+  - input form
+  - computing button
+  - whole-frame bit sequence section
+  - frame fields, now provided as a table. Includes alternating row colors,
+    mouseover effects and hex format column
+
+
+### Fixed
+
+- Broken links in readme to the deployed web page (missing "/" at URL end).
+- Display error msg in case of empty CAN ID instead of assuming the ID == 0.
+- Handle empty or whitespace-only payloads as valid input (no data).
+- Footer's too small bottom margin.
+- Typo in footer disclaimer.
+- noscript-message about JavaScript being required is not all-h2 anymore.
+  Additional styling is added for it to make it at least slightly decent
+  looking.
+- Display a generic error message in case of unknown and uncaught errors
+  at any level in the execution of the code instead of silently doing nothing
+  and crashing the app.
+
+
+
 [1.0.0] - 2021-01-31
 ----------------------------------------
 

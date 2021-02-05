@@ -5,9 +5,9 @@
  */
 body {
     margin: 0.5rem;
-    padding: 0.5rem;
+    padding: 1.0rem;
     font-family: Source Code Pro, Menlo, Consolas, Lucida Console, monospace;
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     background-color: #f8f8f8; /* Slightly less bright white-gray */
 }
 
@@ -26,17 +26,14 @@ a:hover {
 }
 
 #noscript_warning {
-    text-align: center;
+    margin: 2rem;
+    padding: 1rem;
     font-size: 1.5rem;
 }
 
-footer {
-    height: 2rem;
-    font-size: x-small;
-    text-align: left;
-    padding-top: 2rem;
-    margin: auto;
-    width: 60%;
+#noscript_warning h3 {
+    color: darkred;
+    font-style: italic;
 }
 
 .input_form {
@@ -46,21 +43,130 @@ footer {
 .input-error {
     color: red;
     font-size: 1rem;
+    margin-bottom: 1rem;
+}
+
+.input_text {
+    width: 100%;
+    padding: 0.5rem;
+    margin: 1em;
+    box-sizing: border-box;
+    font-family: inherit;
 }
 
 #input_can_identifier {
     width: 20em; /* Enough for 31 chars: 0b111... with 29 bits. */
 }
 
+.dropdown_menu_label {
+    font-size: 1rem;
+}
+
+.dropdown_select {
+    width: 6rem;
+    height: 2rem;
+    font-size: 1rem;
+    font-family: inherit;
+    color: #1EAEDB;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+}
+
 #input_can_payload {
-    width: 90em; /* Enough for 128 hex chars, covering 64 bytes. */
+    width: 85em; /* Enough for 128 hex chars, covering 64 bytes. */
 }
 
 .buttons {
     margin: 1rem;
+    display: flex;
+    justify-content: center;
 }
 
-.output {
-    margin-left: 2rem;
+.button {
+    background-color: #1EAEDB;
+    border: 1rem;
+    color: white;
+    padding: 1em 2em;
+    text-align: center;
+    font-size: 1rem;
+    cursor: pointer;
+    border-radius: 1em;
+    transition-duration: 0.3s;
+    font-family: inherit;
+}
+
+.button:hover {
+    background-color: #105169;
+}
+
+.stuff_bit {
+    text-decoration: underline;
+    color: #b22ed0;
+}
+
+/* Output list with CAN frame as a bit sequence */
+#output_list {
     font-size: 1.2rem;
+    width: 90%;
+    margin-left: 1.5rem;
+}
+
+#output_list li {
+    margin-bottom: 1.5rem;
+}
+
+.output_can_text {
+    margin-top: 0.5rem;
+    background-color: #eee;
+}
+
+/* Output table with CAN frame fields */
+#output_table {
+    font-size: 1.2rem;
+    /* Center in middle of page. */
+    margin-left: auto;
+    margin-right: auto;
+    width: 90%;
+    /* Avoid double border between cells. */
+    border-collapse: collapse;
+}
+
+#output_table td, #output_table th {
+    /* Line around the cells. */
+    border: 0.2em solid #ddd;
+    /* Space between cell border and content inside, making the table
+     * breath a bit more. */
+    padding: 0.5em;
+}
+
+#output_table th {
+    /* Table header row. */
+    text-align: center;
+    font-weight: bold;
+}
+
+#output_table tr {
+    text-align: right;
+}
+
+#output_table tr:nth-child(even) {
+    /* Alternating colors of the rows for easier reading. */
+    background-color: #eee;
+}
+
+#output_table tr:hover {
+    /* Mouseover color change. */
+    background-color: #ddd;
+}
+
+.cell_text {
+    text-align: left;
+}
+
+footer {
+    font-size: x-small;
+    text-align: center;
+    padding: 1.5rem;
+    margin: auto;
+    width: 60%;
 }
