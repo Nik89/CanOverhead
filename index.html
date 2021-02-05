@@ -36,13 +36,18 @@
 <div id="input_form">
     <div class="input">
         <div>
-            <label for="input_can_identifier">CAN Identifier:</label>
-            <input id="input_can_identifier" name="input_can_identifier"
+            <label for="input_can_identifier">Frame identifier</label>
+        </div>
+        <div>
+            <input id="input_can_identifier"
+                   name="input_can_identifier"
+                   class="input_text"
                    type="text" value="42" autofocus/>
             <label for="input_can_identifier_base"
                    class="dropdown_menu_label">in base</label>
             <select name="input_can_identifier_base"
-                    id="input_can_identifier_base">
+                    id="input_can_identifier_base"
+                    class="dropdown_select">
                 <option value="0b">Bin</option>
                 <option value="">Dec</option>
                 <option value="0x" selected>Hex</option>
@@ -50,11 +55,15 @@
             <div id="input_can_identifier_error" class="input-error"></div>
         </div>
         <div>
-            <label for="input_can_payload">CAN Payload data (hex):</label>
-            <input id="input_can_payload" name="input_can_payload"
-                   type="text" value="43 41 4E"/>
-            <div id="input_can_payload_error" class="input-error"></div>
+            <label for="input_can_payload">Frame payload data (hex)</label>
         </div>
+        <div>
+            <input id="input_can_payload"
+                   name="input_can_payload"
+                   class="input_text"
+                   type="text" value="43 41 4E"/>
+            </div>
+            <div id="input_can_payload_error" class="input-error"></div>
         <div id="input_unknown_error" class="input-error"></div>
     </div>
     <div class="buttons">

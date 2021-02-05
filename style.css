@@ -5,9 +5,9 @@
  */
 body {
     margin: 0.5rem;
-    padding: 0.5rem;
+    padding: 1.0rem;
     font-family: Source Code Pro, Menlo, Consolas, Lucida Console, monospace;
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     background-color: #f8f8f8; /* Slightly less bright white-gray */
 }
 
@@ -36,14 +36,6 @@ a:hover {
     font-style: italic;
 }
 
-footer {
-    font-size: x-small;
-    text-align: center;
-    padding: 1.5rem;
-    margin: auto;
-    width: 60%;
-}
-
 .input_form {
     background-color: #c6c6c67a;
 }
@@ -53,16 +45,34 @@ footer {
     font-size: 1rem;
 }
 
+.input_text {
+    width: 100%;
+    padding: 0.5rem;
+    margin: 1em;
+    box-sizing: border-box;
+    font-family: inherit;
+}
+
 #input_can_identifier {
     width: 20em; /* Enough for 31 chars: 0b111... with 29 bits. */
 }
 
 .dropdown_menu_label {
-    font-size: 0.8rem;
+    font-size: 1rem;
+}
+
+.dropdown_select {
+    width: 6rem;
+    height: 2rem;
+    font-size: 1rem;
+    font-family: inherit;
+    color: #1EAEDB;
+    border: 2px solid #ccc;
+    border-radius: 5px;
 }
 
 #input_can_payload {
-    width: 90em; /* Enough for 128 hex chars, covering 64 bytes. */
+    width: 85em; /* Enough for 128 hex chars, covering 64 bytes. */
 }
 
 .buttons {
@@ -81,6 +91,7 @@ footer {
     cursor: pointer;
     border-radius: 1em;
     transition-duration: 0.3s;
+    font-family: inherit;
 }
 
 .button:hover {
@@ -116,7 +127,7 @@ footer {
 
 #output_table td, #output_table th {
     /* Line around the cells. */
-    border: 3px solid #ddd;
+    border: 0.2em solid #ddd;
     /* Space between cell border and content inside, making the table
      * breath a bit more. */
     padding: 0.5em;
@@ -144,4 +155,12 @@ footer {
 
 .cell_text {
     text-align: left;
+}
+
+footer {
+    font-size: x-small;
+    text-align: center;
+    padding: 1.5rem;
+    margin: auto;
+    width: 60%;
 }
