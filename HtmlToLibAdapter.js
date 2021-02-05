@@ -67,22 +67,50 @@ function clearErrorsAndOutputs() {
     clear("input_unknown_error");
     // Clear outputs about the whole frame
     clear("output_can_whole_frame");
+    clear("output_can_whole_frame_len");
     clear("output_can_whole_frame_stuffed");
+    clear("output_can_whole_frame_stuffed_len");
     clear("output_max_length");
     // Clear outputs about the frame fields
     clear("output_can_field01");
+    clear("output_can_field01_len");
+    clear("output_can_field01_hex");
     clear("output_can_field02");
+    clear("output_can_field02_len");
+    clear("output_can_field02_hex");
     clear("output_can_field03");
+    clear("output_can_field03_len");
+    clear("output_can_field03_hex");
     clear("output_can_field04");
+    clear("output_can_field04_len");
+    clear("output_can_field04_hex");
     clear("output_can_field05");
+    clear("output_can_field05_len");
+    clear("output_can_field05_hex");
     clear("output_can_field06");
+    clear("output_can_field06_len");
+    clear("output_can_field06_hex");
     clear("output_can_field07");
+    clear("output_can_field07_len");
+    clear("output_can_field07_hex");
     clear("output_can_field08");
+    clear("output_can_field08_len");
+    clear("output_can_field08_hex");
     clear("output_can_field09");
+    clear("output_can_field09_len");
+    clear("output_can_field09_hex");
     clear("output_can_field10");
+    clear("output_can_field10_len");
+    clear("output_can_field10_hex");
     clear("output_can_field11");
+    clear("output_can_field11_len");
+    clear("output_can_field11_hex");
     clear("output_can_field12");
+    clear("output_can_field12_len");
+    clear("output_can_field12_hex");
     clear("output_can_field13");
+    clear("output_can_field13_len");
+    clear("output_can_field13_hex");
 }
 
 
