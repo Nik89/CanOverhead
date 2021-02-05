@@ -83,55 +83,43 @@ check(arrayEqual(bits._sequence, []), bits._sequence);
 check(bits._isStuffed === false);
 // Binary string
 bits = new BitSequence("    1 ")
-check(arrayEqual(bits._sequence, [true]));
+check(arrayEqual(bits._sequence, [1]));
 check(bits._isStuffed === false);
 bits = new BitSequence("      0  1    ");
-check(arrayEqual(bits._sequence, [false, true]));
+check(arrayEqual(bits._sequence, [0, 1]));
 check(bits._isStuffed === false);
 bits = new BitSequence("      0  1  101    ");
-check(arrayEqual(bits._sequence, [false, true, true, false, true]));
+check(arrayEqual(bits._sequence, [0, 1, 1, 0, 1]));
 check(bits._isStuffed === false);
 bits = new BitSequence("      0  1  101    ", true);
-check(arrayEqual(bits._sequence, [false, true, true, false, true]));
+check(arrayEqual(bits._sequence, [0, 1, 1, 0, 1]));
 check(bits._isStuffed === true);
 // Array of ints
 bits = new BitSequence([0, 1, 0]);
-check(arrayEqual(bits._sequence, [false, true, false]));
+check(arrayEqual(bits._sequence, [0, 1, 0]));
 check(bits._isStuffed === false);
 // Array of booleans
 bits = new BitSequence([false, true, false]);
-check(arrayEqual(bits._sequence, [false, true, false]));
+check(arrayEqual(bits._sequence, [0, 1, 0]));
 check(bits._isStuffed === false);
 // Hybrid array
 bits = new BitSequence([1, false, "0"]);
-check(arrayEqual(bits._sequence, [true, false, false]));
+check(arrayEqual(bits._sequence, [1, 0, 0]));
 check(bits._isStuffed === false);
 // Single bit integer
 bits = new BitSequence(0);
-check(arrayEqual(bits._sequence, [false]));
+check(arrayEqual(bits._sequence, [0]));
 check(bits._isStuffed === false);
 bits = new BitSequence(1);
-check(arrayEqual(bits._sequence, [true]));
+check(arrayEqual(bits._sequence, [1]));
 check(bits._isStuffed === false);
 // Single bit boolean
 bits = new BitSequence(false);
-check(arrayEqual(bits._sequence, [false]));
+check(arrayEqual(bits._sequence, [0]));
 check(bits._isStuffed === false);
 bits = new BitSequence(true);
-check(arrayEqual(bits._sequence, [true]));
+check(arrayEqual(bits._sequence, [1]));
 check(bits._isStuffed === false);
-
-// exactAmountOfStuffBits
-check(new BitSequence().exactAmountOfStuffBits()
-    === 0);
-check(new BitSequence("1").exactAmountOfStuffBits()
-    === 0);
-check(new BitSequence("1110101010").exactAmountOfStuffBits()
-    === 0);
-check(new BitSequence("11111").exactAmountOfStuffBits()
-    === 1);
-check(new BitSequence("111110000").exactAmountOfStuffBits()
-    === 2);
 
 // applyBitStuffing
 check(new BitSequence().applyBitStuffing()
@@ -141,9 +129,9 @@ check(new BitSequence("1").applyBitStuffing()
 check(new BitSequence("1110101010").applyBitStuffing()
     .equal(new BitSequence("1110101010", true)));
 check(new BitSequence("11111").applyBitStuffing()
-    .equal(new BitSequence("111110", true)));
+    .equal(new BitSequence("111112", true)));
 check(new BitSequence("111110000").applyBitStuffing()
-    .equal(new BitSequence("11111000001", true)));
+    .equal(new BitSequence("11111200003", true)));
 
 // Cannot double-stuff
 try {
@@ -160,19 +148,15 @@ check(new BitSequence("1110101010").length() === 10);
 check(new BitSequence("11111").length() === 5);
 check(new BitSequence("11111000001", true).length() === 11);
 
-// length after stuffing
-check(new BitSequence().exactLengthAfterStuffing() === 0);
-check(new BitSequence("1").exactLengthAfterStuffing() === 1);
-check(new BitSequence("1110101010").exactLengthAfterStuffing() === 10);
-check(new BitSequence("11111").exactLengthAfterStuffing() === 6);
-check(new BitSequence("111110000").exactLengthAfterStuffing() === 11);
-
 // toBinString
 check(new BitSequence("").toBinString() === "");
 check(new BitSequence("0").toBinString() === "0");
 check(new BitSequence("10").toBinString() === "10");
 check(new BitSequence("0010").toBinString() === "0010");
 check(new BitSequence("0110101").toBinString() === "0110101");
+check(new BitSequence("0110101").toBinString("[", "]") === "0110101");
+check(new BitSequence("1111121", true).toBinString("[", "]") === "11111[0]1");
+check(new BitSequence("0000031", true).toBinString("[", "]") === "00000[1]1");
 
 // toBinStringWithSpacesRightAlign
 check(new BitSequence("").toBinStringWithSpacesRightAlign() === "");
@@ -181,6 +165,9 @@ check(new BitSequence("10").toBinStringWithSpacesRightAlign() === "10");
 check(new BitSequence("0010").toBinStringWithSpacesRightAlign() === "0010");
 check(new BitSequence("0110101").toBinStringWithSpacesRightAlign() === "011 0101");
 check(new BitSequence("010110101").toBinStringWithSpacesRightAlign() === "0 1011 0101");
+check(new BitSequence("010110101").toBinStringWithSpacesRightAlign("[", "]") === "0 1011 0101");
+check(new BitSequence("0001111121", true).toBinStringWithSpacesRightAlign("[", "]") === "00 0111 11[0]1");
+check(new BitSequence("0000031", true).toBinStringWithSpacesRightAlign("[", "]") === "000 00[1]1");
 
 // toBinStringWithSpacesLeftAlign
 check(new BitSequence("").toBinStringWithSpacesLeftAlign() === "");
@@ -189,6 +176,9 @@ check(new BitSequence("10").toBinStringWithSpacesLeftAlign() === "10");
 check(new BitSequence("0010").toBinStringWithSpacesLeftAlign() === "0010");
 check(new BitSequence("0110101").toBinStringWithSpacesLeftAlign() === "0110 101");
 check(new BitSequence("010110101").toBinStringWithSpacesLeftAlign() === "0101 1010 1");
+check(new BitSequence("010110101").toBinStringWithSpacesLeftAlign("[", "]") === "0101 1010 1");
+check(new BitSequence("0001111121", true).toBinStringWithSpacesLeftAlign("[", "]") === "0001 1111 [0]1");
+check(new BitSequence("0000031", true).toBinStringWithSpacesLeftAlign("[", "]") === "0000 0[1]1");
 
 // toHexString
 check(new BitSequence("").toHexString() === "");
@@ -221,11 +211,11 @@ for (let b of bits) {
 }
 bits = new BitSequence("1");
 for (let b of bits) {
-    check(b === true);
+    check(b === 1);
 }
 bits = new BitSequence("101");
 for (let b of bits) {
-    check(b === true || b === false);
+    check(b === 1 || b === 0);
 }
 
 
@@ -288,9 +278,9 @@ expectedWholeFrame = new BitSequence(
 );
 check(frame.wholeFrame().equal(expectedWholeFrame));
 expectedWholeFrameStuffed = new BitSequence(
-    "0  000 01000 00100  0  0  01  0000  " // Header
+    "0  000 03000 00300  0  0  03  0000  " // Header
     + "" // Payload
-    + "0100 00010 0000 10000  " // CRC
+    + "0300 00030 0000 30000  " // CRC
     + "1  1  1  111 1111  111", // Rest of the trailer (unstuffed)
     true // This sequence is already stuffed
 );
@@ -324,8 +314,8 @@ expectedWholeFrame = new BitSequence(
 );
 check(frame.wholeFrame().equal(expectedWholeFrame));
 expectedWholeFrameStuffed = new BitSequence(
-    "0  000 01000 00100  0  0  01  0001  " // Header
-    + "0000 01000" // Payload
+    "0  000 03000 00300  0  0  03  0001  " // Header
+    + "0000 03000" // Payload
     + "100 0100 0010 0110" // CRC
     + "1  1  1  111 1111  111", // Rest of the trailer (unstuffed)
     true // This sequence is already stuffed
@@ -372,9 +362,9 @@ expectedWholeFrame = new BitSequence(
 check(frame.wholeFrame().equal(expectedWholeFrame));
 expectedWholeFrameStuffed = new BitSequence(
     "0  001 0011 0011  0  0  0  1000  " // Header
-    + "1111 10111  0000 01000  00100 00010  00001 0000" // Payload
-    + "01000 00100  00010 00001  0000 01000  1111 10111"  // Payload
-    + "001 1000 0101 11110" // CRC
+    + "1111 12111  0000 03000  00300 00030  00003 0000" // Payload
+    + "03000 00300  00030 00003  0000 03000  1111 12111"  // Payload
+    + "001 1000 0101 11112" // CRC
     + "1  1  1  111 1111  111", // Rest of the trailer (unstuffed)
     true // This sequence is already stuffed
 );
