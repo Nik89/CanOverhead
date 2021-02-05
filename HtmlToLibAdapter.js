@@ -101,9 +101,11 @@ function displayCanFrame11BitWholeFrame(canFrame) {
     // With stuffing
     let bitsWithStuffs = canFrame.wholeFrameStuffed();
     let stuffBitsAmount = bitsWithStuffs.length() - bits.length();
-    frameAsString = `[${bitsWithStuffs.length()} bits, `
-        + `of which ${stuffBitsAmount} stuff bits]<br/>`
-        + bitsWithStuffs.toBinStringWithSpacesLeftAlign();
+    frameAsString = `[${bitsWithStuffs.length()} bits, of which `
+        + `<span class="stuff_bit">${stuffBitsAmount} stuff bits</span>]<br/>`
+        + bitsWithStuffs.toBinStringWithSpacesLeftAlign(
+            "<span class=\"stuff_bit\">", "</span>"
+        );
     display("output_can_whole_frame_stuffed", frameAsString);
     // Max theoretical length
     display("output_max_length", `${canFrame.maxLengthAfterStuffing()} bits`);

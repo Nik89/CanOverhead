@@ -21,8 +21,6 @@ improvements
 - RTR frame support
   - Radio button input to select data frame vs RTR frame. The payload text
     input gets disabled for RTR and is not used.
-- UX improvements
-  - Display stuff bits in bold
 - Deploy script improvements
   - Merges all minified files into one html file, compresses only that
   - Removed moving to gh-pages as GitHub supports also the deployment from other
