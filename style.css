@@ -43,6 +43,7 @@ a:hover {
 .input-error {
     color: red;
     font-size: 1rem;
+    margin-bottom: 1rem;
 }
 
 .input_text {
