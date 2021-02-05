@@ -284,7 +284,8 @@ function calculate() {
         displayUnknownError(
             "An unexpected error occurred :( Please " +
             "<a href=\"https://github.com/Nik89/CanOverhead/issues\">" +
-            "report</a> the conditions leading to your bug!");
+            "report</a> the conditions leading to your bug! " +
+            "Here is some debug information: " + err.message);
         console.error(err);
     }
 }
