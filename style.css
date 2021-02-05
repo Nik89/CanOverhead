@@ -111,7 +111,12 @@ a:hover {
 }
 
 #output_list li {
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.output_can_text {
+    margin-top: 0.5rem;
+    background-color: #eee;
 }
 
 /* Output table with CAN frame fields */
@@ -145,7 +150,7 @@ a:hover {
 
 #output_table tr:nth-child(even) {
     /* Alternating colors of the rows for easier reading. */
-    background-color: #eeeeee;
+    background-color: #eee;
 }
 
 #output_table tr:hover {
