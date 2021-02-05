@@ -83,87 +83,106 @@
                 <div id="output_max_length"></div>
             </li>
         </ul>
-        CAN frame fields without stuff bits [binary]:
-        <ol>
-            <li>
-                <label for="output_can_field01">
-                    Start of Frame (SOF):
-                </label>
-                <div id="output_can_field01"></div>
-            </li>
-            <li>
-                <label for="output_can_field02">
-                    Identifier (ID):
-                </label>
-                <div id="output_can_field02"></div>
-            </li>
-            <li>
-                <label for="output_can_field02">
-                    Remote Transfer Request (RTR):
-                </label>
-                <div id="output_can_field03"></div>
-            </li>
-            <li>
-                <label for="output_can_field04">
-                    Identifier Extension (IDE):
-                </label>
-                <div id="output_can_field04"></div>
-            </li>
-            <li>
-                <label for="output_can_field05">
-                    Reserved 0 (R0):
-                </label>
-                <div id="output_can_field05"></div>
-            </li>
-            <li>
-                <label for="output_can_field06">
-                    Data Length Code (DLC):
-                </label>
-                <div id="output_can_field06"></div>
-            </li>
-            <li>
-                <label for="output_can_field07">
-                    Data (Payload):
-                </label>
-                <div id="output_can_field07"></div>
-            </li>
-            <li>
-                <label for="output_can_field08">
-                    Cyclic Redundancy Check (CRC):
-                </label>
-                <div id="output_can_field08"></div>
-            </li>
-            <li>
-                <label for="output_can_field09">
-                    CRC Delimiter:
-                </label>
-                <div id="output_can_field09"></div>
-            </li>
-            <li>
-                <label for="output_can_field10">
-                    Acknowledgement (ACK) Slot:
-                </label>
-                <div id="output_can_field10"></div>
-            </li>
-            <li>
-                <label for="output_can_field11">
-                    Acknowledgement Delimiter:
-                </label>
-                <div id="output_can_field11"></div>
-            </li>
-            <li>
-                <label for="output_can_field12">
-                    End of Frame (EOF):
-                </label>
-                <div id="output_can_field12"></div>
-            </li>
-            <li>
-                <label for="output_can_field13">
-                    Pause After Frame:
-                </label>
-                <div id="output_can_field13"></div>
-            </li>
-        </ol>
+        <table id="output_table">
+            <tr>
+                <th>#</th>
+                <th>Field name</th>
+                <th>Length<br/>[bits]</th>
+                <th>Content<br/>[bin]</th>
+                <th>Content<br/>[hex]</th>
+            </tr>
+            <tr>
+                <td>1</td>
+                <td class="cell_text">Start of Frame (SOF)</td>
+                <td id="output_can_field01_len"></td>
+                <td id="output_can_field01"></td>
+                <td id="output_can_field01_hex"></td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td class="cell_text">Identifier (ID)</td>
+                <td id="output_can_field02_len"></td>
+                <td id="output_can_field02"></td>
+                <td id="output_can_field02_hex"></td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td class="cell_text">Remote Transfer Request (RTR)</td>
+                <td id="output_can_field03_len"></td>
+                <td id="output_can_field03"></td>
+                <td id="output_can_field03_hex"></td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td class="cell_text">Identifier Extension (IDE)</td>
+                <td id="output_can_field04_len"></td>
+                <td id="output_can_field04"></td>
+                <td id="output_can_field04_hex"></td>
+            </tr>
+            <tr>
+                <td>5</td>
+                <td class="cell_text">Reserved 0 (R0)</td>
+                <td id="output_can_field05_len"></td>
+                <td id="output_can_field05"></td>
+                <td id="output_can_field05_hex"></td>
+            </tr>
+            <tr>
+                <td>6</td>
+                <td class="cell_text">Data Length Code (DLC)</td>
+                <td id="output_can_field06_len"></td>
+                <td id="output_can_field06"></td>
+                <td id="output_can_field06_hex"></td>
+            </tr>
+            <tr>
+                <td>7</td>
+                <td class="cell_text">Data (Payload)</td>
+                <td id="output_can_field07_len"></td>
+                <td id="output_can_field07"></td>
+                <td id="output_can_field07_hex"></td>
+            </tr>
+            <tr>
+                <td>8</td>
+                <td class="cell_text">Cyclic Redundancy Check (CRC)</td>
+                <td id="output_can_field08_len"></td>
+                <td id="output_can_field08"></td>
+                <td id="output_can_field08_hex"></td>
+            </tr>
+            <tr>
+                <td>9</td>
+                <td class="cell_text">CRC Delimiter</td>
+                <td id="output_can_field09_len"></td>
+                <td id="output_can_field09"></td>
+                <td id="output_can_field09_hex"></td>
+            </tr>
+            <tr>
+                <td>10</td>
+                <td class="cell_text">Acknowledgement (ACK) Slot</td>
+                <td id="output_can_field10_len"></td>
+                <td id="output_can_field10"></td>
+                <td id="output_can_field10_hex"></td>
+            </tr>
+            <tr>
+                <td>11</td>
+                <td class="cell_text">Acknowledgement Delimiter</td>
+                <td id="output_can_field11_len"></td>
+                <td id="output_can_field11"></td>
+                <td id="output_can_field11_hex"></td>
+            </tr>
+            <tr>
+                <td>12</td>
+                <td class="cell_text">End of Frame (EOF)</td>
+                <td id="output_can_field12_len"></td>
+                <td id="output_can_field12"></td>
+                <td id="output_can_field12_hex"></td>
+            </tr>
+            <tr>
+                <td>13</td>
+                <td class="cell_text">Pause After Frame</td>
+                <td id="output_can_field13_len"></td>
+                <td id="output_can_field13"></td>
+                <td id="output_can_field13_hex"></td>
+            </tr>
+        </table>
     </div>
 </div>
 <footer>

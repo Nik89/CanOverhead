@@ -25,7 +25,8 @@ and this project adheres to
 
 ### Changed
 
-- Show payload (data field) length in bytes instead of bits.
+- CAN frame fields output formatted as a table with a more modern style,
+  alternating row colors, mouseover effects and including also hex format.
 - Autofocus on CAN ID input field.
 
 
