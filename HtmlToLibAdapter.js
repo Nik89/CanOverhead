@@ -94,19 +94,18 @@ function clearErrorsAndOutputs() {
  */
 function displayCanFrame11BitWholeFrame(canFrame) {
     // Without stuffing
-    let bits = canFrame.wholeFrame();
-    let frameAsString = `[${bits.length()} bits]<br/>`
-        + bits.toBinStringWithSpacesLeftAlign();
-    display("output_can_whole_frame", frameAsString);
+    const bits = canFrame.wholeFrame();
+    display("output_can_whole_frame_len", `[${bits.length()} bits]`);
+    display("output_can_whole_frame", bits.toBinStringWithSpacesLeftAlign());
     // With stuffing
-    let bitsWithStuffs = canFrame.wholeFrameStuffed();
-    let stuffBitsAmount = bitsWithStuffs.length() - bits.length();
-    frameAsString = `[${bitsWithStuffs.length()} bits, of which `
-        + `<span class="stuff_bit">${stuffBitsAmount} stuff bits</span>]<br/>`
-        + bitsWithStuffs.toBinStringWithSpacesLeftAlign(
-            "<span class=\"stuff_bit\">", "</span>"
-        );
-    display("output_can_whole_frame_stuffed", frameAsString);
+    let stuffedBits = canFrame.wholeFrameStuffed();
+    let stuffBitsAmount = stuffedBits.length() - bits.length();
+    display("output_can_whole_frame_stuffed_len",
+        `[${stuffedBits.length()} bits, of which `
+        + `<span class="stuff_bit">${stuffBitsAmount} stuff bits</span>]`);
+    display("output_can_whole_frame_stuffed",
+        stuffedBits.toBinStringWithSpacesLeftAlign(
+            "<span class=\"stuff_bit\">", "</span>"));
     // Max theoretical length
     display("output_max_length", `${canFrame.maxLengthAfterStuffing()} bits`);
 }

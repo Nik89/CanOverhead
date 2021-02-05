@@ -61,28 +61,22 @@
         <button class="button" onclick="calculate()">Compute</button>
     </div>
     <div class="output">
-        Whole frame [binary]:
-        <ul>
-            <li>
-                <label for="output_can_whole_frame">
-                    Without stuff bits:
-                </label>
+        <h4>Whole frame bit sequence</h4>
+        <ul id="output_list">
+            <li>Without stuff bits
+                <span id="output_can_whole_frame_len"></span>
                 <div id="output_can_whole_frame"></div>
             </li>
-            <li>
-                <label for="output_can_whole_frame_stuffed">
-                    With stuff bits (as appears on bus):
-                </label>
+            <li>With stuff bits (as appears on bus)
+                <span id="output_can_whole_frame_stuffed_len"></span>
                 <div id="output_can_whole_frame_stuffed"></div>
             </li>
-            <li>
-                <label for="output_max_length">
-                    Worst-case frame length after stuffing,
-                    assuming same ID and payload lengths:
-                </label>
+            <li>Worst-case frame length after stuffing
+                (assuming same ID and payload lengths)
                 <div id="output_max_length"></div>
             </li>
         </ul>
+        <h4>Breakdown of frame fields</h4>
         <table id="output_table">
             <tr>
                 <th>#</th>

@@ -90,7 +90,18 @@ footer {
     color: #b22ed0;
 }
 
-/* Output table style */
+/* Output list with CAN frame as a bit sequence */
+#output_list {
+    font-size: 1.2rem;
+    width: 90%;
+    margin-left: 1.5rem;
+}
+
+#output_list li {
+    margin-bottom: 1rem;
+}
+
+/* Output table with CAN frame fields */
 #output_table {
     font-size: 1.2rem;
     /* Center in middle of page. */

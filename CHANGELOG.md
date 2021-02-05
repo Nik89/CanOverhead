@@ -28,6 +28,7 @@ and this project adheres to
 - CAN frame fields output formatted as a table with a more modern style,
   alternating row colors, mouseover effects and including also hex format.
 - Autofocus on CAN ID input field.
+- Improved format of the whole-frame bit sequence section
 
 
 ### Fixed
