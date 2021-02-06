@@ -269,7 +269,7 @@ check(frame.field09_crcDelimiter().equal(new BitSequence(1)));
 check(frame.field10_ackSlot().equal(new BitSequence(1)));
 check(frame.field11_ackDelimiter().equal(new BitSequence(1)));
 check(frame.field12_endOfFrame().equal(new BitSequence("111 1111")));
-check(frame.field13_pauseAfterFrame().equal(new BitSequence("111")));
+check(frame.field13_interFrameSpace().equal(new BitSequence("111")));
 expectedWholeFrame = new BitSequence(
     "0  000 0000 0000  0  0  0  0000  " // Header
     + "" // Payload
@@ -305,7 +305,7 @@ check(frame.field09_crcDelimiter().equal(new BitSequence(1)));
 check(frame.field10_ackSlot().equal(new BitSequence(1)));
 check(frame.field11_ackDelimiter().equal(new BitSequence(1)));
 check(frame.field12_endOfFrame().equal(new BitSequence("111 1111")));
-check(frame.field13_pauseAfterFrame().equal(new BitSequence("111")));
+check(frame.field13_interFrameSpace().equal(new BitSequence("111")));
 expectedWholeFrame = new BitSequence(
     "0  000 0000 0000  0  0  0  0001  " // Header
     + "0000 0000" // Payload
@@ -351,7 +351,7 @@ check(frame.field09_crcDelimiter().equal(new BitSequence(1)));
 check(frame.field10_ackSlot().equal(new BitSequence(1)));
 check(frame.field11_ackDelimiter().equal(new BitSequence(1)));
 check(frame.field12_endOfFrame().equal(new BitSequence("111 1111")));
-check(frame.field13_pauseAfterFrame().equal(new BitSequence("111")));
+check(frame.field13_interFrameSpace().equal(new BitSequence("111")));
 expectedWholeFrame = new BitSequence(
     "0  001 0011 0011  0  0  0  1000  " // Header
     + "1111 1111  0000 0000  0000 0000  0000 0000" // Payload

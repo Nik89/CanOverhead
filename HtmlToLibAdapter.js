@@ -197,7 +197,7 @@ function displayCanFrame11BitFields(canFrame) {
     display("output_can_field12_len", field.length().toString());
     display("output_can_field12", field.toBinString());
     display("output_can_field12_hex", field.toHexString());
-    field = canFrame.field13_pauseAfterFrame();
+    field = canFrame.field13_interFrameSpace();
     display("output_can_field13_len", field.length().toString());
     display("output_can_field13", field.toBinString());
     display("output_can_field13_hex", field.toHexString());

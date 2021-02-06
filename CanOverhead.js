@@ -684,16 +684,16 @@ class CanFrame11Bit {
     }
 
     /**
-     * Provides the empty space required between two immediately successive
-     * CAN frames as BitSequence.
+     * Provides the empty Inter-Frame Space required between two immediately
+     * successive CAN frames as BitSequence.
      *
      * Length: 3 bits. This field is *not* stuffable.
      *
      * Always recessive bits.
      *
-     * @returns {BitSequence} Pause after EOF
+     * @returns {BitSequence} IFS
      */
-    field13_pauseAfterFrame() {
+    field13_interFrameSpace() {
         return new BitSequence([
             bit.RECESSIVE, bit.RECESSIVE, bit.RECESSIVE,
         ]);
@@ -718,7 +718,7 @@ class CanFrame11Bit {
         frame.extend(this.field10_ackSlot());
         frame.extend(this.field11_ackDelimiter());
         frame.extend(this.field12_endOfFrame());
-        frame.extend(this.field13_pauseAfterFrame());
+        frame.extend(this.field13_interFrameSpace());
         return frame;
     }
 
@@ -742,7 +742,7 @@ class CanFrame11Bit {
         frame.extend(this.field10_ackSlot());
         frame.extend(this.field11_ackDelimiter());
         frame.extend(this.field12_endOfFrame());
-        frame.extend(this.field13_pauseAfterFrame());
+        frame.extend(this.field13_interFrameSpace());
         return frame;
     }
 
