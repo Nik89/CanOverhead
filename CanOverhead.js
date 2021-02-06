@@ -351,7 +351,8 @@ class BitSequence {
                 str += " ";
                 count = 0;
             }
-            str += BitSequence._seqBitToString(bit, stuffBitPrefix, stuffBitSuffix);
+            str += BitSequence._seqBitToString(
+                bit, stuffBitPrefix, stuffBitSuffix);
             count++;
         }
         return str;
@@ -401,28 +402,15 @@ class BitSequence {
     }
 }
 
-const idSize = {
-    BASE_11_BIT: 11,
-    EXTENDED_29_BIT: 29,
-}
-const bit = {
+const Bit = {
     DOMINANT: false,
     RECESSIVE: true,
-}
-const fieldRtr = {
-    DATA_FRAME: bit.DOMINANT,
-    RTR_FRAME: bit.RECESSIVE,
-}
-const fieldIde = {
-    BASE_11_BIT: bit.DOMINANT,
-    EXTENDED_29_BIT: bit.RECESSIVE,
 }
 
 const MAX_ID_VALUE_11_BIT = 0x7FF;
 const MAX_ID_VALUE_29_BIT = 0x1FFFFFFF;
 const MIN_ID_VALUE = 0;
 const MAX_PAYLOAD_BYTES = 8;
-
 
 const Field = {
     ID: 1,
@@ -516,7 +504,7 @@ class _CanFrame {
  * the fields of the frame or all of them together (also with stuff bits)
  * as BitSequences.
  */
-class CanFrame11Bit extends _CanFrame{
+class CanFrame11Bit extends _CanFrame {
     /**
      * Constructs a Classic CAN frame with an 11-bit ID.
      *
@@ -539,7 +527,7 @@ class CanFrame11Bit extends _CanFrame{
      * @returns {BitSequence} SOF
      */
     field01_startOfFrame() {
-        return new BitSequence(bit.DOMINANT);
+        return new BitSequence(Bit.DOMINANT);
     }
 
     /**
@@ -551,7 +539,7 @@ class CanFrame11Bit extends _CanFrame{
      */
     field02_identifier() {
         return new BitSequence(this.id.toString(2)
-            .padStart(idSize.BASE_11_BIT, "0"));
+            .padStart(11, "0"));
     }
 
     /**
@@ -564,7 +552,7 @@ class CanFrame11Bit extends _CanFrame{
      * @returns {BitSequence} RTR
      */
     field03_remoteTransmissionRequest() {
-        return new BitSequence(fieldRtr.DATA_FRAME);
+        return new BitSequence(Bit.DOMINANT);
     }
 
     /**
@@ -578,7 +566,7 @@ class CanFrame11Bit extends _CanFrame{
      * @returns {BitSequence} IDE
      */
     field04_identifierExtensionBit() {
-        return new BitSequence(fieldIde.BASE_11_BIT);
+        return new BitSequence(Bit.DOMINANT);
     }
 
     /**
@@ -591,7 +579,7 @@ class CanFrame11Bit extends _CanFrame{
      * @returns {BitSequence} R0
      */
     field05_reservedBit() {
-        return new BitSequence(bit.DOMINANT);
+        return new BitSequence(Bit.DOMINANT);
     }
 
     /**
@@ -655,7 +643,7 @@ class CanFrame11Bit extends _CanFrame{
      * @returns {BitSequence} CRC Delimiter
      */
     field09_crcDelimiter() {
-        return new BitSequence(bit.RECESSIVE);
+        return new BitSequence(Bit.RECESSIVE);
     }
 
     /**
@@ -669,7 +657,7 @@ class CanFrame11Bit extends _CanFrame{
      * @returns {BitSequence} ACK slot
      */
     field10_ackSlot() {
-        return new BitSequence(bit.RECESSIVE);
+        return new BitSequence(Bit.RECESSIVE);
     }
 
     /**
@@ -682,7 +670,7 @@ class CanFrame11Bit extends _CanFrame{
      * @returns {BitSequence} ACK delimiter
      */
     field11_ackDelimiter() {
-        return new BitSequence(bit.RECESSIVE);
+        return new BitSequence(Bit.RECESSIVE);
     }
 
     /**
@@ -696,8 +684,8 @@ class CanFrame11Bit extends _CanFrame{
      */
     field12_endOfFrame() {
         return new BitSequence([
-            bit.RECESSIVE, bit.RECESSIVE, bit.RECESSIVE, bit.RECESSIVE,
-            bit.RECESSIVE, bit.RECESSIVE, bit.RECESSIVE,
+            Bit.RECESSIVE, Bit.RECESSIVE, Bit.RECESSIVE, Bit.RECESSIVE,
+            Bit.RECESSIVE, Bit.RECESSIVE, Bit.RECESSIVE,
         ]);
     }
 
@@ -713,7 +701,7 @@ class CanFrame11Bit extends _CanFrame{
      */
     field13_interFrameSpace() {
         return new BitSequence([
-            bit.RECESSIVE, bit.RECESSIVE, bit.RECESSIVE,
+            Bit.RECESSIVE, Bit.RECESSIVE, Bit.RECESSIVE,
         ]);
     }
 
@@ -821,7 +809,7 @@ class CanFrame29Bit extends _CanFrame {
      * @returns {BitSequence} SOF
      */
     field01_startOfFrame() {
-        return new BitSequence(bit.DOMINANT);
+        return new BitSequence(Bit.DOMINANT);
     }
 
     /**
@@ -847,7 +835,7 @@ class CanFrame29Bit extends _CanFrame {
      * @returns {BitSequence} SRR
      */
     field03_substituteRemoteRequest() {
-        return new BitSequence(bit.RECESSIVE);
+        return new BitSequence(Bit.RECESSIVE);
     }
 
     /**
@@ -861,7 +849,7 @@ class CanFrame29Bit extends _CanFrame {
      * @returns {BitSequence} IDE
      */
     field04_identifierExtensionBit() {
-        return new BitSequence(bit.RECESSIVE);
+        return new BitSequence(Bit.RECESSIVE);
     }
 
     /**
@@ -887,7 +875,7 @@ class CanFrame29Bit extends _CanFrame {
      * @returns {BitSequence} RTR
      */
     field06_remoteTransmissionRequest() {
-        return new BitSequence(bit.DOMINANT);
+        return new BitSequence(Bit.DOMINANT);
     }
 
     /**
@@ -900,7 +888,7 @@ class CanFrame29Bit extends _CanFrame {
      * @returns {BitSequence} R1
      */
     field07_reservedBit1() {
-        return new BitSequence(bit.DOMINANT);
+        return new BitSequence(Bit.DOMINANT);
     }
 
     /**
@@ -913,7 +901,7 @@ class CanFrame29Bit extends _CanFrame {
      * @returns {BitSequence} R0
      */
     field08_reservedBit0() {
-        return new BitSequence(bit.DOMINANT);
+        return new BitSequence(Bit.DOMINANT);
     }
 
     /**
@@ -980,7 +968,7 @@ class CanFrame29Bit extends _CanFrame {
      * @returns {BitSequence} CRC Delimiter
      */
     field12_crcDelimiter() {
-        return new BitSequence(bit.RECESSIVE);
+        return new BitSequence(Bit.RECESSIVE);
     }
 
     /**
@@ -994,7 +982,7 @@ class CanFrame29Bit extends _CanFrame {
      * @returns {BitSequence} ACK slot
      */
     field13_ackSlot() {
-        return new BitSequence(bit.RECESSIVE);
+        return new BitSequence(Bit.RECESSIVE);
     }
 
     /**
@@ -1007,7 +995,7 @@ class CanFrame29Bit extends _CanFrame {
      * @returns {BitSequence} ACK delimiter
      */
     field14_ackDelimiter() {
-        return new BitSequence(bit.RECESSIVE);
+        return new BitSequence(Bit.RECESSIVE);
     }
 
     /**
@@ -1021,8 +1009,8 @@ class CanFrame29Bit extends _CanFrame {
      */
     field15_endOfFrame() {
         return new BitSequence([
-            bit.RECESSIVE, bit.RECESSIVE, bit.RECESSIVE, bit.RECESSIVE,
-            bit.RECESSIVE, bit.RECESSIVE, bit.RECESSIVE,
+            Bit.RECESSIVE, Bit.RECESSIVE, Bit.RECESSIVE, Bit.RECESSIVE,
+            Bit.RECESSIVE, Bit.RECESSIVE, Bit.RECESSIVE,
         ]);
     }
 
@@ -1038,7 +1026,7 @@ class CanFrame29Bit extends _CanFrame {
      */
     field16_interFrameSpace() {
         return new BitSequence([
-            bit.RECESSIVE, bit.RECESSIVE, bit.RECESSIVE,
+            Bit.RECESSIVE, Bit.RECESSIVE, Bit.RECESSIVE,
         ]);
     }
 
