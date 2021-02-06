@@ -224,11 +224,11 @@ for (let b of bits) {
 // Test expected results are computed with
 // https://www.ghsi.de/pages/subpages/Online%20CRC%20Calculation/index.php
 // CRC 15 bits for classic CAN
-check(CanFrame11Bit.crc15([0]) === 0);
-check(CanFrame11Bit.crc15([1, 1, 1, 1, 0, 0, 0, 1]) === 0b110001011110110);
-check(CanFrame11Bit.crc15([true, true, true, true, 0, 0, false, 1]) === 0b110001011110110);
-check(CanFrame11Bit.crc15([1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1]) === 0b000010001110100);
-check(CanFrame11Bit.crc15([1, 1, 0, 1, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0]) === 0b010001010101010);
+check(crc15([0]) === 0);
+check(crc15([1, 1, 1, 1, 0, 0, 0, 1]) === 0b110001011110110);
+check(crc15([true, true, true, true, 0, 0, false, 1]) === 0b110001011110110);
+check(crc15([1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1]) === 0b000010001110100);
+check(crc15([1, 1, 0, 1, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0]) === 0b010001010101010);
 
 // CRC 17 bits for CAN FD
 check(crc17([0]) === 0);
@@ -298,8 +298,7 @@ check(frame.field05_reservedBit().equal(new BitSequence(0)));
 check(frame.field06_dataLengthCode().equal(new BitSequence("0001")));
 check(frame.field07_dataField().equal(new BitSequence("0000 0000")));
 toComputeCrcOn = new BitSequence("0  000 0000 0000  0  0  0001  0000 0000");
-crcBits = new BitSequence(
-    CanFrame11Bit.crc15(toComputeCrcOn).toString(2).padStart(15, "0"));
+crcBits = new BitSequence(crc15(toComputeCrcOn).toString(2).padStart(15, "0"));
 check(frame.field08_crc().equal(crcBits));
 check(frame.field09_crcDelimiter().equal(new BitSequence(1)));
 check(frame.field10_ackSlot().equal(new BitSequence(1)));
@@ -344,8 +343,7 @@ toComputeCrcOn = new BitSequence(
     "0  001 0011 0011  0  0  0  1000  "
     + "1111 1111  0000 0000  0000 0000  0000 0000"
     + "0000 0000  0000 0000  0000 0000  1111 1111");
-crcBits = new BitSequence(
-    CanFrame11Bit.crc15(toComputeCrcOn).toString(2).padStart(15, "0"));
+crcBits = new BitSequence(crc15(toComputeCrcOn).toString(2).padStart(15, "0"));
 check(frame.field08_crc().equal(crcBits));
 check(frame.field09_crcDelimiter().equal(new BitSequence(1)));
 check(frame.field10_ackSlot().equal(new BitSequence(1)));
