@@ -210,7 +210,7 @@ function displayCanFrame11BitFields(canFrame) {
  * and clears any base prefix "0b" / "0x" from the number if it defines
  * the same base as in the dropdown menu.
  * @return {number} parsed ID
- * @throws RangeError in case of problems
+ * @throws ValidationError in case of problems
  */
 function parseCanIdentifierFromInputForm() {
     // Get ID
@@ -255,6 +255,11 @@ function parseCanIdentifierFromInputForm() {
                 identifierStr = identifierStr.substring(2);
             }
             break;
+        default:
+            // Impossible case, input was manipulated into something not
+            // supported.
+            throw new ValidationError(
+                "Unsupported base prefix " + basePrefix, Field.ID);
     }
     // Prepend "0x" or "0b" to the ID to enforce its base.
     // Note: we are NOT using parseInt(), which may seem as the most logical
@@ -277,7 +282,7 @@ function parseCanIdentifierFromInputForm() {
 /**
  * Obtains, parses and validates the user input for the CAN Payload.
  * @return {Uint8Array} parsed payload
- * @throws RangeError in case of problems
+ * @throws ValidationError in case of problems
  */
 function parseCanPayloadFromInputForm() {
     let payloadStr = document.getElementById("input_can_payload").value;
