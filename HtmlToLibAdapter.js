@@ -247,15 +247,14 @@ function parseCanIdentifierSizeFromInputForm() {
  */
 function parseCanIdentifierFromInputForm() {
     // Get ID
-    let identifierStr = document.getElementById("input_can_identifier").value;
+    let identifierStr = read("input_can_identifier");
     identifierStr = identifierStr.trim().toLowerCase();
     if (identifierStr.length === 0) {
         // Empty or whitespace-only user input
         throw new ValidationError("Insert an identifier value.", Field.ID);
     }
     // Get the base of the ID
-    const basePrefix =
-        document.getElementById("input_can_identifier_base").value;
+    const basePrefix = read("input_can_identifier_base");
     // Remove any existing "0x"/"0b" prefix from the identifier
     // in the cases where it makes sense.
     switch (basePrefix) {
@@ -318,7 +317,7 @@ function parseCanIdentifierFromInputForm() {
  * @throws ValidationError in case of problems
  */
 function parseCanPayloadFromInputForm() {
-    let payloadStr = document.getElementById("input_can_payload").value;
+    let payloadStr = read("input_can_payload");
     // Strip hex prefixes, any whitespace and some common separators
     const toStrip = /0x|[\s,]/g;
     payloadStr = payloadStr.toLowerCase().replaceAll(toStrip, "");
