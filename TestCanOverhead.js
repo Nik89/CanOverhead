@@ -394,3 +394,5 @@ for (let i = 0; i <= 8; i++) {
     check(frame.maxLengthAfterStuffing()
         === expectedMaxFrameLenAfterStuffing, payload);
 }
+
+// TODO tests for 29 bit ID frame

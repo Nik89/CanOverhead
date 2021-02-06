@@ -33,6 +33,18 @@ function clear(id) {
 }
 
 /**
+ * Reads (gets) the value of the input form with the given ID.
+ *
+ * It's basically just syntax sugar to shorten other code lines.
+ *
+ * @param {string} id identifier of the div where to write
+ * @return {string} content of the form
+ */
+function read(id) {
+    return document.getElementById(id).value;
+}
+
+/**
  * Prints the error message related to an invalid input of the CAN identifier.
  * @param {string} msg
  */
@@ -201,6 +213,27 @@ function displayCanFrame11BitFields(canFrame) {
     display("output_can_field13_len", field.length().toString());
     display("output_can_field13", field.toBinString());
     display("output_can_field13_hex", field.toHexString());
+}
+
+/**
+ * Obtains, parses and validates the user input for the CAN identifier size.
+ *
+ * @return {number} ID size in bits
+ * @throws ValidationError in case of problems
+ */
+function parseCanIdentifierSizeFromInputForm() {
+    const identifierSizeStr = read("input_can_identifier_bits");
+    switch (identifierSizeStr) {
+        case "11":
+            return 11;
+        case "29":
+            return 29;
+        default:
+            // Impossible case, input was manipulated into something not
+            // supported.
+            throw new ValidationError(
+                "Unsupported identifier size " + identifierSizeStr, Field.ID);
+    }
 }
 
 /**
