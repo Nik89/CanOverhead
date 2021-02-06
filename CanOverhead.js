@@ -495,6 +495,27 @@ class _CanFrame {
         this.id = id;
         this.payload = payload;
     }
+
+    /**
+     * Converts the payload from Uint8Array to BitSequence, padded with zeros.
+     * @returns {BitSequence}
+     */
+    payloadAsBitSequence() {
+        let payloadBits = new BitSequence();
+        for (let byte of this.payload) {
+            payloadBits.extend(byte.toString(2).padStart(8, "0"));
+        }
+        return payloadBits;
+    }
+
+    /**
+     * Converts the payload length to the BitSequence in the DLC field.
+     * @returns {BitSequence}
+     */
+    dataLengthCode() {
+        return new BitSequence(
+            this.payload.length.toString(2).padStart(4, "0"));
+    }
 }
 
 /**
@@ -607,11 +628,7 @@ class CanFrame11Bit extends _CanFrame {
      * @returns {BitSequence} Data
      */
     field07_dataField() {
-        let payloadBits = new BitSequence();
-        for (let byte of this.payload) {
-            payloadBits.extend(byte.toString(2).padStart(8, "0"));
-        }
-        return payloadBits;
+        return this.payloadAsBitSequence();
     }
 
     /**
@@ -915,8 +932,7 @@ class CanFrame29Bit extends _CanFrame {
      * @returns {BitSequence} DLC
      */
     field09_dataLengthCode() {
-        return new BitSequence(
-            this.payload.length.toString(2).padStart(4, "0"));
+        return this.dataLengthCode();
     }
 
     /**
@@ -929,11 +945,7 @@ class CanFrame29Bit extends _CanFrame {
      * @returns {BitSequence} Data
      */
     field10_dataField() {
-        let payloadBits = new BitSequence();
-        for (let byte of this.payload) {
-            payloadBits.extend(byte.toString(2).padStart(8, "0"));
-        }
-        return payloadBits;
+        return this.payloadAsBitSequence();
     }
 
     /**
