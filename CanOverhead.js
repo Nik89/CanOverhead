@@ -446,39 +446,37 @@ class ValidationError extends Error {
 }
 
 /**
- * Data structure representing a Classic CAN data frame with 11-bit identifier.
- *
- * Provide an ID and the payload, the query the various methods to obtain
- * the fields of the frame or all of them together (also with stuff bits)
- * as BitSequences.
+ * @private
+ * Internal class with some shared code for other specialised CAN frames.
  */
-class CanFrame11Bit {
+class _CanFrame {
     /**
-     * Constructs a Classic CAN frame with an 11-bit ID.
+     * Validates the constructor inputs for a Classic CAN frame.
      *
      * @param {number} id integer of the CAN ID. Most significant bit is the
      *        first transmitted
      * @param {Uint8Array} payload array of integers. Most significant bit
      *        of the first byte (at index 0) is the first transmitted
+     * @param {number} maxId max value the ID can have
      */
-    constructor(id, payload) {
+    constructor(id, payload, maxId) {
         // Check ID
         if (typeof (id) !== "number") {
             throw new TypeError("Identifier must be a number.");
         }
-        if (id < MIN_ID_VALUE || id > MAX_ID_VALUE_11_BIT) {
+        if (id < MIN_ID_VALUE || id > maxId) {
             throw new ValidationError(
                 "Identifier out of bounds. Valid range: ["
                 + MIN_ID_VALUE
                 + ", "
-                + MAX_ID_VALUE_11_BIT
+                + maxId
                 + "] = [0x"
                 + MIN_ID_VALUE
                     .toString(16)
                     .toUpperCase()
                     .padStart(3, "0")
                 + ", 0x"
-                + MAX_ID_VALUE_11_BIT
+                + maxId
                     .toString(16)
                     .toUpperCase()
                     .padStart(3, "0")
@@ -488,7 +486,7 @@ class CanFrame11Bit {
                     .toUpperCase()
                     .padStart(11, "0")
                 + ", 0b"
-                + MAX_ID_VALUE_11_BIT
+                + maxId
                     .toString(2)
                     .toUpperCase()
                     .padStart(11, "0")
@@ -506,9 +504,29 @@ class CanFrame11Bit {
                 + "] bytes",
                 Field.PAYLOAD);
         }
-        // Everything valid
         this.id = id;
         this.payload = payload;
+    }
+}
+
+/**
+ * Data structure representing a Classic CAN data frame with 11-bit identifier.
+ *
+ * Provide an ID and the payload, the query the various methods to obtain
+ * the fields of the frame or all of them together (also with stuff bits)
+ * as BitSequences.
+ */
+class CanFrame11Bit extends _CanFrame{
+    /**
+     * Constructs a Classic CAN frame with an 11-bit ID.
+     *
+     * @param {number} id integer of the CAN ID. Most significant bit is the
+     *        first transmitted
+     * @param {Uint8Array} payload array of integers. Most significant bit
+     *        of the first byte (at index 0) is the first transmitted
+     */
+    constructor(id, payload) {
+        super(id, payload, MAX_ID_VALUE_11_BIT);
     }
 
     /**
@@ -780,7 +798,7 @@ class CanFrame11Bit {
  * the fields of the frame or all of them together (also with stuff bits)
  * as BitSequences.
  */
-class CanFrame29Bit {
+class CanFrame29Bit extends _CanFrame {
     /**
      * Constructs a Classic CAN extended frame with 29-bit ID.
      *
@@ -790,53 +808,7 @@ class CanFrame29Bit {
      *        of the first byte (at index 0) is the first transmitted
      */
     constructor(id, payload) {
-        // Check ID
-        if (typeof (id) !== "number") {
-            throw new TypeError("Identifier must be a number.");
-        }
-        if (id < MIN_ID_VALUE || id > MAX_ID_VALUE_29_BIT) {
-            throw new ValidationError(
-                "Identifier out of bounds. Valid range: ["
-                + MIN_ID_VALUE
-                + ", "
-                + MAX_ID_VALUE_29_BIT
-                + "] = [0x"
-                + MIN_ID_VALUE
-                    .toString(16)
-                    .toUpperCase()
-                    .padStart(3, "0")
-                + ", 0x"
-                + MAX_ID_VALUE_29_BIT
-                    .toString(16)
-                    .toUpperCase()
-                    .padStart(3, "0")
-                + "] = [0b"
-                + MIN_ID_VALUE
-                    .toString(2)
-                    .toUpperCase()
-                    .padStart(11, "0")
-                + ", 0b"
-                + MAX_ID_VALUE_29_BIT
-                    .toString(2)
-                    .toUpperCase()
-                    .padStart(11, "0")
-                + "]",
-                Field.ID);
-        }
-        // Check Payload
-        if (!(payload instanceof Uint8Array)) {
-            throw new TypeError("Payload must be a Uint8Array.");
-        }
-        if (payload.length > MAX_PAYLOAD_BYTES) {
-            throw new ValidationError(
-                "Payload too long. Valid length range: [0, "
-                + MAX_PAYLOAD_BYTES
-                + "] bytes",
-                Field.PAYLOAD);
-        }
-        // Everything valid
-        this.id = id;
-        this.payload = payload;
+        super(id, payload, MAX_ID_VALUE_29_BIT);
     }
 
     /**
