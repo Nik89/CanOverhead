@@ -287,7 +287,7 @@ function displayCanFrame11BitFields(canFrame) {
     display("output_can_data11_field11_hex", field.toHexString());
     field = canFrame.field12_endOfFrame();
     display("output_can_data11_field12_len", field.length().toString());
-    display("output_can_data11_field12", field.toBinString());
+    display("output_can_data11_field12", field.toBinStringWithSpacesRightAlign());
     display("output_can_data11_field12_hex", field.toHexString());
     field = canFrame.field13_interFrameSpace();
     display("output_can_data11_field13_len", field.length().toString());
@@ -322,7 +322,7 @@ function displayCanFrame29BitFields(canFrame) {
     display("output_can_data29_field04_hex", field.toHexString());
     field = canFrame.field05_identifierPartB();
     display("output_can_data29_field05_len", field.length().toString());
-    display("output_can_data29_field05", field.toBinString());
+    display("output_can_data29_field05", field.toBinStringWithSpacesRightAlign());
     display("output_can_data29_field05_hex", field.toHexString());
     field = canFrame.field06_remoteTransmissionRequest();
     display("output_can_data29_field06_len", field.length().toString());
@@ -330,11 +330,11 @@ function displayCanFrame29BitFields(canFrame) {
     display("output_can_data29_field06_hex", field.toHexString());
     field = canFrame.field07_reservedBit1();
     display("output_can_data29_field07_len", field.length().toString());
-    display("output_can_data29_field07", field.toBinStringWithSpacesRightAlign());
+    display("output_can_data29_field07", field.toBinString());
     display("output_can_data29_field07_hex", field.toHexString());
     field = canFrame.field08_reservedBit0();
     display("output_can_data29_field08_len", field.length().toString());
-    display("output_can_data29_field08", field.toBinStringWithSpacesRightAlign());
+    display("output_can_data29_field08", field.toBinString());
     display("output_can_data29_field08_hex", field.toHexString());
     field = canFrame.field09_dataLengthCode();
     display("output_can_data29_field09_len", field.length().toString());
@@ -342,11 +342,11 @@ function displayCanFrame29BitFields(canFrame) {
     display("output_can_data29_field09_hex", field.toHexString());
     field = canFrame.field10_dataField();
     display("output_can_data29_field10_len", field.length().toString());
-    display("output_can_data29_field10", field.toBinString());
+    display("output_can_data29_field10", field.toBinStringWithSpacesRightAlign());
     display("output_can_data29_field10_hex", field.toHexString());
     field = canFrame.field11_crc();
     display("output_can_data29_field11_len", field.length().toString());
-    display("output_can_data29_field11", field.toBinString());
+    display("output_can_data29_field11", field.toBinStringWithSpacesRightAlign());
     display("output_can_data29_field11_hex", field.toHexString());
     field = canFrame.field12_crcDelimiter();
     display("output_can_data29_field12_len", field.length().toString());
@@ -362,7 +362,7 @@ function displayCanFrame29BitFields(canFrame) {
     display("output_can_data29_field14_hex", field.toHexString());
     field = canFrame.field15_endOfFrame();
     display("output_can_data29_field15_len", field.length().toString());
-    display("output_can_data29_field15", field.toBinString());
+    display("output_can_data29_field15", field.toBinStringWithSpacesRightAlign());
     display("output_can_data29_field15_hex", field.toHexString());
     field = canFrame.field16_interFrameSpace();
     display("output_can_data29_field16_len", field.length().toString());
