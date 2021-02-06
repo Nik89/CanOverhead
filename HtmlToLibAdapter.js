@@ -230,6 +230,8 @@ function displayCanFrameWholeFrame(canFrame) {
             "<span class=\"stuff_bit\">", "</span>"));
     // Max theoretical length
     display("output_max_length", `${canFrame.maxLengthAfterStuffing()} bits`);
+    unhide("output_list_title");
+    unhide("output_list");
 }
 
 /**
@@ -291,6 +293,8 @@ function displayCanFrame11BitFields(canFrame) {
     display("output_can_data11_field13_len", field.length().toString());
     display("output_can_data11_field13", field.toBinString());
     display("output_can_data11_field13_hex", field.toHexString());
+    unhide("output_table_title");
+    unhide("output_table_data11bit");
 }
 
 /**
@@ -364,6 +368,8 @@ function displayCanFrame29BitFields(canFrame) {
     display("output_can_data29_field16_len", field.length().toString());
     display("output_can_data29_field16", field.toBinString());
     display("output_can_data29_field16_hex", field.toHexString());
+    unhide("output_table_title");
+    unhide("output_table_data29bit");
 }
 
 /**
@@ -512,16 +518,11 @@ function calculate() {
             const canFrame = new CanFrame11Bit(identifier, payload);
             displayCanFrameWholeFrame(canFrame);
             displayCanFrame11BitFields(canFrame);
-            unhide("output_table_data11bit");
         } else if (identifierSize === 29) {
             const canFrame = new CanFrame29Bit(identifier, payload);
             displayCanFrameWholeFrame(canFrame);
             displayCanFrame29BitFields(canFrame);
-            unhide("output_table_data29bit");
         }
-        unhide("output_list_title");
-        unhide("output_list");
-        unhide("output_table_title");
         // Successful conversion and output
     } catch (err) {
         if (err instanceof ValidationError) {
