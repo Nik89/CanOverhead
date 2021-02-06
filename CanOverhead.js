@@ -423,6 +423,28 @@ const MAX_ID_VALUE_11_BIT = 0x7FF;
 const MIN_ID_VALUE = 0;
 const MAX_PAYLOAD_BYTES = 8;
 
+
+const Field = {
+    ID: 1,
+    PAYLOAD: 2,
+}
+
+/**
+ * Custom error class for input validation issues.
+ */
+class ValidationError extends Error {
+    /**
+     * Constructs a new ValidationError.
+     * @param {string} message to display to the user
+     * @param {Field} field type of the field causing the error
+     */
+    constructor(message, field) {
+        super(message);
+        this.name = "ValidationError";
+        this.field = field;
+    }
+}
+
 /**
  * Data structure representing a Classic CAN data frame with 11-bit identifier.
  *
@@ -445,14 +467,44 @@ class CanFrame11Bit {
             throw new TypeError("Identifier must be a number.");
         }
         if (id < MIN_ID_VALUE || id > MAX_ID_VALUE_11_BIT) {
-            throw new RangeError("Identifier out of bounds.");
+            throw new ValidationError(
+                "Identifier out of bounds. Valid range: ["
+                + MIN_ID_VALUE
+                + ", "
+                + MAX_ID_VALUE_11_BIT
+                + "] = [0x"
+                + MIN_ID_VALUE
+                    .toString(16)
+                    .toUpperCase()
+                    .padStart(3, "0")
+                + ", 0x"
+                + MAX_ID_VALUE_11_BIT
+                    .toString(16)
+                    .toUpperCase()
+                    .padStart(3, "0")
+                + "] = [0b"
+                + MIN_ID_VALUE
+                    .toString(2)
+                    .toUpperCase()
+                    .padStart(11, "0")
+                + ", 0b"
+                + MAX_ID_VALUE_11_BIT
+                    .toString(2)
+                    .toUpperCase()
+                    .padStart(11, "0")
+                + "]",
+                Field.ID);
         }
         // Check Payload
         if (!(payload instanceof Uint8Array)) {
             throw new TypeError("Payload must be a Uint8Array.");
         }
         if (payload.length > MAX_PAYLOAD_BYTES) {
-            throw new RangeError("Payload too long.");
+            throw new ValidationError(
+                "Payload too long. Valid length range: [0, "
+                + MAX_PAYLOAD_BYTES
+                + "] bytes",
+                Field.PAYLOAD);
         }
         // Everything valid
         this.id = id;

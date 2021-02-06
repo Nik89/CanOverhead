@@ -49,11 +49,17 @@ function displayCanPayloadError(msg) {
 }
 
 /**
- * Prints a generic error message related to an invalid input.
- * @param {string} msg
+ * Prints a generic error message related to an invalid input, also logging it
+ * to the console.
+ * @param {Error} err
  */
-function displayUnknownError(msg) {
-    display("input_unknown_error", msg);
+function displayUnknownError(err) {
+    display("input_unknown_error",
+        "An unexpected error occurred :( Please " +
+        "<a href=\"https://github.com/Nik89/CanOverhead/issues\">" +
+        "report</a> the conditions leading to your bug! " +
+        "Here is some debug information: " + err.message);
+    console.error(err);
 }
 
 /**
@@ -203,6 +209,8 @@ function displayCanFrame11BitFields(canFrame) {
  * Takes care of reading the base of the value from the dropdown value
  * and clears any base prefix "0b" / "0x" from the number if it defines
  * the same base as in the dropdown menu.
+ * @return {number} parsed ID
+ * @throws RangeError in case of problems
  */
 function parseCanIdentifierFromInputForm() {
     // Get ID
@@ -210,7 +218,7 @@ function parseCanIdentifierFromInputForm() {
     identifierStr = identifierStr.trim().toLowerCase();
     if (identifierStr.length === 0) {
         // Empty or whitespace-only user input
-        return null;
+        throw new ValidationError("Insert an identifier value.", Field.ID);
     }
     // Get the base of the ID
     const basePrefix =
@@ -224,14 +232,19 @@ function parseCanIdentifierFromInputForm() {
             if (identifierStr.startsWith("0b")) {
                 identifierStr = identifierStr.substring(2);
             } else if (identifierStr.startsWith("0x")) {
-                return null;
+                throw new ValidationError(
+                    "'0x' prefix not supported for binary input.",
+                    Field.ID);
             }
             break;
         case "":
             // Decimal. Any base prefix is not acceptable
             if (identifierStr.startsWith("0b")
                 || identifierStr.startsWith("0x")) {
-                return null;
+                throw new ValidationError(
+                    "'0b' or '0x' prefixes not supported for decimal input.",
+                    Field.ID);
+
             }
             break;
         case "0x":
@@ -255,30 +268,44 @@ function parseCanIdentifierFromInputForm() {
     const identifier = Number(basePrefix + identifierStr);
     if (isNaN(identifier)) {
         // Not a number: user typed other characters or words
-        return null;
+        throw new ValidationError(
+            "Invalid identifier number format.", Field.ID);
     }
     return identifier;
 }
 
 /**
  * Obtains, parses and validates the user input for the CAN Payload.
+ * @return {Uint8Array} parsed payload
+ * @throws RangeError in case of problems
  */
 function parseCanPayloadFromInputForm() {
     let payloadStr = document.getElementById("input_can_payload").value;
-    if (payloadStr.trim().length === 0) {
+    // Strip hex prefixes, any whitespace and some common separators
+    const toStrip = /0x|[\s,]/g;
+    payloadStr = payloadStr.toLowerCase().replaceAll(toStrip, "");
+    if (payloadStr.length === 0) {
         // Empty or whitespace-only user input. This is an empty payload, 0 B.
         return new Uint8Array(0);
     }
-    // Strip hex prefixes, any whitespace and some common separators
-    const hexPrefixOrNonHexChars = /0[xX]|[^0-9a-fA-F]/g;
-    payloadStr = payloadStr.replaceAll(hexPrefixOrNonHexChars, "");
-    if (payloadStr.length % 2 !== 0) {
-        return null;
+    const nonHexChars = payloadStr.match(/[^0-9a-f]/g);
+    if (nonHexChars !== null) {
+        throw new ValidationError(
+            "Illegal characters found: " + nonHexChars + ".", Field.PAYLOAD);
     }
-    // Split into strings of 2 hex characters
-    payloadStr = payloadStr.match(/../g);
+    if (payloadStr.length % 2 !== 0) {
+        throw new ValidationError(
+            "Odd amount of hex characters.", Field.PAYLOAD);
+    }
+    // Split into array of strings of 2 characters.
+    const payloadHexPairs = payloadStr.match(/../g);
+    const payloadInts = payloadHexPairs.map(byteStr => parseInt(byteStr, 16));
+    if (payloadInts.includes(NaN)) {
+        throw new ValidationError(
+            "Failed parsing of hex characters.", Field.PAYLOAD);
+    }
     // Convert array of hex strings to array of bytes
-    return new Uint8Array(payloadStr.map(byteStr => parseInt(byteStr, 16)));
+    return new Uint8Array(payloadInts);
 }
 
 /**
@@ -290,42 +317,30 @@ function calculate() {
         clearErrorsAndOutputs();
         // Parse input fields
         const identifier = parseCanIdentifierFromInputForm();
-        if (identifier === null) {
-            displayCanIdentifierError(
-                "Incorrect identifier format.");
-            return; // Early exit
-        }
         const payload = parseCanPayloadFromInputForm();
-        if (payload === null) {
-            displayCanPayloadError(
-                "Payload must have an even amount of hex characters.");
-            return; // Early exit
-        }
         // Pass everything to the CanOverhead library
-        try {
-            let canFrame = new CanFrame11Bit(identifier, payload);
-            displayCanFrame11BitWholeFrame(canFrame);
-            displayCanFrame11BitFields(canFrame);
-            // Successful conversion and output
-        } catch (err) {
-            if (err instanceof RangeError
-                && err.message.startsWith("Identifier")) {
-                // Error of the identifier
-                displayCanIdentifierError(err.message);
-            } else if (err instanceof RangeError
-                && err.message.startsWith("Payload")) {
-                // Error of the identifier
-                displayCanPayloadError(err.message);
-            }
-        }
+        let canFrame = new CanFrame11Bit(identifier, payload);
+        // Fill output fields
+        displayCanFrame11BitWholeFrame(canFrame);
+        displayCanFrame11BitFields(canFrame);
+        // Successful conversion and output
     } catch (err) {
-        // Other errors, but they "should never happen".
-        displayUnknownError(
-            "An unexpected error occurred :( Please " +
-            "<a href=\"https://github.com/Nik89/CanOverhead/issues\">" +
-            "report</a> the conditions leading to your bug! " +
-            "Here is some debug information: " + err.message);
-        console.error(err);
+        if (err instanceof ValidationError) {
+            switch (err.field) {
+                case Field.ID:
+                    displayCanIdentifierError(err.message);
+                    break;
+                case Field.PAYLOAD:
+                    displayCanPayloadError(err.message);
+                    break;
+                default:
+                    // Unsupported field type, programming error.
+                    displayUnknownError(err);
+            }
+        } else {
+            // Other errors, but they "should never happen".
+            displayUnknownError(err);
+        }
     }
 }
 

@@ -33,6 +33,7 @@ and this project adheres to
   - whole-frame bit sequence section
   - frame fields, now provided as a table. Includes alternating row colors,
     mouseover effects and hex format column
+- More verbose and detailed error messages for the various incorrect inputs.
 
 
 ### Fixed
@@ -48,6 +49,7 @@ and this project adheres to
 - Display a generic error message in case of unknown and uncaught errors
   at any level in the execution of the code instead of silently doing nothing
   and crashing the app.
+- Fixed non-hex payload chars being parsed into a 0 value.
 
 
 
