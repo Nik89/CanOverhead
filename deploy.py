@@ -23,6 +23,7 @@ import subprocess as sub
 import glob
 import sys
 import gzip
+import re
 
 import markdown
 
@@ -111,6 +112,30 @@ def _minify(input_file_name: str, web_api_url: str) -> None:
     open(output_file_name, "w", encoding="UTF-8").write(minified)
 
 
+def inline_js_and_css_into_html(html_file_name: str, ) -> None:
+    html_file_name = os.path.join(BUILD_DIR, html_file_name)
+    html = open(html_file_name).readlines()
+    inlined = []
+    for line in html:
+        if '<link' in line and 'stylesheet' in line:
+            css_file = re.search(r'[a-zA-Z0-9_]+\.css', line)
+            if css_file is None:
+                raise RuntimeError("Can't extract CSS file name from HTML.")
+            css_file = os.path.join(BUILD_DIR, css_file.group(0))
+            inlined.append('<style>' + open(css_file).read() + '</style>\n')
+            os.remove(css_file)
+        elif '<script' in line:
+            js_file = re.search(r'[a-zA-Z0-9_]+\.js', line)
+            if js_file is None:
+                raise RuntimeError("Can't extract JS file name from HTML.")
+            js_file = os.path.join(BUILD_DIR, js_file.group(0))
+            inlined.append('<script>' + open(js_file).read() + '</script>\n')
+            os.remove(js_file)
+        else:
+            inlined.append(line)
+    open(html_file_name, 'w').writelines(inlined)
+
+
 def _shell(cmd: str) -> str:
     # TODO make it internal
     """Launches a simple shell command as a subprocess, returning its stdout."""
@@ -190,12 +215,13 @@ def build():
     minify_js("CanOverhead.js")
     minify_js("HtmlToLibAdapter.js")
     minify_js("TestCanOverhead.js")
+    inline_js_and_css_into_html("index.html")
     prepend_comment_in_index_file()
     compress_file("index.html")
-    compress_file("style.css")
-    compress_file("CanOverhead.js")
-    compress_file("HtmlToLibAdapter.js")
-    compress_file("TestCanOverhead.js")
+    #compress_file("style.css")
+    #compress_file("CanOverhead.js")
+    #compress_file("HtmlToLibAdapter.js")
+    #compress_file("TestCanOverhead.js")
     compress_file("changelog.html")
     compress_file("license.html")
     compress_file("readme.html")
