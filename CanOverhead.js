@@ -462,22 +462,18 @@ class _CanFrame {
                 + MIN_ID_VALUE
                     .toString(16)
                     .toUpperCase()
-                    .padStart(3, "0")
                 + ", 0x"
                 + maxId
                     .toString(16)
                     .toUpperCase()
-                    .padStart(3, "0")
                 + "] = [0b"
                 + MIN_ID_VALUE
                     .toString(2)
                     .toUpperCase()
-                    .padStart(11, "0")
                 + ", 0b"
                 + maxId
                     .toString(2)
                     .toUpperCase()
-                    .padStart(11, "0")
                 + "]",
                 Field.ID);
         }
@@ -614,8 +610,7 @@ class CanFrame11Bit extends _CanFrame {
      * @returns {BitSequence} DLC
      */
     field06_dataLengthCode() {
-        return new BitSequence(this.payload.length.toString(2)
-            .padStart(4, "0"));
+        return this.dataLengthCode();
     }
 
     /**
