@@ -112,20 +112,20 @@ def _minify(input_file_name: str, web_api_url: str) -> None:
     open(output_file_name, "w", encoding="UTF-8").write(minified)
 
 
-def inline_js_and_css_into_html(html_file_name: str, ) -> None:
+def inline_js_and_css_into_html(html_file_name: str) -> None:
     html_file_name = os.path.join(BUILD_DIR, html_file_name)
     html = open(html_file_name).readlines()
     inlined = []
     for line in html:
         if '<link' in line and 'stylesheet' in line:
-            css_file = re.search(r'[a-zA-Z0-9_]+\.css', line)
+            css_file = re.search(r'[a-zA-Z0-9_\.]+\.css', line)
             if css_file is None:
                 raise RuntimeError("Can't extract CSS file name from HTML.")
             css_file = os.path.join(BUILD_DIR, css_file.group(0))
             inlined.append('<style>' + open(css_file).read() + '</style>\n')
             os.remove(css_file)
         elif '<script' in line:
-            js_file = re.search(r'[a-zA-Z0-9_]+\.js', line)
+            js_file = re.search(r'[a-zA-Z0-9_\.]+\.js', line)
             if js_file is None:
                 raise RuntimeError("Can't extract JS file name from HTML.")
             js_file = os.path.join(BUILD_DIR, js_file.group(0))

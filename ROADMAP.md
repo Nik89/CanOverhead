@@ -25,7 +25,7 @@ improvements
   - Merges all minified files into one html file, compresses only that
   - Removed moving to gh-pages as GitHub supports also the deployment from other
     branches. Now the released script is put into `release/` and not commited
-    onto gh-pages.
+    onto gh-pages. (Rename builds directory to docs to match GitHub support?)
 
 
 
