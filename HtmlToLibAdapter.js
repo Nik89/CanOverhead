@@ -33,6 +33,40 @@ function clear(id) {
 }
 
 /**
+ * Reads (gets) the value of the input form with the given ID.
+ *
+ * It's basically just syntax sugar to shorten other code lines.
+ *
+ * @param {string} id identifier of the div where to write
+ * @return {string} content of the form
+ */
+function read(id) {
+    return document.getElementById(id).value;
+}
+
+/**
+ * Hides the document element from view.
+ *
+ * It's basically just syntax sugar to shorten other code lines.
+ *
+ * @param {string} id identifier of the element to hide
+ */
+function hide(id) {
+    document.getElementById(id).style.display='none';
+}
+
+/**
+ * Shows the previously-hidden document element.
+ *
+ * It's basically just syntax sugar to shorten other code lines.
+ *
+ * @param {string} id identifier of the element to sho
+ */
+function unhide(id) {
+    document.getElementById(id).style.display='block';
+}
+
+/**
  * Prints the error message related to an invalid input of the CAN identifier.
  * @param {string} msg
  */
@@ -77,54 +111,110 @@ function clearErrorsAndOutputs() {
     clear("output_can_whole_frame_stuffed");
     clear("output_can_whole_frame_stuffed_len");
     clear("output_max_length");
-    // Clear outputs about the frame fields
-    clear("output_can_field01");
-    clear("output_can_field01_len");
-    clear("output_can_field01_hex");
-    clear("output_can_field02");
-    clear("output_can_field02_len");
-    clear("output_can_field02_hex");
-    clear("output_can_field03");
-    clear("output_can_field03_len");
-    clear("output_can_field03_hex");
-    clear("output_can_field04");
-    clear("output_can_field04_len");
-    clear("output_can_field04_hex");
-    clear("output_can_field05");
-    clear("output_can_field05_len");
-    clear("output_can_field05_hex");
-    clear("output_can_field06");
-    clear("output_can_field06_len");
-    clear("output_can_field06_hex");
-    clear("output_can_field07");
-    clear("output_can_field07_len");
-    clear("output_can_field07_hex");
-    clear("output_can_field08");
-    clear("output_can_field08_len");
-    clear("output_can_field08_hex");
-    clear("output_can_field09");
-    clear("output_can_field09_len");
-    clear("output_can_field09_hex");
-    clear("output_can_field10");
-    clear("output_can_field10_len");
-    clear("output_can_field10_hex");
-    clear("output_can_field11");
-    clear("output_can_field11_len");
-    clear("output_can_field11_hex");
-    clear("output_can_field12");
-    clear("output_can_field12_len");
-    clear("output_can_field12_hex");
-    clear("output_can_field13");
-    clear("output_can_field13_len");
-    clear("output_can_field13_hex");
+    // Clear outputs about the frame fields for data 11-bit frames
+    clear("output_can_data11_field01");
+    clear("output_can_data11_field01_len");
+    clear("output_can_data11_field01_hex");
+    clear("output_can_data11_field02");
+    clear("output_can_data11_field02_len");
+    clear("output_can_data11_field02_hex");
+    clear("output_can_data11_field03");
+    clear("output_can_data11_field03_len");
+    clear("output_can_data11_field03_hex");
+    clear("output_can_data11_field04");
+    clear("output_can_data11_field04_len");
+    clear("output_can_data11_field04_hex");
+    clear("output_can_data11_field05");
+    clear("output_can_data11_field05_len");
+    clear("output_can_data11_field05_hex");
+    clear("output_can_data11_field06");
+    clear("output_can_data11_field06_len");
+    clear("output_can_data11_field06_hex");
+    clear("output_can_data11_field07");
+    clear("output_can_data11_field07_len");
+    clear("output_can_data11_field07_hex");
+    clear("output_can_data11_field08");
+    clear("output_can_data11_field08_len");
+    clear("output_can_data11_field08_hex");
+    clear("output_can_data11_field09");
+    clear("output_can_data11_field09_len");
+    clear("output_can_data11_field09_hex");
+    clear("output_can_data11_field10");
+    clear("output_can_data11_field10_len");
+    clear("output_can_data11_field10_hex");
+    clear("output_can_data11_field11");
+    clear("output_can_data11_field11_len");
+    clear("output_can_data11_field11_hex");
+    clear("output_can_data11_field12");
+    clear("output_can_data11_field12_len");
+    clear("output_can_data11_field12_hex");
+    clear("output_can_data11_field13");
+    clear("output_can_data11_field13_len");
+    clear("output_can_data11_field13_hex");
+    // Clear outputs about the frame fields for data 29-bit frames
+    clear("output_can_data29_field01");
+    clear("output_can_data29_field01_len");
+    clear("output_can_data29_field01_hex");
+    clear("output_can_data29_field02");
+    clear("output_can_data29_field02_len");
+    clear("output_can_data29_field02_hex");
+    clear("output_can_data29_field03");
+    clear("output_can_data29_field03_len");
+    clear("output_can_data29_field03_hex");
+    clear("output_can_data29_field04");
+    clear("output_can_data29_field04_len");
+    clear("output_can_data29_field04_hex");
+    clear("output_can_data29_field05");
+    clear("output_can_data29_field05_len");
+    clear("output_can_data29_field05_hex");
+    clear("output_can_data29_field06");
+    clear("output_can_data29_field06_len");
+    clear("output_can_data29_field06_hex");
+    clear("output_can_data29_field07");
+    clear("output_can_data29_field07_len");
+    clear("output_can_data29_field07_hex");
+    clear("output_can_data29_field08");
+    clear("output_can_data29_field08_len");
+    clear("output_can_data29_field08_hex");
+    clear("output_can_data29_field09");
+    clear("output_can_data29_field09_len");
+    clear("output_can_data29_field09_hex");
+    clear("output_can_data29_field10");
+    clear("output_can_data29_field10_len");
+    clear("output_can_data29_field10_hex");
+    clear("output_can_data29_field11");
+    clear("output_can_data29_field11_len");
+    clear("output_can_data29_field11_hex");
+    clear("output_can_data29_field12");
+    clear("output_can_data29_field12_len");
+    clear("output_can_data29_field12_hex");
+    clear("output_can_data29_field13");
+    clear("output_can_data29_field13_len");
+    clear("output_can_data29_field13_hex");
+    clear("output_can_data29_field14");
+    clear("output_can_data29_field14_len");
+    clear("output_can_data29_field14_hex");
+    clear("output_can_data29_field15");
+    clear("output_can_data29_field15_len");
+    clear("output_can_data29_field15_hex");
+    clear("output_can_data29_field16");
+    clear("output_can_data29_field16_len");
+    clear("output_can_data29_field16_hex");
+    clear("output_can_data29_field16_hex");
+    // Hide all output fields
+    hide("output_list_title");
+    hide("output_list");
+    hide("output_table_title");
+    hide("output_table_data11bit");
+    hide("output_table_data29bit");
 }
 
 
 /**
- * Computes and prints the whole CAN frame with 11 bit ID as bit sequence.
- * @param {CanFrame11Bit} canFrame
+ * Computes and prints the whole CAN frame as bit sequence.
+ * @param {CanFrame11Bit|CanFrame29Bit} canFrame
  */
-function displayCanFrame11BitWholeFrame(canFrame) {
+function displayCanFrameWholeFrame(canFrame) {
     // Without stuffing
     const bits = canFrame.wholeFrame();
     display("output_can_whole_frame_len", `[${bits.length()} bits]`);
@@ -140,6 +230,8 @@ function displayCanFrame11BitWholeFrame(canFrame) {
             "<span class=\"stuff_bit\">", "</span>"));
     // Max theoretical length
     display("output_max_length", `${canFrame.maxLengthAfterStuffing()} bits`);
+    unhide("output_list_title");
+    unhide("output_list");
 }
 
 /**
@@ -150,57 +242,155 @@ function displayCanFrame11BitWholeFrame(canFrame) {
 function displayCanFrame11BitFields(canFrame) {
     let field;
     field = canFrame.field01_startOfFrame();
-    display("output_can_field01_len", field.length().toString());
-    display("output_can_field01", field.toBinString());
-    display("output_can_field01_hex", field.toHexString());
+    display("output_can_data11_field01_len", field.length().toString());
+    display("output_can_data11_field01", field.toBinString());
+    display("output_can_data11_field01_hex", field.toHexString());
     field = canFrame.field02_identifier();
-    display("output_can_field02_len", field.length().toString());
-    display("output_can_field02", field.toBinStringWithSpacesRightAlign());
-    display("output_can_field02_hex", field.toHexString());
+    display("output_can_data11_field02_len", field.length().toString());
+    display("output_can_data11_field02", field.toBinStringWithSpacesRightAlign());
+    display("output_can_data11_field02_hex", field.toHexString());
     field = canFrame.field03_remoteTransmissionRequest();
-    display("output_can_field03_len", field.length().toString());
-    display("output_can_field03", field.toBinString());
-    display("output_can_field03_hex", field.toHexString());
+    display("output_can_data11_field03_len", field.length().toString());
+    display("output_can_data11_field03", field.toBinString());
+    display("output_can_data11_field03_hex", field.toHexString());
     field = canFrame.field04_identifierExtensionBit();
-    display("output_can_field04_len", field.length().toString());
-    display("output_can_field04", field.toBinString());
-    display("output_can_field04_hex", field.toHexString());
+    display("output_can_data11_field04_len", field.length().toString());
+    display("output_can_data11_field04", field.toBinString());
+    display("output_can_data11_field04_hex", field.toHexString());
     field = canFrame.field05_reservedBit();
-    display("output_can_field05_len", field.length().toString());
-    display("output_can_field05", field.toBinString());
-    display("output_can_field05_hex", field.toHexString());
+    display("output_can_data11_field05_len", field.length().toString());
+    display("output_can_data11_field05", field.toBinString());
+    display("output_can_data11_field05_hex", field.toHexString());
     field = canFrame.field06_dataLengthCode();
-    display("output_can_field06_len", field.length().toString());
-    display("output_can_field06", field.toBinString());
-    display("output_can_field06_hex", field.toHexString());
+    display("output_can_data11_field06_len", field.length().toString());
+    display("output_can_data11_field06", field.toBinString());
+    display("output_can_data11_field06_hex", field.toHexString());
     field = canFrame.field07_dataField();
-    display("output_can_field07_len", field.length().toString());
-    display("output_can_field07", field.toBinStringWithSpacesRightAlign());
-    display("output_can_field07_hex", field.toHexString());
+    display("output_can_data11_field07_len", field.length().toString());
+    display("output_can_data11_field07", field.toBinStringWithSpacesRightAlign());
+    display("output_can_data11_field07_hex", field.toHexString());
     field = canFrame.field08_crc();
-    display("output_can_field08_len", field.length().toString());
-    display("output_can_field08", field.toBinStringWithSpacesRightAlign());
-    display("output_can_field08_hex", field.toHexString());
+    display("output_can_data11_field08_len", field.length().toString());
+    display("output_can_data11_field08", field.toBinStringWithSpacesRightAlign());
+    display("output_can_data11_field08_hex", field.toHexString());
     field = canFrame.field09_crcDelimiter();
-    display("output_can_field09_len", field.length().toString());
-    display("output_can_field09", field.toBinString());
-    display("output_can_field09_hex", field.toHexString());
+    display("output_can_data11_field09_len", field.length().toString());
+    display("output_can_data11_field09", field.toBinString());
+    display("output_can_data11_field09_hex", field.toHexString());
     field = canFrame.field10_ackSlot();
-    display("output_can_field10_len", field.length().toString());
-    display("output_can_field10", field.toBinString());
-    display("output_can_field10_hex", field.toHexString());
+    display("output_can_data11_field10_len", field.length().toString());
+    display("output_can_data11_field10", field.toBinString());
+    display("output_can_data11_field10_hex", field.toHexString());
     field = canFrame.field11_ackDelimiter();
-    display("output_can_field11_len", field.length().toString());
-    display("output_can_field11", field.toBinString());
-    display("output_can_field11_hex", field.toHexString());
+    display("output_can_data11_field11_len", field.length().toString());
+    display("output_can_data11_field11", field.toBinString());
+    display("output_can_data11_field11_hex", field.toHexString());
     field = canFrame.field12_endOfFrame();
-    display("output_can_field12_len", field.length().toString());
-    display("output_can_field12", field.toBinString());
-    display("output_can_field12_hex", field.toHexString());
-    field = canFrame.field13_pauseAfterFrame();
-    display("output_can_field13_len", field.length().toString());
-    display("output_can_field13", field.toBinString());
-    display("output_can_field13_hex", field.toHexString());
+    display("output_can_data11_field12_len", field.length().toString());
+    display("output_can_data11_field12", field.toBinStringWithSpacesRightAlign());
+    display("output_can_data11_field12_hex", field.toHexString());
+    field = canFrame.field13_interFrameSpace();
+    display("output_can_data11_field13_len", field.length().toString());
+    display("output_can_data11_field13", field.toBinString());
+    display("output_can_data11_field13_hex", field.toHexString());
+    unhide("output_table_title");
+    unhide("output_table_data11bit");
+}
+
+/**
+ * Computes and prints all fields of a CAN frame with 29 bit ID, along with
+ * their length in bits.
+ * @param {CanFrame29Bit} canFrame
+ */
+function displayCanFrame29BitFields(canFrame) {
+    let field;
+    field = canFrame.field01_startOfFrame();
+    display("output_can_data29_field01_len", field.length().toString());
+    display("output_can_data29_field01", field.toBinString());
+    display("output_can_data29_field01_hex", field.toHexString());
+    field = canFrame.field02_identifierPartA();
+    display("output_can_data29_field02_len", field.length().toString());
+    display("output_can_data29_field02", field.toBinStringWithSpacesRightAlign());
+    display("output_can_data29_field02_hex", field.toHexString());
+    field = canFrame.field03_substituteRemoteRequest();
+    display("output_can_data29_field03_len", field.length().toString());
+    display("output_can_data29_field03", field.toBinString());
+    display("output_can_data29_field03_hex", field.toHexString());
+    field = canFrame.field04_identifierExtensionBit();
+    display("output_can_data29_field04_len", field.length().toString());
+    display("output_can_data29_field04", field.toBinString());
+    display("output_can_data29_field04_hex", field.toHexString());
+    field = canFrame.field05_identifierPartB();
+    display("output_can_data29_field05_len", field.length().toString());
+    display("output_can_data29_field05", field.toBinStringWithSpacesRightAlign());
+    display("output_can_data29_field05_hex", field.toHexString());
+    field = canFrame.field06_remoteTransmissionRequest();
+    display("output_can_data29_field06_len", field.length().toString());
+    display("output_can_data29_field06", field.toBinString());
+    display("output_can_data29_field06_hex", field.toHexString());
+    field = canFrame.field07_reservedBit1();
+    display("output_can_data29_field07_len", field.length().toString());
+    display("output_can_data29_field07", field.toBinString());
+    display("output_can_data29_field07_hex", field.toHexString());
+    field = canFrame.field08_reservedBit0();
+    display("output_can_data29_field08_len", field.length().toString());
+    display("output_can_data29_field08", field.toBinString());
+    display("output_can_data29_field08_hex", field.toHexString());
+    field = canFrame.field09_dataLengthCode();
+    display("output_can_data29_field09_len", field.length().toString());
+    display("output_can_data29_field09", field.toBinString());
+    display("output_can_data29_field09_hex", field.toHexString());
+    field = canFrame.field10_dataField();
+    display("output_can_data29_field10_len", field.length().toString());
+    display("output_can_data29_field10", field.toBinStringWithSpacesRightAlign());
+    display("output_can_data29_field10_hex", field.toHexString());
+    field = canFrame.field11_crc();
+    display("output_can_data29_field11_len", field.length().toString());
+    display("output_can_data29_field11", field.toBinStringWithSpacesRightAlign());
+    display("output_can_data29_field11_hex", field.toHexString());
+    field = canFrame.field12_crcDelimiter();
+    display("output_can_data29_field12_len", field.length().toString());
+    display("output_can_data29_field12", field.toBinString());
+    display("output_can_data29_field12_hex", field.toHexString());
+    field = canFrame.field13_ackSlot();
+    display("output_can_data29_field13_len", field.length().toString());
+    display("output_can_data29_field13", field.toBinString());
+    display("output_can_data29_field13_hex", field.toHexString());
+    field = canFrame.field14_ackDelimiter();
+    display("output_can_data29_field14_len", field.length().toString());
+    display("output_can_data29_field14", field.toBinString());
+    display("output_can_data29_field14_hex", field.toHexString());
+    field = canFrame.field15_endOfFrame();
+    display("output_can_data29_field15_len", field.length().toString());
+    display("output_can_data29_field15", field.toBinStringWithSpacesRightAlign());
+    display("output_can_data29_field15_hex", field.toHexString());
+    field = canFrame.field16_interFrameSpace();
+    display("output_can_data29_field16_len", field.length().toString());
+    display("output_can_data29_field16", field.toBinString());
+    display("output_can_data29_field16_hex", field.toHexString());
+    unhide("output_table_title");
+    unhide("output_table_data29bit");
+}
+
+/**
+ * Obtains, parses and validates the user input for the CAN identifier size.
+ *
+ * @return {number} ID size in bits
+ * @throws ValidationError in case of problems
+ */
+function parseCanIdentifierSizeFromInputForm() {
+    const identifierSizeStr = read("input_can_identifier_bits");
+    switch (identifierSizeStr) {
+        case "11":
+            return 11;
+        case "29":
+            return 29;
+        default:
+            // Impossible case, input was manipulated into something not
+            // supported.
+            throw new ValidationError(
+                "Unsupported identifier size " + identifierSizeStr, Field.ID);
+    }
 }
 
 /**
@@ -210,19 +400,18 @@ function displayCanFrame11BitFields(canFrame) {
  * and clears any base prefix "0b" / "0x" from the number if it defines
  * the same base as in the dropdown menu.
  * @return {number} parsed ID
- * @throws RangeError in case of problems
+ * @throws ValidationError in case of problems
  */
 function parseCanIdentifierFromInputForm() {
     // Get ID
-    let identifierStr = document.getElementById("input_can_identifier").value;
+    let identifierStr = read("input_can_identifier");
     identifierStr = identifierStr.trim().toLowerCase();
     if (identifierStr.length === 0) {
         // Empty or whitespace-only user input
         throw new ValidationError("Insert an identifier value.", Field.ID);
     }
     // Get the base of the ID
-    const basePrefix =
-        document.getElementById("input_can_identifier_base").value;
+    const basePrefix = read("input_can_identifier_base");
     // Remove any existing "0x"/"0b" prefix from the identifier
     // in the cases where it makes sense.
     switch (basePrefix) {
@@ -255,6 +444,11 @@ function parseCanIdentifierFromInputForm() {
                 identifierStr = identifierStr.substring(2);
             }
             break;
+        default:
+            // Impossible case, input was manipulated into something not
+            // supported.
+            throw new ValidationError(
+                "Unsupported base prefix " + basePrefix, Field.ID);
     }
     // Prepend "0x" or "0b" to the ID to enforce its base.
     // Note: we are NOT using parseInt(), which may seem as the most logical
@@ -277,10 +471,10 @@ function parseCanIdentifierFromInputForm() {
 /**
  * Obtains, parses and validates the user input for the CAN Payload.
  * @return {Uint8Array} parsed payload
- * @throws RangeError in case of problems
+ * @throws ValidationError in case of problems
  */
 function parseCanPayloadFromInputForm() {
-    let payloadStr = document.getElementById("input_can_payload").value;
+    let payloadStr = read("input_can_payload");
     // Strip hex prefixes, any whitespace and some common separators
     const toStrip = /0x|[\s,]/g;
     payloadStr = payloadStr.toLowerCase().replaceAll(toStrip, "");
@@ -316,13 +510,19 @@ function calculate() {
     try {
         clearErrorsAndOutputs();
         // Parse input fields
+        const identifierSize = parseCanIdentifierSizeFromInputForm();
         const identifier = parseCanIdentifierFromInputForm();
         const payload = parseCanPayloadFromInputForm();
-        // Pass everything to the CanOverhead library
-        let canFrame = new CanFrame11Bit(identifier, payload);
-        // Fill output fields
-        displayCanFrame11BitWholeFrame(canFrame);
-        displayCanFrame11BitFields(canFrame);
+        // Pass everything to the CanOverhead library and fill output fields
+        if (identifierSize === 11) {
+            const canFrame = new CanFrame11Bit(identifier, payload);
+            displayCanFrameWholeFrame(canFrame);
+            displayCanFrame11BitFields(canFrame);
+        } else if (identifierSize === 29) {
+            const canFrame = new CanFrame29Bit(identifier, payload);
+            displayCanFrameWholeFrame(canFrame);
+            displayCanFrame29BitFields(canFrame);
+        }
         // Successful conversion and output
     } catch (err) {
         if (err instanceof ValidationError) {
