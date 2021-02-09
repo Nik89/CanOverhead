@@ -415,6 +415,7 @@ const MAX_PAYLOAD_BYTES = 8;
 const Field = {
     ID: 1,
     PAYLOAD: 2,
+    DLC: 3,
 }
 
 /**
@@ -443,11 +444,14 @@ class _CanFrame {
      *
      * @param {number} id integer of the CAN ID. Most significant bit is the
      *        first transmitted
-     * @param {Uint8Array} payload array of integers. Most significant bit
-     *        of the first byte (at index 0) is the first transmitted
+     * @param {Uint8Array|null} payload array of integers. Most significant bit
+     *        of the first byte (at index 0) is the first transmitted.
+     *        Must be empty or null for RTR frames (when dlc is not null).
      * @param {number} maxId max value the ID can have
+     * @param {number|null} dlc content of the Data Length Code for RTR frames
+     *        or null for Data frames
      */
-    constructor(id, payload, maxId) {
+    constructor(id, payload=null, maxId, dlc = null) {
         // Check ID
         if (typeof (id) !== "number") {
             throw new TypeError("Identifier must be a number.");
@@ -477,19 +481,44 @@ class _CanFrame {
                 + "]",
                 Field.ID);
         }
-        // Check Payload
-        if (!(payload instanceof Uint8Array)) {
+        if (payload === null) {
+            // Replace null payload with empty payload
+            payload = new Uint8Array(0);
+        }
+        else if (!(payload instanceof Uint8Array)) {
             throw new TypeError("Payload must be a Uint8Array.");
         }
-        if (payload.length > MAX_PAYLOAD_BYTES) {
-            throw new ValidationError(
-                "Payload too long. Valid length range: [0, "
-                + MAX_PAYLOAD_BYTES
-                + "] bytes",
-                Field.PAYLOAD);
+        // Check if RTR or Data frame
+        if (dlc === null) {
+            // It's a data frame. Check Payload
+            if (payload.length > MAX_PAYLOAD_BYTES) {
+                throw new ValidationError(
+                    "Payload too long. Valid length range: [0, "
+                    + MAX_PAYLOAD_BYTES
+                    + "] bytes",
+                    Field.PAYLOAD);
+            }
+        } else {
+            // It's an RTR frame. Payload must be empty.
+            if (typeof dlc !== "number") {
+                throw new TypeError("DLC field must be an integer.");
+            }
+            if (dlc < 0 || dlc > MAX_PAYLOAD_BYTES) {
+                throw new ValidationError(
+                    "DLC field out of bounds. Valid range: [0, "
+                    + MAX_PAYLOAD_BYTES
+                    + "] bytes",
+                    Field.DLC);
+            }
+            if (payload.length === 0) {
+                throw new ValidationError(
+                    "Payload must be empty for RTR frames.",
+                    Field.PAYLOAD);
+            }
         }
         this.id = id;
         this.payload = payload;
+        this.dlc = dlc;
     }
 
     /**
@@ -509,8 +538,30 @@ class _CanFrame {
      * @returns {BitSequence}
      */
     dataLengthCode() {
-        return new BitSequence(
-            this.payload.length.toString(2).padStart(4, "0"));
+        if (this.dlc !== null) {
+            // Is RTR frame, take DLC as provided from the user
+            return new BitSequence(
+                this.dlc.toString(2).padStart(4, "0"));
+        } else {
+            // Is data frame, build DLC from the payload length
+            return new BitSequence(
+                this.payload.length.toString(2).padStart(4, "0"));
+        }
+    }
+
+    /**
+     * Provides the RTR bit as a BitSequence, based on the class constructor
+     * input.
+     * @returns {BitSequence}
+     */
+    remoteTransmissionRequest() {
+        if (this.dlc !== null) {
+            // Is RTR frame
+            return new BitSequence(Bit.RECESSIVE);
+        } else {
+            // Is data frame
+            return new BitSequence(Bit.DOMINANT);
+        }
     }
 }
 
@@ -527,11 +578,14 @@ class CanFrame11Bit extends _CanFrame {
      *
      * @param {number} id integer of the CAN ID. Most significant bit is the
      *        first transmitted
-     * @param {Uint8Array} payload array of integers. Most significant bit
-     *        of the first byte (at index 0) is the first transmitted
+     * @param {Uint8Array|null} payload array of integers. Most significant bit
+     *        of the first byte (at index 0) is the first transmitted.
+     *        Must be empty or null for RTR frames (when dlc is not null).
+     * @param {number|null} dlc content of the Data Length Code for RTR frames
+     *        or null for Data frames
      */
-    constructor(id, payload) {
-        super(id, payload, MAX_ID_VALUE_11_BIT);
+    constructor(id, payload=null, dlc = null) {
+        super(id, payload, MAX_ID_VALUE_11_BIT, dlc);
     }
 
     /**
@@ -569,7 +623,7 @@ class CanFrame11Bit extends _CanFrame {
      * @returns {BitSequence} RTR
      */
     field03_remoteTransmissionRequest() {
-        return new BitSequence(Bit.DOMINANT);
+        return this.remoteTransmissionRequest();
     }
 
     /**
@@ -804,11 +858,14 @@ class CanFrame29Bit extends _CanFrame {
      *
      * @param {number} id integer of the CAN ID. Most significant bit is the
      *        first transmitted
-     * @param {Uint8Array} payload array of integers. Most significant bit
-     *        of the first byte (at index 0) is the first transmitted
+     * @param {Uint8Array|null} payload array of integers. Most significant bit
+     *        of the first byte (at index 0) is the first transmitted.
+     *        Must be empty or null for RTR frames (when dlc is not null).
+     * @param {number|null} dlc content of the Data Length Code for RTR frames
+     *        or null for Data frames
      */
-    constructor(id, payload) {
-        super(id, payload, MAX_ID_VALUE_29_BIT);
+    constructor(id, payload=null, dlc = null) {
+        super(id, payload, MAX_ID_VALUE_29_BIT, dlc);
     }
 
     /**
@@ -887,7 +944,7 @@ class CanFrame29Bit extends _CanFrame {
      * @returns {BitSequence} RTR
      */
     field06_remoteTransmissionRequest() {
-        return new BitSequence(Bit.DOMINANT);
+        return this.remoteTransmissionRequest();
     }
 
     /**
