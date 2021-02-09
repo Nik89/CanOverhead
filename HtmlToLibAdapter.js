@@ -393,6 +393,29 @@ function parseCanIdentifierSizeFromInputForm() {
     }
 }
 
+function parseCanFrameTypeFromInputForm() {
+    const typeStr = read("input_frame_type");
+    switch (typeStr) {
+        case "can_data11":
+        case "can_data29":
+        case "can_rtr11":
+        case "can_rtr29":
+            return typeStr;
+        case "canfd_data11":
+        case "canfd_data29":
+        default:
+            // Impossible case, input was manipulated into something not
+            // supported.
+            throw new ValidationError(
+                "Unsupported frame type " + typeStr, Field.TYPE);
+    }
+}
+
+function parseCanDlcFromInputForm() {
+    // TODO
+    return null;
+}
+
 /**
  * Obtains, parses and validates the user input for the CAN identifier.
  *
@@ -510,19 +533,30 @@ function calculate() {
     try {
         clearErrorsAndOutputs();
         // Parse input fields
-        const identifierSize = parseCanIdentifierSizeFromInputForm();
+        const frameType = parseCanFrameTypeFromInputForm();
         const identifier = parseCanIdentifierFromInputForm();
         const payload = parseCanPayloadFromInputForm();
-        // Pass everything to the CanOverhead library and fill output fields
-        if (identifierSize === 11) {
-            const canFrame = new CanFrame11Bit(identifier, payload);
-            displayCanFrameWholeFrame(canFrame);
-            displayCanFrame11BitFields(canFrame);
-        } else if (identifierSize === 29) {
-            const canFrame = new CanFrame29Bit(identifier, payload);
-            displayCanFrameWholeFrame(canFrame);
-            displayCanFrame29BitFields(canFrame);
+        const dlc = parseCanDlcFromInputForm();
+        let canFrame;
+        switch (frameType) {
+            case "can_data11":
+                canFrame = new CanFrame11Bit(identifier, payload, null);
+                displayCanFrame11BitFields(canFrame);
+                break;
+            case "can_data29":
+                canFrame = new CanFrame29Bit(identifier, payload, null);
+                displayCanFrame29BitFields(canFrame);
+                break;
+            case "can_rtr11":
+                canFrame = new CanFrame11Bit(identifier, null, dlc);
+                displayCanFrame11BitFields(canFrame);
+                break;
+            case "can_rtr29":
+                canFrame = new CanFrame29Bit(identifier, null, dlc);
+                displayCanFrame29BitFields(canFrame);
+                break;
         }
+        displayCanFrameWholeFrame(canFrame);
         // Successful conversion and output
     } catch (err) {
         if (err instanceof ValidationError) {

@@ -36,9 +36,20 @@
 <div id="input_form">
     <div class="input">
         <div>
-            <label for="input_can_identifier">Frame identifier</label>
+            <label for="input_frame_type">Frame type</label>
+            <select name="input_frame_type"
+                    id="input_frame_type"
+                    class="dropdown_select">
+                <option value="can_data11" selected>Base data frame (11-bit ID)</option>
+                <option value="can_data29">Extended data frame (29-bit ID)</option>
+                <option value="can_rtr11">Base RTR frame (11-bit ID)</option>
+                <option value="can_rtr29">Extended RTR frame (29-bit ID)</option>
+                <option value="canfd_data11" hidden>FD base data frame (11-bit ID)</option>
+                <option value="canfd_data29" hidden>FD extended data frame (29-bit ID)</option>
+            </select>
         </div>
         <div>
+            <label for="input_can_identifier">Frame identifier</label>
             <input id="input_can_identifier"
                    name="input_can_identifier"
                    class="input_text"

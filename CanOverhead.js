@@ -416,6 +416,7 @@ const Field = {
     ID: 1,
     PAYLOAD: 2,
     DLC: 3,
+    TYPE: 4,
 }
 
 /**

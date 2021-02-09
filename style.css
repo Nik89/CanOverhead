@@ -63,8 +63,8 @@ a:hover {
 }
 
 .dropdown_select {
-    width: 6rem;
-    height: 2rem;
+    /*width: 6rem;*/
+    height: 2.5em;
     font-size: 1rem;
     font-family: inherit;
     color: #1EAEDB;
