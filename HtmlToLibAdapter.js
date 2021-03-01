@@ -128,6 +128,8 @@ function clearErrorsAndOutputs() {
     clear("output_can_whole_frame_stuffed");
     clear("output_can_whole_frame_stuffed_len");
     clear("output_max_length");
+    clear("output_transfer_time");
+    clear("output_overhead");
     // Clear outputs about the frame fields for data 11-bit frames
     clear("output_can_data11_field01");
     clear("output_can_data11_field01_len");
@@ -230,15 +232,22 @@ function clearErrorsAndOutputs() {
 /**
  * Computes and prints the whole CAN frame as bit sequence.
  * @param {CanFrame11Bit|CanFrame29Bit} canFrame
+ * @param {number} bitrate in bits per second
  */
-function displayCanFrameWholeFrame(canFrame) {
+function displayCanFrameWholeFrame(canFrame, bitrate) {
     // Without stuffing
     const bits = canFrame.wholeFrame();
     display("output_can_whole_frame_len", `[${bits.length()} bits]`);
     display("output_can_whole_frame", bits.toBinStringWithSpacesLeftAlign());
     // With stuffing
-    let stuffedBits = canFrame.wholeFrameStuffed();
-    let stuffBitsAmount = stuffedBits.length() - bits.length();
+    const stuffedBits = canFrame.wholeFrameStuffed();
+    const stuffBitsAmount = stuffedBits.length() - bits.length();
+    const transferTimeSeconds = stuffedBits.length() / bitrate;
+    const transferTimeStrMillis = (transferTimeSeconds * 1e3).toFixed(3);
+    const data = canFrame.dataLength();
+    const metadata = stuffedBits.length() - data;
+    const overhead = metadata / (data + metadata);
+    const overheadPercString = (overhead * 100).toFixed(2);
     display("output_can_whole_frame_stuffed_len",
         `[${stuffedBits.length()} bits, of which `
         + `<span class="stuff_bit">${stuffBitsAmount} stuff bits</span>]`);
@@ -247,8 +256,12 @@ function displayCanFrameWholeFrame(canFrame) {
             "<span class=\"stuff_bit\">", "</span>"));
     // Max theoretical length
     display("output_max_length", `${canFrame.maxLengthAfterStuffing()} bits`);
+    display("output_transfer_time", `${transferTimeStrMillis} ms`);
+    display("output_overhead", `ID + payload: ${data} bits, metadata: ${metadata} bits = ${overheadPercString} % of frame`);
     unhide("output_list_title");
     unhide("output_list");
+    unhide("output_transfer_time");
+    unhide("output_overhead");
 }
 
 /**
@@ -387,6 +400,33 @@ function displayCanFrame29BitFields(canFrame) {
     display("output_can_data29_field16_hex", field.toHexString());
     unhide("output_table_title");
     unhide("output_table_data29bit");
+}
+
+/**
+ * Obtains, parses and validates the user input for the bitrate.
+ *
+ * @return {number} bitrate in bits per second
+ * @throws ValidationError in case of problems
+ */
+function parseCanFrameBitrateFromInputForm() {
+    const bitrateStr = read("input_can_bitrate").trim().toLowerCase();
+    if (bitrateStr.length === 0) {
+        throw new ValidationError("Empty bitrate", Field.BITRATE);
+    }
+    if (bitrateStr.startsWith("0x")
+        || bitrateStr.startsWith("0b")
+        || bitrateStr.startsWith("0o")) {
+        throw new ValidationError(
+            "Bitrate can be expressed only in base 10. Found: " + bitrateStr,
+            Field.BITRATE);
+    }
+    const bitrate = Number(bitrateStr);
+    if (isNaN(bitrate)) {
+        throw new ValidationError(
+            "Incorrect bitrate format. Cannot be parsed. Found: " + bitrateStr,
+            Field.BITRATE);
+    }
+    return bitrate;
 }
 
 /**
@@ -604,6 +644,7 @@ function resetInputForm() {
     document.getElementById("input_can_identifier").value = "";
     document.getElementById("input_can_payload").value = "";
     document.getElementById("input_can_dlc").selectedIndex = 0;
+    document.getElementById("input_can_bitrate").selectedIndex = 5;
 }
 
 function alterInputFormOnFrameTypeChange(dropdown) {
@@ -638,6 +679,7 @@ function calculate() {
         // Parse input fields
         const frameType = parseCanFrameTypeFromInputForm();
         const identifier = parseCanIdentifierFromInputForm();
+        const bitrate = parseCanFrameBitrateFromInputForm();
         let canFrame;
         let payload = null;
         let dlc = null;
@@ -668,7 +710,7 @@ function calculate() {
                     "Unsupported frame type: " + frameType, Field.DLC);
                 displayUnknownError(err)
         }
-        displayCanFrameWholeFrame(canFrame);
+        displayCanFrameWholeFrame(canFrame, bitrate);
         // Successful conversion and output
     } catch (err) {
         displayError(err);

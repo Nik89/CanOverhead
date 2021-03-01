@@ -417,6 +417,7 @@ const Field = {
     PAYLOAD: 2,
     DLC: 3,
     TYPE: 4,
+    BITRATE: 5,
 }
 
 /**
@@ -452,7 +453,7 @@ class _CanFrame {
      * @param {number|null} dlc content of the Data Length Code for RTR frames
      *        or null for Data frames
      */
-    constructor(id, payload=null, maxId, dlc = null) {
+    constructor(id, payload = null, maxId, dlc = null) {
         // Check ID
         if (typeof (id) !== "number") {
             throw new TypeError("Identifier must be a number.");
@@ -485,8 +486,7 @@ class _CanFrame {
         if (payload === null) {
             // Replace null payload with empty payload
             payload = new Uint8Array(0);
-        }
-        else if (!(payload instanceof Uint8Array)) {
+        } else if (!(payload instanceof Uint8Array)) {
             throw new TypeError("Payload must be a Uint8Array.");
         }
         // Check if RTR or Data frame
@@ -585,7 +585,7 @@ class CanFrame11Bit extends _CanFrame {
      * @param {number|null} dlc content of the Data Length Code for RTR frames
      *        or null for Data frames
      */
-    constructor(id, payload=null, dlc = null) {
+    constructor(id, payload = null, dlc = null) {
         super(id, payload, MAX_ID_VALUE_11_BIT, dlc);
     }
 
@@ -843,6 +843,10 @@ class CanFrame11Bit extends _CanFrame {
         amountAfterStuffing += 3; // Pause after end of frame
         return amountAfterStuffing;
     }
+
+    dataLength() {
+        return 11 + this.payload.length * 8;
+    }
 }
 
 
@@ -865,7 +869,7 @@ class CanFrame29Bit extends _CanFrame {
      * @param {number|null} dlc content of the Data Length Code for RTR frames
      *        or null for Data frames
      */
-    constructor(id, payload=null, dlc = null) {
+    constructor(id, payload = null, dlc = null) {
         super(id, payload, MAX_ID_VALUE_29_BIT, dlc);
     }
 
@@ -1174,6 +1178,10 @@ class CanFrame29Bit extends _CanFrame {
         amountAfterStuffing += 7; // End of frame
         amountAfterStuffing += 3; // Pause after end of frame
         return amountAfterStuffing;
+    }
+
+    dataLength() {
+        return 29 + this.payload.length * 8;
     }
 }
 
