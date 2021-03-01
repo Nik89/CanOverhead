@@ -52,7 +52,7 @@ function read(id) {
  * @param {string} id identifier of the element to hide
  */
 function hide(id) {
-    document.getElementById(id).style.display='none';
+    document.getElementById(id).style.display = 'none';
 }
 
 /**
@@ -63,7 +63,7 @@ function hide(id) {
  * @param {string} id identifier of the element to sho
  */
 function unhide(id) {
-    document.getElementById(id).style.display='block';
+    document.getElementById(id).style.display = 'block';
 }
 
 /**
@@ -526,6 +526,58 @@ function parseCanPayloadFromInputForm() {
 }
 
 /**
+ * Hides the CAN DLC input field and shows the Payload input field
+ */
+function displayInputFormForDataFrame() {
+    hide("input_can_dlc_block");
+    unhide("input_can_payload_block");
+}
+
+/**
+ * Hides the CAN Paylaod input field and shows the DLC input field.
+ */
+function displayInputFormForRtrFrame() {
+    hide("input_can_payload_block");
+    unhide("input_can_dlc_block");
+}
+
+/**
+ * Forces the frame type back to the default one (Base data frame).
+ *
+ * That same field having the "selected" option in HTML is not enough for
+ * Firefox to reset the dropdown menu to that specific entry of the menu
+ * when the page is reloaded. This leads to bugs in displaying of the
+ * input form, where the CAN Payload input field is shown, but the dropdown
+ * menu is still stuck on the RTR frame types, so a forced reset is required.
+ */
+function resetFrameTypeDropDown() {
+    document.getElementById("input_frame_type").selectedIndex = 0;
+    // TODO check if it's needed to call displayInputFormForDataFrame();
+}
+
+function alterInputFormOnFrameTypeChange(dropdown) {
+    clearErrorsAndOutputs();
+    switch (dropdown.value) {
+        case "can_data11":
+        case "can_data29":
+        case "canfd_data11":
+        case "canfd_data29":
+            displayInputFormForDataFrame();
+            break;
+        case "can_rtr11":
+        case "can_rtr29":
+            displayInputFormForRtrFrame();
+            break;
+        default:
+            // Impossible case, input was manipulated into something
+            // not supported.
+            let err = new ValidationError(
+                "Unsupported frame type " + dropdown.value, Field.TYPE);
+            displayUnknownError(err);
+    }
+}
+
+/**
  * Main function, triggering the construction of the CAN frame, stuffing etc.
  * and displaying all of the output fields or errors.
  */
@@ -583,10 +635,12 @@ function calculate() {
  * @param {KeyboardEvent} keyBoardEvent event
  * @private
  */
-function _onKeyPress(keyBoardEvent) {
+function onKeyPress(keyBoardEvent) {
     if (keyBoardEvent.key === "Enter") {
         calculate();
     }
 }
 
-document.onkeydown = _onKeyPress;
+/* On page load. */
+document.onkeydown = onKeyPress;
+resetFrameTypeDropDown()

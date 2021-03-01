@@ -58,6 +58,11 @@ a:hover {
     width: 20em; /* Enough for 31 chars: 0b111... with 29 bits. */
 }
 
+#input_can_dlc_block {
+    /* Initially hidden. */
+    display: none;
+}
+
 .small_label {
     font-size: 1rem;
 }
