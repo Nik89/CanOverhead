@@ -412,8 +412,42 @@ function parseCanFrameTypeFromInputForm() {
 }
 
 function parseCanDlcFromInputForm() {
-    // TODO
-    return null;
+    const dlcStr = read("input_can_dlc").trim();
+    // While a switch-case may seem a stupid way to validate an input being
+    // an integer in [0, 8] in string format, using proper string validation
+    // results in more complex and harder to debug code: the input string must
+    // be converted to integer properly but
+    // - parseInt() does not do a proper job, see comments in
+    //   parseCanIdentifierFromInputForm()
+    // - "012345678".indexOf(dlcStr) does not provide proper results for
+    //   dlcStr being "" or being a multi-character substring such as "23".
+    // So, as the possible inputs are only 9, it's just easier to hardcode
+    // a short switch-case and call it a day.
+    switch (dlcStr) {
+        case "0":
+            return 0;
+        case "1":
+            return 1;
+        case "2":
+            return 2;
+        case "3":
+            return 3;
+        case "4":
+            return 4;
+        case "5":
+            return 5;
+        case "6":
+            return 6;
+        case "7":
+            return 7;
+        case "8":
+            return 8;
+        default :
+            // Impossible case, input was manipulated into something not
+            // supported.
+            throw new ValidationError(
+                "Unsupported DLC value " + dlcStr, Field.DLC);
+    }
 }
 
 /**
@@ -552,7 +586,6 @@ function displayInputFormForRtrFrame() {
  */
 function resetFrameTypeDropDown() {
     document.getElementById("input_frame_type").selectedIndex = 0;
-    // TODO check if it's needed to call displayInputFormForDataFrame();
 }
 
 function alterInputFormOnFrameTypeChange(dropdown) {

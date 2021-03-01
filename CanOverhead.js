@@ -511,7 +511,7 @@ class _CanFrame {
                     + "] bytes",
                     Field.DLC);
             }
-            if (payload.length === 0) {
+            if (payload.length !== 0) {
                 throw new ValidationError(
                     "Payload must be empty for RTR frames.",
                     Field.PAYLOAD);
