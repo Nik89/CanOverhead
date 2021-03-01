@@ -63,7 +63,6 @@
                 <option value="0x" selected>Hex</option>
             </select>
         </div>
-        <div id="input_can_identifier_error" class="input-error"></div>
         <div id="input_can_payload_block">
             <label for="input_can_payload">
                 Frame payload data
@@ -76,7 +75,6 @@
                    class="input_text"
                    type="text" placeholder="43 41 4E"/>
         </div>
-        <div id="input_can_payload_error" class="input-error"></div>
         <div id="input_can_dlc_block">
             <label for="input_can_dlc">RTR frame Data Length Code (DLC)</label>
             <select name="input_can_dlc" id="input_can_dlc"
@@ -92,8 +90,7 @@
                 <option value="8">8</option>
             </select>
         </div>
-        <div id="input_can_dlc_error" class="input-error"></div>
-        <div id="input_unknown_error" class="input-error"></div>
+        <div id="input_error" class="input-error"></div>
     </div>
     <div class="buttons">
         <button class="button" onclick="calculate()">Compute</button>

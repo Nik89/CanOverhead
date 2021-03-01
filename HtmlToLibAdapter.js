@@ -67,19 +67,11 @@ function unhide(id) {
 }
 
 /**
- * Prints the error message related to an invalid input of the CAN identifier.
+ * Prints the error message about incorrect user input.
  * @param {string} msg
  */
-function displayCanIdentifierError(msg) {
-    display("input_can_identifier_error", msg);
-}
-
-/**
- * Prints the error message related to an invalid input of the CAN payload.
- * @param {string} msg
- */
-function displayCanPayloadError(msg) {
-    display("input_can_payload_error", msg);
+function displayInputFormError(msg) {
+    display("input_error", msg);
 }
 
 /**
@@ -88,7 +80,7 @@ function displayCanPayloadError(msg) {
  * @param {Error} err
  */
 function displayUnknownError(err) {
-    display("input_unknown_error",
+    display("input_error",
         "An unexpected error occurred :( Please " +
         "<a href=\"https://github.com/Nik89/CanOverhead/issues\">" +
         "report</a> the conditions leading to your bug! " +
@@ -102,9 +94,7 @@ function displayUnknownError(err) {
  */
 function clearErrorsAndOutputs() {
     // Clear errors
-    clear("input_can_identifier_error");
-    clear("input_can_payload_error");
-    clear("input_unknown_error");
+    clear("input_error");
     // Clear outputs about the whole frame
     clear("output_can_whole_frame");
     clear("output_can_whole_frame_len");
@@ -653,10 +643,10 @@ function calculate() {
         if (err instanceof ValidationError) {
             switch (err.field) {
                 case Field.ID:
-                    displayCanIdentifierError(err.message);
-                    break;
                 case Field.PAYLOAD:
-                    displayCanPayloadError(err.message);
+                case Field.DLC:
+                case Field.TYPE:
+                    displayInputFormError(err.message);
                     break;
                 default:
                     // Unsupported field type, programming error.
