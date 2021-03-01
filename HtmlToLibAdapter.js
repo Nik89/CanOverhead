@@ -567,16 +567,26 @@ function displayInputFormForRtrFrame() {
 }
 
 /**
- * Forces the frame type back to the default one (Base data frame).
+ * Forces the input form back again to the initial content, as when the page
+ * was initially filled.
  *
- * That same field having the "selected" option in HTML is not enough for
+ * - frame type back to the default one (Base data frame)
+ * - DLC back to the default one (0 bytes)
+ * - identifier and payload cleared.
+ *
+ * This function is required as reloading the page in some browsers is not
+ * enough to clear the input form. Additionally for dropdown menus,
+ * having the "selected" option in HTML is not enough for
  * Firefox to reset the dropdown menu to that specific entry of the menu
  * when the page is reloaded. This leads to bugs in displaying of the
  * input form, where the CAN Payload input field is shown, but the dropdown
  * menu is still stuck on the RTR frame types, so a forced reset is required.
  */
-function resetFrameTypeDropDown() {
+function resetInputForm() {
     document.getElementById("input_frame_type").selectedIndex = 0;
+    document.getElementById("input_can_identifier").value = "";
+    document.getElementById("input_can_payload").value = "";
+    document.getElementById("input_can_dlc").selectedIndex = 0;
 }
 
 function alterInputFormOnFrameTypeChange(dropdown) {
@@ -672,4 +682,4 @@ function onKeyPress(keyBoardEvent) {
 
 /* On page load. */
 document.onkeydown = onKeyPress;
-resetFrameTypeDropDown()
+resetInputForm();
