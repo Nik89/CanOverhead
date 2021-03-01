@@ -17,12 +17,10 @@
 # details.
 
 import os
+
 import requests
 import shutil
-import subprocess as sub
-import glob
-import sys
-import gzip
+import re
 
 import markdown
 
@@ -111,75 +109,37 @@ def _minify(input_file_name: str, web_api_url: str) -> None:
     open(output_file_name, "w", encoding="UTF-8").write(minified)
 
 
-def _shell(cmd: str) -> str:
-    # TODO make it internal
-    """Launches a simple shell command as a subprocess, returning its stdout."""
-    return sub.run(cmd, shell=True, check=True, stdout=sub.PIPE).stdout.decode(
-        'UTF-8')
-
-
-def _remove_ignore_if_non_existing(filename: str):
-    # TODO docstring
-    try:
-        os.remove(filename)
-    except FileNotFoundError:
-        pass
-
-
-def build_dir_to_gh_pages():
-    """
-    Move built files to root level on the gh-pages branch.
-
-    - Check that git status is clean
-    - Git checkout gh-pages
-    - Remove the following files from the project root: .editorconfig, *.html,
-      *.css, *.js, *.md
-    - copy the whole content of the builds dir into project root
-    - commit with message "Minified and deployed ${git hash of the minified}"
-    - Git checkout develop
-    - No pushing performed (that must be done manually for security reasons)
-    """
-    if not os.path.isdir('.git'):
-        raise RuntimeError("Deployment to GH Pages can only be performed "
-                           "when in the repository root directory.")
-    if len(_shell('git status --porcelain').strip()) > 0:
-        raise RuntimeError("Git status is not clean. "
-                           "Cannot deploy to GH Pages branch.")
-    git_head_hash = _shell('git rev-parse HEAD').strip()
-    _shell('git checkout gh-pages')
-    _remove_ignore_if_non_existing('.editorconfig')
-    to_remove = glob.glob('*.html')
-    to_remove.extend(glob.glob('*.css'))
-    to_remove.extend(glob.glob('*.js'))
-    to_remove.extend(glob.glob('*.md'))
-    to_remove.extend(glob.glob('*.py'))
-    to_remove.extend(glob.glob('*.txt'))
-    to_remove.extend(glob.glob('*.gz'))
-    for file in to_remove:
-        _remove_ignore_if_non_existing(file)
-    for file in os.listdir(BUILD_DIR):
-        shutil.copy2(os.path.join(BUILD_DIR, file), os.curdir)
-    commit_msg = 'Minified and deployed commit {}'.format(git_head_hash[:10])
-    _shell('git add --all')
-    _shell('git commit -a -m"{}"'.format(commit_msg))
-    _shell('git checkout develop')
-
-
-def compress_file(input_file_name: str):
-    """
-    Compress input file in GZIP format
-    Args:
-        input_file_name: Input file path
-    """
-    input_file_name_in_build_dir = os.path.join(BUILD_DIR, input_file_name)
-    output_file_name_in_build_dir = input_file_name_in_build_dir + '.gz'
-    with open(input_file_name_in_build_dir, 'rb') as file_in,\
-            gzip.open(output_file_name_in_build_dir, 'wb') as file_out:
-        shutil.copyfileobj(file_in, file_out)
+def inline_js_and_css_into_html(html_file_name: str) -> None:
+    """Inline the .css files found in the <link> tags
+    and inline the .js files found in <script> tags
+    into the html file in-place to combine them into a single file."""
+    html_file_name = os.path.join(BUILD_DIR, html_file_name)
+    html = open(html_file_name).readlines()
+    inlined = []
+    for line in html:
+        if '<link' in line and 'stylesheet' in line:
+            css_file = re.search(r'[a-zA-Z0-9_\.]+\.css', line)
+            if css_file is None:
+                raise RuntimeError("Can't extract CSS file name from HTML.")
+            css_file = os.path.join(BUILD_DIR, css_file.group(0))
+            inlined.append('<style>' + open(css_file).read() + '</style>\n')
+            os.remove(css_file)
+        elif '<script' in line:
+            js_file = re.search(r'[a-zA-Z0-9_\.]+\.js', line)
+            if js_file is None:
+                raise RuntimeError("Can't extract JS file name from HTML.")
+            js_file = os.path.join(BUILD_DIR, js_file.group(0))
+            inlined.append('<script>' + open(js_file).read() + '</script>\n')
+            os.remove(js_file)
+        else:
+            inlined.append(line)
+    open(html_file_name, 'w').writelines(inlined)
 
 
 def build():
-    # TODO docstring
+    """Converts the Markdown files in the repo to html, minifies the html,
+    css and js files, inlines them into a single html file and provides all
+    of the results in the builds directory, ready to be deployed."""
     cleanup()
     md2html("CHANGELOG.md")
     md2html("LICENSE.md")
@@ -190,24 +150,9 @@ def build():
     minify_js("CanOverhead.js")
     minify_js("HtmlToLibAdapter.js")
     minify_js("TestCanOverhead.js")
+    inline_js_and_css_into_html("index.html")
     prepend_comment_in_index_file()
-    compress_file("index.html")
-    compress_file("style.css")
-    compress_file("CanOverhead.js")
-    compress_file("HtmlToLibAdapter.js")
-    compress_file("TestCanOverhead.js")
-    compress_file("changelog.html")
-    compress_file("license.html")
-    compress_file("readme.html")
-    compress_file("roadmap.html")
 
 
 if __name__ == "__main__":
-    # TODO documentation
     build()
-    try:
-        if sys.argv[1].strip() == '--commit':
-            build_dir_to_gh_pages()
-    except IndexError:
-        # No main args
-        pass

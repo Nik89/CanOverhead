@@ -44,6 +44,9 @@ and this project adheres to
 - Renamed _Pause-after-frame_ field to _Inter-Frame Space_ for clairity
   and to match with other descriptions of the CAN frames found online.
 - Moved error messages to one location underneath the input form.
+- Deployment script merges html, css and js files into one html file, making
+  it much easier to deploy. Removed deployment into `gh-pages` branch, as
+  now it can be done directly from the `main` branch, `builds` subfolder.
 
 
 ### Fixed

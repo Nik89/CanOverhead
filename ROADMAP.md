@@ -26,11 +26,6 @@ Bitrates and transfer time.
 - Calculation of gross/net (effective) transfer time:
   - exact when exact ID and payload is given
   - range when the ID and payload are not known
-- Deploy script improvements
-  - Merges all minified files into one html file, compresses only that
-  - Removed moving to gh-pages as GitHub supports also the deployment from other
-    branches. Now the released script is put into `release/` and not commited
-    onto gh-pages.
 
 
 [1.3.0]
