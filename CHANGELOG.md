@@ -10,23 +10,26 @@ and this project adheres to
 
 *******************************************************************************
 
-[UNRELEASED]
+[1.1.0] - 2021-03-xx TODO DATE
 ----------------------------------------
 
 ### Added
 
-- Highlight stuff bit: underlined and with a different color.
+- Support for extended frames (29-bit CAN ID) and Remote Transmission Request
+  (RTR frames). The frame type can be selected as first field of the form,
+  impacting the input form itself (to ask for payload or DLC field)
+  and obviously the resulting output.
 - Dropdown menu to select the base of the CAN ID to avoid the user typing
   "0x" or "0b".  Defaults to hex. If the user also types the prefix "0x" or "0b"
   and it matches with the selected base, then the prefix is ignored.
-- Default values for input forms with some example data to let the user
-  quickly run the calculator immediately after loading the page.
 - Run computation when pressing Enter keyboard key.
+- Highlight incorrect input fields with a red border when the computation is
+  run.
+- Highlight stuff bits in the output: underlined and with a different color.
 
 
 ### Changed
 
-- Autofocus on CAN ID input field.
 - Improved style of the following parts into a more modern look-and-feel
   - input form
   - computing button
@@ -34,6 +37,13 @@ and this project adheres to
   - frame fields, now provided as a table. Includes alternating row colors,
     mouseover effects and hex format column
 - More verbose and detailed error messages for the various incorrect inputs.
+- Improved description of input form's payload field, clarifying what is ignored
+  in the user input.
+- Autofocus on CAN ID input field.
+- Input text fields contain examples for the user input.
+- Renamed _Pause-after-frame_ field to _Inter-Frame Space_ for clairity
+  and to match with other descriptions of the CAN frames found online.
+- Moved error messages to one location underneath the input form.
 
 
 ### Fixed
@@ -50,6 +60,8 @@ and this project adheres to
   at any level in the execution of the code instead of silently doing nothing
   and crashing the app.
 - Fixed non-hex payload chars being parsed into a 0 value.
+- Some fields of the CAN frame did not have space separators every 4 bits.
+- Fully reset the input form, clearing its content on page reload/refresh.
 
 
 

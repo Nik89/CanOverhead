@@ -43,7 +43,6 @@ a:hover {
 .input-error {
     color: red;
     font-size: 1rem;
-    margin-bottom: 1rem;
 }
 
 .input_text {
@@ -58,13 +57,18 @@ a:hover {
     width: 20em; /* Enough for 31 chars: 0b111... with 29 bits. */
 }
 
+#input_can_dlc_block {
+    /* Initially hidden. */
+    display: none;
+}
+
 .small_label {
     font-size: 1rem;
 }
 
 .dropdown_select {
-    width: 6rem;
-    height: 2rem;
+    /*width: 6rem;*/
+    height: 2.5em;
     font-size: 1rem;
     font-family: inherit;
     color: #1EAEDB;
@@ -104,11 +108,18 @@ a:hover {
     color: #b22ed0;
 }
 
+.output_section_title {
+    /* Initially hidden. */
+    display: none;
+}
+
 /* Output list with CAN frame as a bit sequence */
 #output_list {
     font-size: 1.2rem;
     width: 90%;
-    margin-left: 1.5rem;
+    margin-left: 1rem;
+    /* Initially hidden. */
+    display: none;
 }
 
 #output_list li {
@@ -121,7 +132,7 @@ a:hover {
 }
 
 /* Output table with CAN frame fields */
-#output_table {
+.output_table {
     font-size: 1.2rem;
     /* Center in middle of page. */
     margin-left: auto;
@@ -129,9 +140,11 @@ a:hover {
     width: 90%;
     /* Avoid double border between cells. */
     border-collapse: collapse;
+    /* Initially hidden. */
+    display: none;
 }
 
-#output_table td, #output_table th {
+.output_table td, .output_table th {
     /* Line around the cells. */
     border: 0.2em solid #ddd;
     /* Space between cell border and content inside, making the table
@@ -139,22 +152,22 @@ a:hover {
     padding: 0.5em;
 }
 
-#output_table th {
+.output_table th {
     /* Table header row. */
     text-align: center;
     font-weight: bold;
 }
 
-#output_table tr {
+.output_table tr {
     text-align: right;
 }
 
-#output_table tr:nth-child(even) {
+.output_table tr:nth-child(even) {
     /* Alternating colors of the rows for easier reading. */
     background-color: #eee;
 }
 
-#output_table tr:hover {
+.output_table tr:hover {
     /* Mouseover color change. */
     background-color: #ddd;
 }

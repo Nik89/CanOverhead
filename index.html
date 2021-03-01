@@ -35,14 +35,24 @@
 </noscript>
 <div id="input_form">
     <div class="input">
-        <div>
-            <label for="input_can_identifier">Frame identifier</label>
+        <div id="input_frame_type_block">
+            <label for="input_frame_type">Frame type</label>
+            <select name="input_frame_type" id="input_frame_type"
+                    class="dropdown_select" onchange="alterInputFormOnFrameTypeChange(this)">
+                <option value="can_data11" selected>Base data frame (11-bit ID)</option>
+                <option value="can_data29">Extended data frame (29-bit ID)</option>
+                <option value="can_rtr11">Base RTR frame (11-bit ID)</option>
+                <option value="can_rtr29">Extended RTR frame (29-bit ID)</option>
+                <option value="canfd_data11" hidden>FD base data frame (11-bit ID)</option>
+                <option value="canfd_data29" hidden>FD extended data frame (29-bit ID)</option>
+            </select>
         </div>
-        <div>
+        <div id="input_can_identifier_block">
+            <label for="input_can_identifier">Frame identifier</label>
             <input id="input_can_identifier"
                    name="input_can_identifier"
                    class="input_text"
-                   type="text" value="42" autofocus/>
+                   type="text" placeholder="42" autofocus/>
             <label for="input_can_identifier_base"
                    class="small_label">in base</label>
             <select name="input_can_identifier_base"
@@ -53,48 +63,67 @@
                 <option value="0x" selected>Hex</option>
             </select>
         </div>
-        <div id="input_can_identifier_error" class="input-error"></div>
-        <div>
+        <div id="input_can_payload_block">
             <label for="input_can_payload">
                 Frame payload data
             </label>
             <span class="small_label">
                 (hex-only, ignoring spaces, commas and '0x' prefixes)
             </span>
-        </div>
-        <div>
             <input id="input_can_payload"
                    name="input_can_payload"
                    class="input_text"
-                   type="text" value="43 41 4E"/>
+                   type="text" placeholder="43 41 4E"/>
         </div>
-        <div id="input_can_payload_error" class="input-error"></div>
-        <div id="input_unknown_error" class="input-error"></div>
+        <div id="input_can_dlc_block">
+            <label for="input_can_dlc">RTR frame Data Length Code (DLC)</label>
+            <select name="input_can_dlc" id="input_can_dlc"
+                    class="dropdown_select">
+                <option value="0" selected>0</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+            </select>
+        </div>
+        <div id="input_error" class="input-error"></div>
     </div>
     <div class="buttons">
         <button class="button" onclick="calculate()">Compute</button>
     </div>
     <div class="output">
-        <h4>Whole frame bit sequence</h4>
+        <h4 id="output_list_title" class="output_section_title">
+            Whole frame bit sequence
+        </h4>
         <ul id="output_list">
             <li>Without stuff bits
                 <span id="output_can_whole_frame_len"></span>
                 <div id="output_can_whole_frame"
                      class="output_can_text"></div>
             </li>
-            <li>With stuff bits (as appears on bus)
+            <li>With stuff bits
+                <span class="small_label">
+                    (as appears on bus)
+                </span>
                 <span id="output_can_whole_frame_stuffed_len"></span>
                 <div id="output_can_whole_frame_stuffed"
                      class="output_can_text"></div>
             </li>
             <li>Worst-case frame length after stuffing
-                (assuming same ID and payload lengths)
-                <div id="output_max_length"
-                     class="output_can_text"></div>
+                <span class="small_label">
+                    (assuming same ID and payload lengths)
+                </span>
+                <div id="output_max_length" class="output_can_text"></div>
             </li>
         </ul>
-        <h4>Breakdown of frame fields</h4>
-        <table id="output_table">
+        <h4 id="output_table_title" class="output_section_title">
+            Breakdown of frame fields
+        </h4>
+        <table class="output_table" id="output_table_data11bit">
             <tr>
                 <th>#</th>
                 <th>Field name</th>
@@ -105,93 +134,214 @@
             <tr>
                 <td>1</td>
                 <td class="cell_text">Start of Frame (SOF)</td>
-                <td id="output_can_field01_len"></td>
-                <td id="output_can_field01"></td>
-                <td id="output_can_field01_hex"></td>
+                <td id="output_can_data11_field01_len"></td>
+                <td id="output_can_data11_field01"></td>
+                <td id="output_can_data11_field01_hex"></td>
             </tr>
             <tr>
                 <td>2</td>
                 <td class="cell_text">Identifier (ID)</td>
-                <td id="output_can_field02_len"></td>
-                <td id="output_can_field02"></td>
-                <td id="output_can_field02_hex"></td>
+                <td id="output_can_data11_field02_len"></td>
+                <td id="output_can_data11_field02"></td>
+                <td id="output_can_data11_field02_hex"></td>
             </tr>
             <tr>
                 <td>3</td>
                 <td class="cell_text">Remote Transfer Request (RTR)</td>
-                <td id="output_can_field03_len"></td>
-                <td id="output_can_field03"></td>
-                <td id="output_can_field03_hex"></td>
+                <td id="output_can_data11_field03_len"></td>
+                <td id="output_can_data11_field03"></td>
+                <td id="output_can_data11_field03_hex"></td>
             </tr>
             <tr>
                 <td>4</td>
                 <td class="cell_text">Identifier Extension (IDE)</td>
-                <td id="output_can_field04_len"></td>
-                <td id="output_can_field04"></td>
-                <td id="output_can_field04_hex"></td>
+                <td id="output_can_data11_field04_len"></td>
+                <td id="output_can_data11_field04"></td>
+                <td id="output_can_data11_field04_hex"></td>
             </tr>
             <tr>
                 <td>5</td>
                 <td class="cell_text">Reserved 0 (R0)</td>
-                <td id="output_can_field05_len"></td>
-                <td id="output_can_field05"></td>
-                <td id="output_can_field05_hex"></td>
+                <td id="output_can_data11_field05_len"></td>
+                <td id="output_can_data11_field05"></td>
+                <td id="output_can_data11_field05_hex"></td>
             </tr>
             <tr>
                 <td>6</td>
                 <td class="cell_text">Data Length Code (DLC)</td>
-                <td id="output_can_field06_len"></td>
-                <td id="output_can_field06"></td>
-                <td id="output_can_field06_hex"></td>
+                <td id="output_can_data11_field06_len"></td>
+                <td id="output_can_data11_field06"></td>
+                <td id="output_can_data11_field06_hex"></td>
             </tr>
             <tr>
                 <td>7</td>
                 <td class="cell_text">Data (Payload)</td>
-                <td id="output_can_field07_len"></td>
-                <td id="output_can_field07"></td>
-                <td id="output_can_field07_hex"></td>
+                <td id="output_can_data11_field07_len"></td>
+                <td id="output_can_data11_field07"></td>
+                <td id="output_can_data11_field07_hex"></td>
             </tr>
             <tr>
                 <td>8</td>
                 <td class="cell_text">Cyclic Redundancy Check (CRC)</td>
-                <td id="output_can_field08_len"></td>
-                <td id="output_can_field08"></td>
-                <td id="output_can_field08_hex"></td>
+                <td id="output_can_data11_field08_len"></td>
+                <td id="output_can_data11_field08"></td>
+                <td id="output_can_data11_field08_hex"></td>
             </tr>
             <tr>
                 <td>9</td>
                 <td class="cell_text">CRC Delimiter</td>
-                <td id="output_can_field09_len"></td>
-                <td id="output_can_field09"></td>
-                <td id="output_can_field09_hex"></td>
+                <td id="output_can_data11_field09_len"></td>
+                <td id="output_can_data11_field09"></td>
+                <td id="output_can_data11_field09_hex"></td>
             </tr>
             <tr>
                 <td>10</td>
                 <td class="cell_text">Acknowledgement (ACK) Slot</td>
-                <td id="output_can_field10_len"></td>
-                <td id="output_can_field10"></td>
-                <td id="output_can_field10_hex"></td>
+                <td id="output_can_data11_field10_len"></td>
+                <td id="output_can_data11_field10"></td>
+                <td id="output_can_data11_field10_hex"></td>
             </tr>
             <tr>
                 <td>11</td>
                 <td class="cell_text">Acknowledgement Delimiter</td>
-                <td id="output_can_field11_len"></td>
-                <td id="output_can_field11"></td>
-                <td id="output_can_field11_hex"></td>
+                <td id="output_can_data11_field11_len"></td>
+                <td id="output_can_data11_field11"></td>
+                <td id="output_can_data11_field11_hex"></td>
             </tr>
             <tr>
                 <td>12</td>
                 <td class="cell_text">End of Frame (EOF)</td>
-                <td id="output_can_field12_len"></td>
-                <td id="output_can_field12"></td>
-                <td id="output_can_field12_hex"></td>
+                <td id="output_can_data11_field12_len"></td>
+                <td id="output_can_data11_field12"></td>
+                <td id="output_can_data11_field12_hex"></td>
             </tr>
             <tr>
                 <td>13</td>
-                <td class="cell_text">Pause After Frame</td>
-                <td id="output_can_field13_len"></td>
-                <td id="output_can_field13"></td>
-                <td id="output_can_field13_hex"></td>
+                <td class="cell_text">Inter-Frame Space (IFS)</td>
+                <td id="output_can_data11_field13_len"></td>
+                <td id="output_can_data11_field13"></td>
+                <td id="output_can_data11_field13_hex"></td>
+            </tr>
+        </table>
+        <table class="output_table" id="output_table_data29bit">
+            <tr>
+                <th>#</th>
+                <th>Field name</th>
+                <th>Length<br/>[bits]</th>
+                <th>Content<br/>[bin]</th>
+                <th>Content<br/>[hex]</th>
+            </tr>
+            <tr>
+                <td>1</td>
+                <td class="cell_text">Start of Frame (SOF)</td>
+                <td id="output_can_data29_field01_len"></td>
+                <td id="output_can_data29_field01"></td>
+                <td id="output_can_data29_field01_hex"></td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td class="cell_text">Identifier part A (ID A)</td>
+                <td id="output_can_data29_field02_len"></td>
+                <td id="output_can_data29_field02"></td>
+                <td id="output_can_data29_field02_hex"></td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td class="cell_text">Substitute Remote Request (SRR)</td>
+                <td id="output_can_data29_field03_len"></td>
+                <td id="output_can_data29_field03"></td>
+                <td id="output_can_data29_field03_hex"></td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td class="cell_text">Identifier Extension (IDE)</td>
+                <td id="output_can_data29_field04_len"></td>
+                <td id="output_can_data29_field04"></td>
+                <td id="output_can_data29_field04_hex"></td>
+            </tr>
+            <tr>
+                <td>5</td>
+                <td class="cell_text">Identifier part B (ID B)</td>
+                <td id="output_can_data29_field05_len"></td>
+                <td id="output_can_data29_field05"></td>
+                <td id="output_can_data29_field05_hex"></td>
+            </tr>
+            <tr>
+                <td>6</td>
+                <td class="cell_text">Remote Transfer Request (RTR)</td>
+                <td id="output_can_data29_field06_len"></td>
+                <td id="output_can_data29_field06"></td>
+                <td id="output_can_data29_field06_hex"></td>
+            </tr>
+            <tr>
+                <td>7</td>
+                <td class="cell_text">Reserved Bit 1 (R1)</td>
+                <td id="output_can_data29_field07_len"></td>
+                <td id="output_can_data29_field07"></td>
+                <td id="output_can_data29_field07_hex"></td>
+            </tr>
+            <tr>
+                <td>8</td>
+                <td class="cell_text">Reserved Bit 0 (R0)</td>
+                <td id="output_can_data29_field08_len"></td>
+                <td id="output_can_data29_field08"></td>
+                <td id="output_can_data29_field08_hex"></td>
+            </tr>
+            <tr>
+                <td>9</td>
+                <td class="cell_text">Data Length Code (DLC)</td>
+                <td id="output_can_data29_field09_len"></td>
+                <td id="output_can_data29_field09"></td>
+                <td id="output_can_data29_field09_hex"></td>
+            </tr>
+            <tr>
+                <td>10</td>
+                <td class="cell_text">Data (Payload)</td>
+                <td id="output_can_data29_field10_len"></td>
+                <td id="output_can_data29_field10"></td>
+                <td id="output_can_data29_field10_hex"></td>
+            </tr>
+            <tr>
+                <td>11</td>
+                <td class="cell_text">Cyclic Redundancy Check (CRC)</td>
+                <td id="output_can_data29_field11_len"></td>
+                <td id="output_can_data29_field11"></td>
+                <td id="output_can_data29_field11_hex"></td>
+            </tr>
+            <tr>
+                <td>12</td>
+                <td class="cell_text">CRC Delimiter</td>
+                <td id="output_can_data29_field12_len"></td>
+                <td id="output_can_data29_field12"></td>
+                <td id="output_can_data29_field12_hex"></td>
+            </tr>
+            <tr>
+                <td>13</td>
+                <td class="cell_text">Acknowledgement (ACK) Slot</td>
+                <td id="output_can_data29_field13_len"></td>
+                <td id="output_can_data29_field13"></td>
+                <td id="output_can_data29_field13_hex"></td>
+            </tr>
+            <tr>
+                <td>14</td>
+                <td class="cell_text">Acknowledgement Delimiter</td>
+                <td id="output_can_data29_field14_len"></td>
+                <td id="output_can_data29_field14"></td>
+                <td id="output_can_data29_field14_hex"></td>
+            </tr>
+            <tr>
+                <td>15</td>
+                <td class="cell_text">End of Frame (EOF)</td>
+                <td id="output_can_data29_field15_len"></td>
+                <td id="output_can_data29_field15"></td>
+                <td id="output_can_data29_field15_hex"></td>
+            </tr>
+            <tr>
+                <td>16</td>
+                <td class="cell_text">Inter-Frame Space (IFS)</td>
+                <td id="output_can_data29_field16_len"></td>
+                <td id="output_can_data29_field16"></td>
+                <td id="output_can_data29_field16_hex"></td>
             </tr>
         </table>
     </div>
