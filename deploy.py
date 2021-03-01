@@ -113,6 +113,9 @@ def _minify(input_file_name: str, web_api_url: str) -> None:
 
 
 def inline_js_and_css_into_html(html_file_name: str) -> None:
+    """Inline the .css files found in the <link> tags
+    and inline the .js files found in <script> tags
+    into the html file in-place to combine them into a single file."""
     html_file_name = os.path.join(BUILD_DIR, html_file_name)
     html = open(html_file_name).readlines()
     inlined = []
@@ -137,14 +140,13 @@ def inline_js_and_css_into_html(html_file_name: str) -> None:
 
 
 def _shell(cmd: str) -> str:
-    # TODO make it internal
     """Launches a simple shell command as a subprocess, returning its stdout."""
     return sub.run(cmd, shell=True, check=True, stdout=sub.PIPE).stdout.decode(
         'UTF-8')
 
 
 def _remove_ignore_if_non_existing(filename: str):
-    # TODO docstring
+    """Deletes a files, but does not complain if the file does not exist."""
     try:
         os.remove(filename)
     except FileNotFoundError:
@@ -204,7 +206,9 @@ def compress_file(input_file_name: str):
 
 
 def build():
-    # TODO docstring
+    """Converts the Markdown files in the repo to html, minifies the html,
+    css and js files, inlines them into a single html file and provides all
+    of the results in the builds directory, ready to be deployed."""
     cleanup()
     md2html("CHANGELOG.md")
     md2html("LICENSE.md")
@@ -217,19 +221,16 @@ def build():
     minify_js("TestCanOverhead.js")
     inline_js_and_css_into_html("index.html")
     prepend_comment_in_index_file()
-    compress_file("index.html")
-    #compress_file("style.css")
-    #compress_file("CanOverhead.js")
-    #compress_file("HtmlToLibAdapter.js")
-    #compress_file("TestCanOverhead.js")
-    compress_file("changelog.html")
-    compress_file("license.html")
-    compress_file("readme.html")
-    compress_file("roadmap.html")
+    #compress_file("index.html")
+    #compress_file("changelog.html")
+    #compress_file("license.html")
+    #compress_file("readme.html")
+    #compress_file("roadmap.html")
 
 
 if __name__ == "__main__":
-    # TODO documentation
+    # Runs the building and inlining when run without args.
+    # With --commit it also commits the built result onto the gh-pages branch.
     build()
     try:
         if sys.argv[1].strip() == '--commit':
