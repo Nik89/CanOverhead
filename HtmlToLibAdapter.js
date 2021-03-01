@@ -638,24 +638,28 @@ function calculate() {
         // Parse input fields
         const frameType = parseCanFrameTypeFromInputForm();
         const identifier = parseCanIdentifierFromInputForm();
-        const payload = parseCanPayloadFromInputForm();
-        const dlc = parseCanDlcFromInputForm();
         let canFrame;
+        let payload = null;
+        let dlc = null;
         switch (frameType) {
             case "can_data11":
-                canFrame = new CanFrame11Bit(identifier, payload, null);
+                payload = parseCanPayloadFromInputForm();
+                canFrame = new CanFrame11Bit(identifier, payload, dlc);
                 displayCanFrame11BitFields(canFrame);
                 break;
             case "can_data29":
-                canFrame = new CanFrame29Bit(identifier, payload, null);
+                payload = parseCanPayloadFromInputForm();
+                canFrame = new CanFrame29Bit(identifier, payload, dlc);
                 displayCanFrame29BitFields(canFrame);
                 break;
             case "can_rtr11":
-                canFrame = new CanFrame11Bit(identifier, null, dlc);
+                dlc = parseCanDlcFromInputForm();
+                canFrame = new CanFrame11Bit(identifier, payload, dlc);
                 displayCanFrame11BitFields(canFrame);
                 break;
             case "can_rtr29":
-                canFrame = new CanFrame29Bit(identifier, null, dlc);
+                dlc = parseCanDlcFromInputForm();
+                canFrame = new CanFrame29Bit(identifier, payload, dlc);
                 displayCanFrame29BitFields(canFrame);
                 break;
             default:
