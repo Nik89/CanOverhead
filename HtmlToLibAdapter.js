@@ -89,12 +89,39 @@ function displayUnknownError(err) {
 }
 
 /**
+ * Shows a red border around an input field.
+ *
+ * It's basically just syntax sugar to shorten other code lines.
+ *
+ * @param {string} id identifier of the element to highlight
+ */
+function highlightIncorrectInput(id) {
+    document.getElementById(id).style.borderColor = "#ff3c3c";
+}
+
+/**
+ * Removes the colored border around an input field, reverting the effect
+ * of highlightIncorrectInput().
+ *
+ * It's basically just syntax sugar to shorten other code lines.
+ *
+ * @param {string} id identifier of the element to clear the highlight of
+ */
+function clearHighlight(id) {
+    document.getElementById(id).style.borderColor = "";
+}
+
+/**
  * Erases the text on the page displaying any error messages and any
  * output from the previous calculation.
  */
 function clearErrorsAndOutputs() {
     // Clear errors
     clear("input_error");
+    clearHighlight("input_can_identifier");
+    clearHighlight("input_can_payload");
+    clearHighlight("input_can_dlc");
+    clearHighlight("input_frame_type");
     // Clear outputs about the whole frame
     clear("output_can_whole_frame");
     clear("output_can_whole_frame_len");
@@ -640,22 +667,42 @@ function calculate() {
         displayCanFrameWholeFrame(canFrame);
         // Successful conversion and output
     } catch (err) {
-        if (err instanceof ValidationError) {
-            switch (err.field) {
-                case Field.ID:
-                case Field.PAYLOAD:
-                case Field.DLC:
-                case Field.TYPE:
-                    displayInputFormError(err.message);
-                    break;
-                default:
-                    // Unsupported field type, programming error.
-                    displayUnknownError(err);
-            }
-        } else {
-            // Other errors, but they "should never happen".
-            displayUnknownError(err);
+        displayError(err);
+    }
+}
+
+/**
+ * Displays the message of an exception to the user nicely, highlighting the
+ * failing input field.
+ *
+ * @param {ValidationError} err to display
+ */
+function displayError(err) {
+    if (err instanceof ValidationError) {
+        switch (err.field) {
+            case Field.ID:
+                highlightIncorrectInput("input_can_identifier");
+                displayInputFormError(err.message);
+                break;
+            case Field.PAYLOAD:
+                highlightIncorrectInput("input_can_payload");
+                displayInputFormError(err.message);
+                break;
+            case Field.DLC:
+                highlightIncorrectInput("input_can_dlc");
+                displayInputFormError(err.message);
+                break;
+            case Field.TYPE:
+                highlightIncorrectInput("input_frame_type");
+                displayInputFormError(err.message);
+                break;
+            default:
+                // Unsupported field type, programming error.
+                displayUnknownError(err);
         }
+    } else {
+        // Other errors, but they "should never happen".
+        displayUnknownError(err);
     }
 }
 
