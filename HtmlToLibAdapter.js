@@ -373,26 +373,11 @@ function displayCanFrame29BitFields(canFrame) {
 }
 
 /**
- * Obtains, parses and validates the user input for the CAN identifier size.
+ * Obtains, parses and validates the user input for the frame type value.
  *
- * @return {number} ID size in bits
+ * @return {string} frame type
  * @throws ValidationError in case of problems
  */
-function parseCanIdentifierSizeFromInputForm() {
-    const identifierSizeStr = read("input_can_identifier_bits");
-    switch (identifierSizeStr) {
-        case "11":
-            return 11;
-        case "29":
-            return 29;
-        default:
-            // Impossible case, input was manipulated into something not
-            // supported.
-            throw new ValidationError(
-                "Unsupported identifier size " + identifierSizeStr, Field.ID);
-    }
-}
-
 function parseCanFrameTypeFromInputForm() {
     const typeStr = read("input_frame_type");
     switch (typeStr) {
@@ -411,6 +396,12 @@ function parseCanFrameTypeFromInputForm() {
     }
 }
 
+/**
+ * Obtains, parses and validates the user input for the DLC value.
+ *
+ * @return {number} DLC value
+ * @throws ValidationError in case of problems
+ */
 function parseCanDlcFromInputForm() {
     const dlcStr = read("input_can_dlc").trim();
     // While a switch-case may seem a stupid way to validate an input being
@@ -640,6 +631,11 @@ function calculate() {
                 canFrame = new CanFrame29Bit(identifier, null, dlc);
                 displayCanFrame29BitFields(canFrame);
                 break;
+            default:
+                // Impossible case, probably bad programming.
+                let err = new ValidationError(
+                    "Unsupported frame type: " + frameType, Field.DLC);
+                displayUnknownError(err)
         }
         displayCanFrameWholeFrame(canFrame);
         // Successful conversion and output
