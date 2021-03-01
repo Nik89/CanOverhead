@@ -52,7 +52,7 @@ function read(id) {
  * @param {string} id identifier of the element to hide
  */
 function hide(id) {
-    document.getElementById(id).style.display='none';
+    document.getElementById(id).style.display = 'none';
 }
 
 /**
@@ -63,23 +63,15 @@ function hide(id) {
  * @param {string} id identifier of the element to sho
  */
 function unhide(id) {
-    document.getElementById(id).style.display='block';
+    document.getElementById(id).style.display = 'block';
 }
 
 /**
- * Prints the error message related to an invalid input of the CAN identifier.
+ * Prints the error message about incorrect user input.
  * @param {string} msg
  */
-function displayCanIdentifierError(msg) {
-    display("input_can_identifier_error", msg);
-}
-
-/**
- * Prints the error message related to an invalid input of the CAN payload.
- * @param {string} msg
- */
-function displayCanPayloadError(msg) {
-    display("input_can_payload_error", msg);
+function displayInputFormError(msg) {
+    display("input_error", msg);
 }
 
 /**
@@ -88,7 +80,7 @@ function displayCanPayloadError(msg) {
  * @param {Error} err
  */
 function displayUnknownError(err) {
-    display("input_unknown_error",
+    display("input_error",
         "An unexpected error occurred :( Please " +
         "<a href=\"https://github.com/Nik89/CanOverhead/issues\">" +
         "report</a> the conditions leading to your bug! " +
@@ -97,14 +89,39 @@ function displayUnknownError(err) {
 }
 
 /**
+ * Shows a red border around an input field.
+ *
+ * It's basically just syntax sugar to shorten other code lines.
+ *
+ * @param {string} id identifier of the element to highlight
+ */
+function highlightIncorrectInput(id) {
+    document.getElementById(id).style.borderColor = "#ff3c3c";
+}
+
+/**
+ * Removes the colored border around an input field, reverting the effect
+ * of highlightIncorrectInput().
+ *
+ * It's basically just syntax sugar to shorten other code lines.
+ *
+ * @param {string} id identifier of the element to clear the highlight of
+ */
+function clearHighlight(id) {
+    document.getElementById(id).style.borderColor = "";
+}
+
+/**
  * Erases the text on the page displaying any error messages and any
  * output from the previous calculation.
  */
 function clearErrorsAndOutputs() {
     // Clear errors
-    clear("input_can_identifier_error");
-    clear("input_can_payload_error");
-    clear("input_unknown_error");
+    clear("input_error");
+    clearHighlight("input_can_identifier");
+    clearHighlight("input_can_payload");
+    clearHighlight("input_can_dlc");
+    clearHighlight("input_frame_type");
     // Clear outputs about the whole frame
     clear("output_can_whole_frame");
     clear("output_can_whole_frame_len");
@@ -373,23 +390,71 @@ function displayCanFrame29BitFields(canFrame) {
 }
 
 /**
- * Obtains, parses and validates the user input for the CAN identifier size.
+ * Obtains, parses and validates the user input for the frame type value.
  *
- * @return {number} ID size in bits
+ * @return {string} frame type
  * @throws ValidationError in case of problems
  */
-function parseCanIdentifierSizeFromInputForm() {
-    const identifierSizeStr = read("input_can_identifier_bits");
-    switch (identifierSizeStr) {
-        case "11":
-            return 11;
-        case "29":
-            return 29;
+function parseCanFrameTypeFromInputForm() {
+    const typeStr = read("input_frame_type");
+    switch (typeStr) {
+        case "can_data11":
+        case "can_data29":
+        case "can_rtr11":
+        case "can_rtr29":
+            return typeStr;
+        case "canfd_data11":
+        case "canfd_data29":
         default:
             // Impossible case, input was manipulated into something not
             // supported.
             throw new ValidationError(
-                "Unsupported identifier size " + identifierSizeStr, Field.ID);
+                "Unsupported frame type " + typeStr, Field.TYPE);
+    }
+}
+
+/**
+ * Obtains, parses and validates the user input for the DLC value.
+ *
+ * @return {number} DLC value
+ * @throws ValidationError in case of problems
+ */
+function parseCanDlcFromInputForm() {
+    const dlcStr = read("input_can_dlc").trim();
+    // While a switch-case may seem a stupid way to validate an input being
+    // an integer in [0, 8] in string format, using proper string validation
+    // results in more complex and harder to debug code: the input string must
+    // be converted to integer properly but
+    // - parseInt() does not do a proper job, see comments in
+    //   parseCanIdentifierFromInputForm()
+    // - "012345678".indexOf(dlcStr) does not provide proper results for
+    //   dlcStr being "" or being a multi-character substring such as "23".
+    // So, as the possible inputs are only 9, it's just easier to hardcode
+    // a short switch-case and call it a day.
+    switch (dlcStr) {
+        case "0":
+            return 0;
+        case "1":
+            return 1;
+        case "2":
+            return 2;
+        case "3":
+            return 3;
+        case "4":
+            return 4;
+        case "5":
+            return 5;
+        case "6":
+            return 6;
+        case "7":
+            return 7;
+        case "8":
+            return 8;
+        default :
+            // Impossible case, input was manipulated into something not
+            // supported.
+            throw new ValidationError(
+                "Unsupported DLC value " + dlcStr, Field.DLC);
     }
 }
 
@@ -503,6 +568,67 @@ function parseCanPayloadFromInputForm() {
 }
 
 /**
+ * Hides the CAN DLC input field and shows the Payload input field
+ */
+function displayInputFormForDataFrame() {
+    hide("input_can_dlc_block");
+    unhide("input_can_payload_block");
+}
+
+/**
+ * Hides the CAN Paylaod input field and shows the DLC input field.
+ */
+function displayInputFormForRtrFrame() {
+    hide("input_can_payload_block");
+    unhide("input_can_dlc_block");
+}
+
+/**
+ * Forces the input form back again to the initial content, as when the page
+ * was initially filled.
+ *
+ * - frame type back to the default one (Base data frame)
+ * - DLC back to the default one (0 bytes)
+ * - identifier and payload cleared.
+ *
+ * This function is required as reloading the page in some browsers is not
+ * enough to clear the input form. Additionally for dropdown menus,
+ * having the "selected" option in HTML is not enough for
+ * Firefox to reset the dropdown menu to that specific entry of the menu
+ * when the page is reloaded. This leads to bugs in displaying of the
+ * input form, where the CAN Payload input field is shown, but the dropdown
+ * menu is still stuck on the RTR frame types, so a forced reset is required.
+ */
+function resetInputForm() {
+    document.getElementById("input_frame_type").selectedIndex = 0;
+    document.getElementById("input_can_identifier").value = "";
+    document.getElementById("input_can_payload").value = "";
+    document.getElementById("input_can_dlc").selectedIndex = 0;
+}
+
+function alterInputFormOnFrameTypeChange(dropdown) {
+    clearErrorsAndOutputs();
+    switch (dropdown.value) {
+        case "can_data11":
+        case "can_data29":
+        case "canfd_data11":
+        case "canfd_data29":
+            displayInputFormForDataFrame();
+            break;
+        case "can_rtr11":
+        case "can_rtr29":
+            displayInputFormForRtrFrame();
+            break;
+        default:
+            // Impossible case, input was manipulated into something
+            // not supported.
+            let err = new ValidationError(
+                "Unsupported frame type " + dropdown.value, Field.TYPE);
+            displayUnknownError(err);
+    }
+}
+
+/**
  * Main function, triggering the construction of the CAN frame, stuffing etc.
  * and displaying all of the output fields or errors.
  */
@@ -510,37 +636,77 @@ function calculate() {
     try {
         clearErrorsAndOutputs();
         // Parse input fields
-        const identifierSize = parseCanIdentifierSizeFromInputForm();
+        const frameType = parseCanFrameTypeFromInputForm();
         const identifier = parseCanIdentifierFromInputForm();
-        const payload = parseCanPayloadFromInputForm();
-        // Pass everything to the CanOverhead library and fill output fields
-        if (identifierSize === 11) {
-            const canFrame = new CanFrame11Bit(identifier, payload);
-            displayCanFrameWholeFrame(canFrame);
-            displayCanFrame11BitFields(canFrame);
-        } else if (identifierSize === 29) {
-            const canFrame = new CanFrame29Bit(identifier, payload);
-            displayCanFrameWholeFrame(canFrame);
-            displayCanFrame29BitFields(canFrame);
+        let canFrame;
+        let payload = null;
+        let dlc = null;
+        switch (frameType) {
+            case "can_data11":
+                payload = parseCanPayloadFromInputForm();
+                canFrame = new CanFrame11Bit(identifier, payload, dlc);
+                displayCanFrame11BitFields(canFrame);
+                break;
+            case "can_data29":
+                payload = parseCanPayloadFromInputForm();
+                canFrame = new CanFrame29Bit(identifier, payload, dlc);
+                displayCanFrame29BitFields(canFrame);
+                break;
+            case "can_rtr11":
+                dlc = parseCanDlcFromInputForm();
+                canFrame = new CanFrame11Bit(identifier, payload, dlc);
+                displayCanFrame11BitFields(canFrame);
+                break;
+            case "can_rtr29":
+                dlc = parseCanDlcFromInputForm();
+                canFrame = new CanFrame29Bit(identifier, payload, dlc);
+                displayCanFrame29BitFields(canFrame);
+                break;
+            default:
+                // Impossible case, probably bad programming.
+                let err = new ValidationError(
+                    "Unsupported frame type: " + frameType, Field.DLC);
+                displayUnknownError(err)
         }
+        displayCanFrameWholeFrame(canFrame);
         // Successful conversion and output
     } catch (err) {
-        if (err instanceof ValidationError) {
-            switch (err.field) {
-                case Field.ID:
-                    displayCanIdentifierError(err.message);
-                    break;
-                case Field.PAYLOAD:
-                    displayCanPayloadError(err.message);
-                    break;
-                default:
-                    // Unsupported field type, programming error.
-                    displayUnknownError(err);
-            }
-        } else {
-            // Other errors, but they "should never happen".
-            displayUnknownError(err);
+        displayError(err);
+    }
+}
+
+/**
+ * Displays the message of an exception to the user nicely, highlighting the
+ * failing input field.
+ *
+ * @param {ValidationError} err to display
+ */
+function displayError(err) {
+    if (err instanceof ValidationError) {
+        switch (err.field) {
+            case Field.ID:
+                highlightIncorrectInput("input_can_identifier");
+                displayInputFormError(err.message);
+                break;
+            case Field.PAYLOAD:
+                highlightIncorrectInput("input_can_payload");
+                displayInputFormError(err.message);
+                break;
+            case Field.DLC:
+                highlightIncorrectInput("input_can_dlc");
+                displayInputFormError(err.message);
+                break;
+            case Field.TYPE:
+                highlightIncorrectInput("input_frame_type");
+                displayInputFormError(err.message);
+                break;
+            default:
+                // Unsupported field type, programming error.
+                displayUnknownError(err);
         }
+    } else {
+        // Other errors, but they "should never happen".
+        displayUnknownError(err);
     }
 }
 
@@ -549,10 +715,12 @@ function calculate() {
  * @param {KeyboardEvent} keyBoardEvent event
  * @private
  */
-function _onKeyPress(keyBoardEvent) {
+function onKeyPress(keyBoardEvent) {
     if (keyBoardEvent.key === "Enter") {
         calculate();
     }
 }
 
-document.onkeydown = _onKeyPress;
+/* On page load. */
+document.onkeydown = onKeyPress;
+resetInputForm();

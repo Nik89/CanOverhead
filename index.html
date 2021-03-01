@@ -35,14 +35,24 @@
 </noscript>
 <div id="input_form">
     <div class="input">
-        <div>
-            <label for="input_can_identifier">Frame identifier</label>
+        <div id="input_frame_type_block">
+            <label for="input_frame_type">Frame type</label>
+            <select name="input_frame_type" id="input_frame_type"
+                    class="dropdown_select" onchange="alterInputFormOnFrameTypeChange(this)">
+                <option value="can_data11" selected>Base data frame (11-bit ID)</option>
+                <option value="can_data29">Extended data frame (29-bit ID)</option>
+                <option value="can_rtr11">Base RTR frame (11-bit ID)</option>
+                <option value="can_rtr29">Extended RTR frame (29-bit ID)</option>
+                <option value="canfd_data11" hidden>FD base data frame (11-bit ID)</option>
+                <option value="canfd_data29" hidden>FD extended data frame (29-bit ID)</option>
+            </select>
         </div>
-        <div>
+        <div id="input_can_identifier_block">
+            <label for="input_can_identifier">Frame identifier</label>
             <input id="input_can_identifier"
                    name="input_can_identifier"
                    class="input_text"
-                   type="text" value="42" autofocus/>
+                   type="text" placeholder="42" autofocus/>
             <label for="input_can_identifier_base"
                    class="small_label">in base</label>
             <select name="input_can_identifier_base"
@@ -52,32 +62,35 @@
                 <option value="">Dec</option>
                 <option value="0x" selected>Hex</option>
             </select>
-            <label for="input_can_identifier_bits"
-                   class="small_label">with size</label>
-            <select name="input_can_identifier_base"
-                    id="input_can_identifier_bits"
-                    class="dropdown_select">
-                <option value="11" selected>11 bits</option>
-                <option value="29">29 bits</option>
-            </select>
         </div>
-        <div id="input_can_identifier_error" class="input-error"></div>
-        <div>
+        <div id="input_can_payload_block">
             <label for="input_can_payload">
                 Frame payload data
             </label>
             <span class="small_label">
                 (hex-only, ignoring spaces, commas and '0x' prefixes)
             </span>
-        </div>
-        <div>
             <input id="input_can_payload"
                    name="input_can_payload"
                    class="input_text"
-                   type="text" value="43 41 4E"/>
+                   type="text" placeholder="43 41 4E"/>
         </div>
-        <div id="input_can_payload_error" class="input-error"></div>
-        <div id="input_unknown_error" class="input-error"></div>
+        <div id="input_can_dlc_block">
+            <label for="input_can_dlc">RTR frame Data Length Code (DLC)</label>
+            <select name="input_can_dlc" id="input_can_dlc"
+                    class="dropdown_select">
+                <option value="0" selected>0</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+            </select>
+        </div>
+        <div id="input_error" class="input-error"></div>
     </div>
     <div class="buttons">
         <button class="button" onclick="calculate()">Compute</button>

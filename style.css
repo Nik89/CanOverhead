@@ -43,7 +43,6 @@ a:hover {
 .input-error {
     color: red;
     font-size: 1rem;
-    margin-bottom: 1rem;
 }
 
 .input_text {
@@ -58,13 +57,18 @@ a:hover {
     width: 20em; /* Enough for 31 chars: 0b111... with 29 bits. */
 }
 
+#input_can_dlc_block {
+    /* Initially hidden. */
+    display: none;
+}
+
 .small_label {
     font-size: 1rem;
 }
 
 .dropdown_select {
-    width: 6rem;
-    height: 2rem;
+    /*width: 6rem;*/
+    height: 2.5em;
     font-size: 1rem;
     font-family: inherit;
     color: #1EAEDB;
