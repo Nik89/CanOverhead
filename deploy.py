@@ -17,12 +17,9 @@
 # details.
 
 import os
+
 import requests
 import shutil
-import subprocess as sub
-import glob
-import sys
-import gzip
 import re
 
 import markdown
@@ -139,72 +136,6 @@ def inline_js_and_css_into_html(html_file_name: str) -> None:
     open(html_file_name, 'w').writelines(inlined)
 
 
-def _shell(cmd: str) -> str:
-    """Launches a simple shell command as a subprocess, returning its stdout."""
-    return sub.run(cmd, shell=True, check=True, stdout=sub.PIPE).stdout.decode(
-        'UTF-8')
-
-
-def _remove_ignore_if_non_existing(filename: str):
-    """Deletes a files, but does not complain if the file does not exist."""
-    try:
-        os.remove(filename)
-    except FileNotFoundError:
-        pass
-
-
-def build_dir_to_gh_pages():
-    """
-    Move built files to root level on the gh-pages branch.
-
-    - Check that git status is clean
-    - Git checkout gh-pages
-    - Remove the following files from the project root: .editorconfig, *.html,
-      *.css, *.js, *.md
-    - copy the whole content of the builds dir into project root
-    - commit with message "Minified and deployed ${git hash of the minified}"
-    - Git checkout develop
-    - No pushing performed (that must be done manually for security reasons)
-    """
-    if not os.path.isdir('.git'):
-        raise RuntimeError("Deployment to GH Pages can only be performed "
-                           "when in the repository root directory.")
-    if len(_shell('git status --porcelain').strip()) > 0:
-        raise RuntimeError("Git status is not clean. "
-                           "Cannot deploy to GH Pages branch.")
-    git_head_hash = _shell('git rev-parse HEAD').strip()
-    _shell('git checkout gh-pages')
-    _remove_ignore_if_non_existing('.editorconfig')
-    to_remove = glob.glob('*.html')
-    to_remove.extend(glob.glob('*.css'))
-    to_remove.extend(glob.glob('*.js'))
-    to_remove.extend(glob.glob('*.md'))
-    to_remove.extend(glob.glob('*.py'))
-    to_remove.extend(glob.glob('*.txt'))
-    to_remove.extend(glob.glob('*.gz'))
-    for file in to_remove:
-        _remove_ignore_if_non_existing(file)
-    for file in os.listdir(BUILD_DIR):
-        shutil.copy2(os.path.join(BUILD_DIR, file), os.curdir)
-    commit_msg = 'Minified and deployed commit {}'.format(git_head_hash[:10])
-    _shell('git add --all')
-    _shell('git commit -a -m"{}"'.format(commit_msg))
-    _shell('git checkout develop')
-
-
-def compress_file(input_file_name: str):
-    """
-    Compress input file in GZIP format
-    Args:
-        input_file_name: Input file path
-    """
-    input_file_name_in_build_dir = os.path.join(BUILD_DIR, input_file_name)
-    output_file_name_in_build_dir = input_file_name_in_build_dir + '.gz'
-    with open(input_file_name_in_build_dir, 'rb') as file_in,\
-            gzip.open(output_file_name_in_build_dir, 'wb') as file_out:
-        shutil.copyfileobj(file_in, file_out)
-
-
 def build():
     """Converts the Markdown files in the repo to html, minifies the html,
     css and js files, inlines them into a single html file and provides all
@@ -221,20 +152,7 @@ def build():
     minify_js("TestCanOverhead.js")
     inline_js_and_css_into_html("index.html")
     prepend_comment_in_index_file()
-    #compress_file("index.html")
-    #compress_file("changelog.html")
-    #compress_file("license.html")
-    #compress_file("readme.html")
-    #compress_file("roadmap.html")
 
 
 if __name__ == "__main__":
-    # Runs the building and inlining when run without args.
-    # With --commit it also commits the built result onto the gh-pages branch.
     build()
-    try:
-        if sys.argv[1].strip() == '--commit':
-            build_dir_to_gh_pages()
-    except IndexError:
-        # No main args
-        pass
