@@ -255,6 +255,13 @@ class BitSequence {
         return new BitSequence(sequenceWithoutStuffing, false);
     }
 
+    // TODO docs
+    applyFixedStuffBits(startIndex, endIndex) {
+        let shiftingEndIndex = endIndex;
+        let stuffed = new BitSequence();
+        // TODO
+    }
+
     /**
      * @private
      * Converts a sequence bit (SeqBit) to string, with optional formatting
@@ -626,8 +633,7 @@ class CanFrame11Bit extends _CanFrame {
      * @returns {BitSequence} ID
      */
     field02_identifier() {
-        return new BitSequence(this.id.toString(2)
-            .padStart(11, "0"));
+        return new BitSequence(this.id.toString(2).padStart(11, "0"));
     }
 
     /**
@@ -1198,6 +1204,433 @@ class CanFrame29Bit extends _CanFrame {
         amountAfterStuffing += 7; // End of frame
         amountAfterStuffing += 3; // Pause after end of frame
         return amountAfterStuffing;
+    }
+}
+
+const FD_PAYLOAD_LENGTHS =
+    [0, 1, 2, 3, 4, 5, 6, 7, 8, 12, 16, 20, 24, 32, 48, 64];
+
+// i=0  1  2  3  4  5  6  7  8   9  10  11  12  13  14  15
+
+class _CanFdFrame extends _CanFrame {
+    static lengthInBytesToDlc(lengthInBytes) {
+        for (let i = 0; i < FD_PAYLOAD_LENGTHS.length; i++) {
+            if (lengthInBytes <= FD_PAYLOAD_LENGTHS[i]) {
+                return i;
+            }
+        }
+        return NaN;
+    }
+
+    paddedLengthInBytes() {
+        for (let i = 0; i < FD_PAYLOAD_LENGTHS.length; i++) {
+            if (this.payload.length <= FD_PAYLOAD_LENGTHS[i]) {
+                return FD_PAYLOAD_LENGTHS[i];
+            }
+        }
+        return NaN;
+    }
+
+    paddingLengthInBytes() {
+        return this.paddedLengthInBytes(this.payload.length) - this.payload.length;
+    }
+
+    paddedPayloadAsBytes() {
+        let padded = new Uint8Array(this.paddedLengthInBytes());
+        for (let i = 0; i < this.payload.length; i++) {
+            padded[i] = this.payload[i];
+        }
+        return padded;
+    }
+
+    payloadAsBitSequence() {
+        let payloadBits = new BitSequence();
+        for (let byte of this.paddedPayloadAsBytes()) {
+            payloadBits.extend(byte.toString(2).padStart(8, "0"));
+        }
+        return payloadBits;
+    }
+
+    dataLengthCode() {
+        const dlcValue = _CanFdFrame.lengthInBytesToDlc(this.payload.length);
+        return new BitSequence(dlcValue.toString(2).padStart(4, "0"));
+    }
+
+    static greyEncode(value) {
+        return value ^ (value >> 1);
+    }
+}
+
+/**
+ * Data structure representing a CAN FD base data frame with 11-bit ID.
+ *
+ * Provide an ID and the payload, the query the various methods to obtain
+ * the fields of the frame or all of them together (also with stuff bits)
+ * as BitSequences.
+ *
+ * According to ISO 11898-1:2015.
+ */
+class CanFdFrame11Bit extends _CanFrame {
+    /**
+     * Constructs a CAN FD base data frame with 11-bit ID.
+     *
+     * @param {number} id integer of the CAN ID. Most significant bit is the
+     *        first transmitted
+     * @param {Uint8Array|null} payload array of integers. Most significant bit
+     *        of the first byte (at index 0) is the first transmitted.
+     */
+    constructor(id, payload = null) {
+        super(id, payload, MAX_ID_VALUE_11_BIT, null);
+    }
+
+    /**
+     * CAN ID length in bits.
+     * @returns {number} amount of bits of the CAN ID.
+     */
+    idBitLength() {
+        return 11; // TODO javascript abstract class/interface/traits?
+    }
+
+    /**
+     * Provides the start of frame field wrapped in a BitSequence.
+     *
+     * Length: 1 bit. This field is stuffable.
+     *
+     * Always dominant.
+     *
+     * @returns {BitSequence} SOF
+     */
+    field01_startOfFrame() {
+        return new BitSequence(Bit.DOMINANT);
+    }
+
+    /**
+     * Provides the identifier field as BitSequence.
+     *
+     * Length: 11 bits. This field is stuffable.
+     *
+     * @returns {BitSequence} ID
+     */
+    field02_identifier() {
+        return new BitSequence(this.id.toString(2).padStart(11, "0"));
+    }
+
+    /**
+     * Provides the remote request substitution field as BitSequence.
+     *
+     * Length: 1 bit. This field is stuffable.
+     *
+     * Always dominant.
+     *
+     * @returns {BitSequence} RRS
+     */
+    field03_remoteRequestSubstitution() {
+        return new BitSequence(Bit.DOMINANT);
+    }
+
+    /**
+     * Provides the identifier extension field as BitSequence.
+     *
+     * Length: 1 bit. This field is stuffable.
+     *
+     * Dominant for 11-bit IDs (base frame format), recessive for 29-bit IDs
+     * (extended frame format).
+     *
+     * @returns {BitSequence} IDE
+     */
+    field04_identifierExtensionBit() {
+        return new BitSequence(Bit.DOMINANT);
+    }
+
+    /**
+     * Provides the Flexible Data rate Format field as BitSequence.
+     *
+     * Length: 1 bit. This field is stuffable.
+     *
+     * Always recessive for CAN FD frames.
+     *
+     * @returns {BitSequence} FDF
+     */
+    field05_flexibleDataRateFormat() {
+        return new BitSequence(Bit.RECESSIVE);
+    }
+
+    /**
+     * Provides the reserved field as BitSequence.
+     *
+     * Length: 1 bit. This field is stuffable.
+     *
+     * Always dominant for CAN FD frames.
+     *
+     * @returns {BitSequence} res
+     */
+    field06_reservedBit() {
+        return new BitSequence(Bit.DOMINANT);
+    }
+
+    /**
+     * Provides the Bitrate Switch field as BitSequence.
+     *
+     * Length: 1 bit. This field is stuffable.
+     *
+     * Dominant if the frame is using the arbitration bitrate for all fields,
+     * recessive if the data part is sent at a different speed.
+     *
+     * @returns {BitSequence} BRS
+     */
+    field07_bitrateSwitchBit() {
+        return new BitSequence(Bit.DOMINANT); // TODO unsupported higher bitrates
+    }
+
+    /**
+     * Provides the Error Status Indicator field as BitSequence.
+     *
+     * Length: 1 bit. This field is stuffable.
+     *
+     * Dominant when the transmitter is in error-active state (default),
+     * recessive when in error-passive.
+     *
+     * @returns {BitSequence} ESI
+     */
+    field08_errorStatusIndicatorBit() {
+        return new BitSequence(Bit.DOMINANT); // TODO unsupported ESI change
+    }
+
+    /**
+     * Provides the data length code as BitSequence.
+     *
+     * Length: 4 bits. This field is stuffable.
+     *
+     * First bit is the most significant one. Values are spanning over [0, 15].
+     *
+     * @returns {BitSequence} DLC
+     */
+    field09_dataLengthCode() {
+        return this.dataLengthCode();
+    }
+
+    /**
+     * Provides the padded data field as BitSequence.
+     *
+     * Length: as many bits as in the this.payload after the padding has
+     * been included: [0, 8, 16, ..., 512].
+     * Always a multiple of 8, as the payload is in bytes.
+     * This field is stuffable.
+     *
+     * @returns {BitSequence} Data
+     */
+    field10_dataField() {
+        return this.payloadAsBitSequence();
+    }
+
+    field11_stuffCount() {
+        let frame = new BitSequence();
+        frame.extend(this.field01_startOfFrame());
+        frame.extend(this.field02_identifier());
+        frame.extend(this.field03_remoteRequestSubstitution());
+        frame.extend(this.field04_identifierExtensionBit());
+        frame.extend(this.field05_flexibleDataRateFormat());
+        frame.extend(this.field06_reservedBit());
+        frame.extend(this.field07_bitrateSwitchBit());
+        frame.extend(this.field08_errorStatusIndicatorBit());
+        frame.extend(this.field09_dataLengthCode());
+        frame.extend(this.field10_dataField());
+        const lengthPreStuffing = frame.length();
+        const lengthPostStuffing = frame.applyBitStuffing().length();
+        const amountOfStuffBits = lengthPostStuffing - lengthPreStuffing;
+        // NOTE: these DO NOT include any FIXED stuff bits.
+        // TODO should they? There is always a fixed stuff bit before the
+        // stuffCount field...
+        // TODO should the fixed ones afterwards also be included?
+        const amountGrayCoded = _CanFdFrame.greyEncode(amountOfStuffBits);
+        return new BitSequence(amountGrayCoded.toString().padStart(3, "0"));
+    }
+
+    field12_stuffCountParity() {
+        this.field11_stuffCount(); // TODO
+        const parityBit = 0; // TODO how is the parity computed? Even or odd?
+        // TODO before or after the grey encoding?
+        return new BitSequence(parityBit);
+    }
+
+    /**
+     * Provides the CRC field as BitSequence, calculated on all the fields
+     * appearing before the CRC itself.
+     *
+     * Length: 17 or 21 bits.
+     * This field is stuffable, BUT with fixed stuff bits.
+     *
+     * @returns {BitSequence} CRC
+     */
+    field13_crc() {
+        let preCrc = new BitSequence();
+        preCrc.extend(this.field01_startOfFrame());
+        preCrc.extend(this.field02_identifier());
+        preCrc.extend(this.field03_remoteRequestSubstitution());
+        preCrc.extend(this.field04_identifierExtensionBit());
+        preCrc.extend(this.field05_flexibleDataRateFormat());
+        preCrc.extend(this.field06_reservedBit());
+        preCrc.extend(this.field07_bitrateSwitchBit());
+        preCrc.extend(this.field08_errorStatusIndicatorBit());
+        preCrc.extend(this.field09_dataLengthCode());
+        preCrc.extend(this.field10_dataField());
+        preCrc.extend(this.field11_stuffCount());
+        preCrc.extend(this.field12_stuffCountParity());
+        let crcAsInteger;
+        let size;
+        if (this.dataLengthCode() <= 10) {
+            crcAsInteger = crc17(preCrc);
+            size = 17;
+        } else {
+            crcAsInteger = crc21(preCrc);
+            size = 21;
+        }
+        return new BitSequence(crcAsInteger.toString(2).padStart(size, "0"));
+    }
+
+    /**
+     * Provides the CRC delimiter field as BitSequence.
+     *
+     * Length: 1 bit. This field is *not* stuffable.
+     *
+     * @returns {BitSequence} CRC Delimiter
+     */
+    field14_crcDelimiter() {
+        return new BitSequence(Bit.RECESSIVE);
+    }
+
+    /**
+     * Provides the acknowledgement slot field as BitSequence.
+     *
+     * Length: 1 bit. This field is *not* stuffable.
+     *
+     * Always recessive during transmission, set to dominant by the received to
+     * acknowledge the transmission.s
+     *
+     * @returns {BitSequence} ACK slot
+     */
+    field15_ackSlot() {
+        return new BitSequence(Bit.RECESSIVE);
+    }
+
+    /**
+     * Provides the acknowledgement slot delimiter field as BitSequence.
+     *
+     * Length: 1 bit. This field is *not* stuffable.
+     *
+     * Always recessive.
+     *
+     * @returns {BitSequence} ACK delimiter
+     */
+    field16_ackDelimiter() {
+        return new BitSequence(Bit.RECESSIVE);
+    }
+
+    /**
+     * Provides the end of frame field as BitSequence.
+     *
+     * Length: 7 bits. This field is *not* stuffable.
+     *
+     * Always recessive bits.
+     *
+     * @returns {BitSequence} EOF
+     */
+    field17_endOfFrame() {
+        return new BitSequence([
+            Bit.RECESSIVE, Bit.RECESSIVE, Bit.RECESSIVE, Bit.RECESSIVE,
+            Bit.RECESSIVE, Bit.RECESSIVE, Bit.RECESSIVE,
+        ]);
+    }
+
+    /**
+     * Provides the empty Inter-Frame Space required between two immediately
+     * successive CAN frames as BitSequence.
+     *
+     * Length: 3 bits. This field is *not* stuffable.
+     *
+     * Always recessive bits.
+     *
+     * @returns {BitSequence} IFS
+     */
+    field18_interFrameSpace() {
+        return new BitSequence([
+            Bit.RECESSIVE, Bit.RECESSIVE, Bit.RECESSIVE,
+        ]);
+    }
+
+    /**
+     * Provides the whole frame as BitSequence, without stuff bits.
+     *
+     * @returns {BitSequence} whole frame
+     */
+    wholeFrame() {
+        let frame = new BitSequence();
+        frame.extend(this.field01_startOfFrame());
+        frame.extend(this.field02_identifier());
+        frame.extend(this.field03_remoteRequestSubstitution());
+        frame.extend(this.field04_identifierExtensionBit());
+        frame.extend(this.field05_flexibleDataRateFormat());
+        frame.extend(this.field06_reservedBit());
+        frame.extend(this.field07_bitrateSwitchBit());
+        frame.extend(this.field08_errorStatusIndicatorBit());
+        frame.extend(this.field09_dataLengthCode());
+        frame.extend(this.field10_dataField());
+        frame.extend(this.field11_stuffCount());
+        frame.extend(this.field12_stuffCountParity());
+        frame.extend(this.field13_crc());
+        frame.extend(this.field14_crcDelimiter());
+        frame.extend(this.field15_ackSlot());
+        frame.extend(this.field16_ackDelimiter());
+        frame.extend(this.field17_endOfFrame());
+        frame.extend(this.field18_interFrameSpace());
+        return frame;
+    }
+
+    /**
+     * Provides the whole frame as BitSequence, including stuff bits,
+     * both regular and fixed.
+     *
+     * @returns {BitSequence} whole frame
+     */
+    wholeFrameStuffed() {
+        let frame = new BitSequence();
+        frame.extend(this.field01_startOfFrame());
+        frame.extend(this.field02_identifier());
+        frame.extend(this.field03_remoteRequestSubstitution());
+        frame.extend(this.field04_identifierExtensionBit());
+        frame.extend(this.field05_flexibleDataRateFormat());
+        frame.extend(this.field06_reservedBit());
+        frame.extend(this.field07_bitrateSwitchBit());
+        frame.extend(this.field08_errorStatusIndicatorBit());
+        frame.extend(this.field09_dataLengthCode());
+        frame.extend(this.field10_dataField());
+        frame = frame.applyBitStuffing();
+        const startIndexOfFixedStuffBits = frame.length();
+        // TODO 1 Fixed stuff bit here and then every 4 bits until reaching
+        // the CRC delimiter EXCLUDED. Each FSB has the value opposite to the
+        // previous bit.
+        frame.extend(this.field11_stuffCount());
+        frame.extend(this.field12_stuffCountParity());
+        frame.extend(this.field13_crc());
+        const endIndexOfFixedStuffBits = frame.length();
+        frame = frame.applyFixedStuffBits(startIndexOfFixedStuffBits, endIndexOfFixedStuffBits);
+        frame.extend(this.field14_crcDelimiter());
+        frame.extend(this.field15_ackSlot());
+        frame.extend(this.field16_ackDelimiter());
+        frame.extend(this.field17_endOfFrame());
+        frame.extend(this.field18_interFrameSpace());
+        return frame;
+    }
+
+    /**
+     * Provides the maximum possible (worst case) amount of bits of the whole
+     * frame after stuffing with the same payload length.
+     *
+     * @returns {number} max amount of bits of the whole frame
+     */
+    maxLengthAfterStuffing() {
+        // TODO
+        return NaN;
     }
 }
 

@@ -17,7 +17,7 @@ Bitrates and transfer time.
 
 ### Added
 
-- Bitrates list available: 1 Mbit/s, 800, 500, 250, 125, 50, 20, 10 kbit/s
+- Bitrates list available: 1 Mbit/s, 800, 500, 250, 125, 50, 20, 10, 5 kbit/s
   - Bitrate can also be provided by the user instead of using one of the
     default ones from the list above
 - Calculation of gross/net (effective) bitrate:
@@ -26,6 +26,8 @@ Bitrates and transfer time.
 - Calculation of gross/net (effective) transfer time:
   - exact when exact ID and payload is given
   - range when the ID and payload are not known
+- Indicate that CAN frames are from the ISO standard TODOOOOO
+  and FD frames from ISO 11898-1:2015
 
 
 [1.3.0]
