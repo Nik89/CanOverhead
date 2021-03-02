@@ -642,9 +642,10 @@ function displayInputFormForRtrFrame() {
 function resetInputForm() {
     document.getElementById("input_frame_type").selectedIndex = 0;
     document.getElementById("input_can_identifier").value = "";
+    document.getElementById("input_can_identifier_base").selectedIndex = 1;
     document.getElementById("input_can_payload").value = "";
     document.getElementById("input_can_dlc").selectedIndex = 0;
-    document.getElementById("input_can_bitrate").selectedIndex = 5;
+    document.getElementById("input_can_bitrate").selectedIndex = 6;
 }
 
 function alterInputFormOnFrameTypeChange(dropdown) {
