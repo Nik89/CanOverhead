@@ -129,6 +129,7 @@ a:hover {
 .output_can_text {
     margin-top: 0.5rem;
     background-color: #eee;
+    white-space: break-spaces; /* Prevent HTML merging whitespace paddings. */
 }
 
 /* Output table with CAN frame fields */

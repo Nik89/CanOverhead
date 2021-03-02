@@ -564,6 +564,14 @@ class _CanFrame {
             return new BitSequence(Bit.DOMINANT);
         }
     }
+
+    /**
+     * Payload length in bits.
+     * @returns {number} amount of bits of the payload.
+     */
+    dataBitLength() {
+        return this.payload.length * 8;
+    }
 }
 
 /**
@@ -587,6 +595,14 @@ class CanFrame11Bit extends _CanFrame {
      */
     constructor(id, payload = null, dlc = null) {
         super(id, payload, MAX_ID_VALUE_11_BIT, dlc);
+    }
+
+    /**
+     * CAN ID length in bits.
+     * @returns {number} amount of bits of the CAN ID.
+     */
+    idBitLength() {
+        return 11;
     }
 
     /**
@@ -843,12 +859,7 @@ class CanFrame11Bit extends _CanFrame {
         amountAfterStuffing += 3; // Pause after end of frame
         return amountAfterStuffing;
     }
-
-    dataLength() {
-        return 11 + this.payload.length * 8;
-    }
 }
-
 
 /**
  * Data structure representing a Classic CAN extended data frame with 29-bit ID.
@@ -871,6 +882,15 @@ class CanFrame29Bit extends _CanFrame {
      */
     constructor(id, payload = null, dlc = null) {
         super(id, payload, MAX_ID_VALUE_29_BIT, dlc);
+    }
+
+
+    /**
+     * CAN ID length in bits, combining part A and part B.
+     * @returns {number} amount of bits of the CAN ID.
+     */
+    idBitLength() {
+        return 29;
     }
 
     /**
@@ -1178,10 +1198,6 @@ class CanFrame29Bit extends _CanFrame {
         amountAfterStuffing += 7; // End of frame
         amountAfterStuffing += 3; // Pause after end of frame
         return amountAfterStuffing;
-    }
-
-    dataLength() {
-        return 29 + this.payload.length * 8;
     }
 }
 

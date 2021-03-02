@@ -129,7 +129,10 @@ function clearErrorsAndOutputs() {
     clear("output_can_whole_frame_stuffed_len");
     clear("output_max_length");
     clear("output_transfer_time");
-    clear("output_overhead");
+    clear("output_overhead_no_id");
+    clear("output_overhead_with_id");
+    clear("output_effective_bitrate_no_id");
+    clear("output_effective_bitrate_with_id");
     // Clear outputs about the frame fields for data 11-bit frames
     clear("output_can_data11_field01");
     clear("output_can_data11_field01_len");
@@ -228,7 +231,6 @@ function clearErrorsAndOutputs() {
     hide("output_table_data29bit");
 }
 
-
 /**
  * Computes and prints the whole CAN frame as bit sequence.
  * @param {CanFrame11Bit|CanFrame29Bit} canFrame
@@ -244,11 +246,11 @@ function displayCanFrameWholeFrame(canFrame, bitrate) {
     const stuffBitsAmount = stuffedBits.length() - bits.length();
     const transferTimeSeconds = stuffedBits.length() / bitrate;
     const transferTimeStrMillis = (transferTimeSeconds * 1e3).toFixed(3);
-    const data = canFrame.dataLength();
-    const metadata = stuffedBits.length() - data;
-    const overhead = metadata / (data + metadata);
-    const overheadPercString = (overhead * 100).toFixed(2);
-    display("output_can_whole_frame_stuffed_len",
+    const dataNoId = canFrame.dataBitLength();
+    const dataWithId = canFrame.dataBitLength() + canFrame.idBitLength();
+    const metadataWithId = stuffedBits.length() - dataNoId;
+    const metadataNoId = stuffedBits.length() - dataWithId;
+        display("output_can_whole_frame_stuffed_len",
         `[${stuffedBits.length()} bits, of which `
         + `<span class="stuff_bit">${stuffBitsAmount} stuff bits</span>]`);
     display("output_can_whole_frame_stuffed",
@@ -257,11 +259,27 @@ function displayCanFrameWholeFrame(canFrame, bitrate) {
     // Max theoretical length
     display("output_max_length", `${canFrame.maxLengthAfterStuffing()} bits`);
     display("output_transfer_time", `${transferTimeStrMillis} ms`);
-    display("output_overhead", `ID + payload: ${data} bits, metadata: ${metadata} bits = ${overheadPercString} % of frame`);
+    display("output_overhead_no_id", `Data (just payload): ${dataNoId.toString().padStart(2)} bits. Metadata: ${metadataWithId.toString().padStart(2)} bits = ${overheadPercentageStr(dataNoId, metadataWithId)}% of frame`);
+    display("output_overhead_with_id", `Data (ID + payload): ${dataWithId.toString().padStart(2)} bits. Metadata: ${metadataNoId.toString().padStart(2)} bits = ${overheadPercentageStr(dataWithId, metadataNoId)}% of frame`);
+    display("output_effective_bitrate_no_id", `Data (just payload): ${effectiveBitrateKbpsStr(dataNoId, transferTimeSeconds)} kbit/s`);
+    display("output_effective_bitrate_with_id", `Data (ID + payload): ${effectiveBitrateKbpsStr(dataWithId, transferTimeSeconds)} kbit/s`);
     unhide("output_list_title");
     unhide("output_list");
     unhide("output_transfer_time");
-    unhide("output_overhead");
+    unhide("output_overhead_no_id");
+    unhide("output_overhead_with_id");
+    unhide("output_effective_bitrate_no_id");
+    unhide("output_effective_bitrate_with_id");
+}
+
+function overheadPercentageStr(data, metadata) {
+    const overhead = metadata / (data + metadata);
+    return (overhead * 100).toFixed(2).padStart(6);
+}
+
+function effectiveBitrateKbpsStr(data, transferTimeSeconds) {
+    const dataEffectiveBitrate = data / transferTimeSeconds;
+    return (dataEffectiveBitrate / 1e3).toFixed(3).padStart(8);
 }
 
 /**
