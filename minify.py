@@ -52,7 +52,8 @@ def md2html(input_file_name: str):
     output_file_name += ".html"
     output_file_name = os.path.join(BUILD_DIR, output_file_name)
     markdown.markdownFromFile(input=input_file_name, output=output_file_name,
-                              encoding="UTF-8", output_format="html")
+                              encoding="UTF-8", output_format="html",
+                              tab_length=2)
 
 
 def prepend_comment_in_index_file():
