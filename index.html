@@ -77,6 +77,10 @@
         </div>
         <div id="input_can_dlc_block">
             <label for="input_can_dlc">RTR frame Data Length Code (DLC)</label>
+            <span
+                title="This should be the payload length of the frame transmitted by the receiver(s) of the RTR frame. RTR frames themselves have no payload."
+                class="help_popup">&#9432;
+            </span>
             <select name="input_can_dlc" id="input_can_dlc"
                     class="dropdown_select">
                 <option value="0" selected>0</option>
@@ -92,6 +96,10 @@
         </div>
         <div id="input_can_bitrate_block">
             <label for="input_can_bitrate">CAN bitrate</label>
+            <span
+                title="In KILObit (multiples of 1000), not KIBIbit (multiples of 1024)"
+                class="help_popup">&#9432;
+            </span>
             <select name="input_can_bitrate" id="input_can_bitrate"
                     class="dropdown_select">
                 <option value="5e6">5 Mbit/s</option>
