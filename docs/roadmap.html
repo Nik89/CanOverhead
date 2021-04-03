@@ -5,27 +5,14 @@
 and this project adheres to
 <a href="https://semver.org/spec/v2.0.0.html">Semantic Versioning</a>.</p>
 <hr>
-<h2>[1.2.0]</h2>
-<p>Bitrates and transfer time.</p>
-<h3>Added</h3>
-<ul>
-<li>Bitrates list available: 1 Mbit/s, 800, 500, 250, 125, 50, 20, 10, 5 kbit/s</li>
-<li>Bitrate can also be provided by the user instead of using one of the
-    default ones from the list above</li>
-<li>Calculation of gross/net (effective) bitrate:</li>
-<li>exact when exact ID and payload is given</li>
-<li>range when the ID and payload are not known</li>
-<li>Calculation of gross/net (effective) transfer time:</li>
-<li>exact when exact ID and payload is given</li>
-<li>range when the ID and payload are not known</li>
-<li>Info popups explaining what all of these fields are.</li>
-</ul>
 <h2>[1.3.0]</h2>
 <p>CAN FD frames with only one bitrate.</p>
 <h3>Added</h3>
 <ul>
-<li>Radio button to select between CAN and CAN FD frames for 11 and 29 bit IDs.</li>
+<li>Radio button to select between CAN and CAN FD frames for 11 and 29 bit IDs.<ul>
 <li>RTR frames are not available in FD mode.</li>
+</ul>
+</li>
 <li>Adapted computation of the CAN frame bits to support extended CAN FD frames.</li>
 <li>Effective bitrate and transfer speed computed with the assumption that
   the payload bitrate is equal to the arbitration bitrate.</li>
@@ -36,5 +23,10 @@ and this project adheres to
 <h3>Added</h3>
 <ul>
 <li>Support for CAN FD with payload bitrate different than then arbitration
-  bitrate.</li>
+  bitrate.<ul>
+<li>Bitrate can also be provided by the user instead of using one of the
+  default ones from the list above</li>
+<li>Bitrate can be expressed in multiple of 1024 (kibibit, Mebibit etc.)</li>
+</ul>
+</li>
 </ul>

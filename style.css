@@ -80,6 +80,10 @@ a:hover {
     width: 85em; /* Enough for 128 hex chars, covering 64 bytes. */
 }
 
+.help_popup {
+    font-weight: bold;
+}
+
 .buttons {
     margin: 1rem;
     display: flex;
@@ -129,6 +133,7 @@ a:hover {
 .output_can_text {
     margin-top: 0.5rem;
     background-color: #eee;
+    white-space: break-spaces; /* Prevent HTML merging whitespace paddings. */
 }
 
 /* Output table with CAN frame fields */

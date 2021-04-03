@@ -10,25 +10,6 @@ and this project adheres to
 
 *******************************************************************************
 
-[1.2.0]
-----------------------------------------
-
-Bitrates and transfer time.
-
-### Added
-
-- Bitrates list available: 1 Mbit/s, 800, 500, 250, 125, 50, 20, 10, 5 kbit/s
-  - Bitrate can also be provided by the user instead of using one of the
-    default ones from the list above
-- Calculation of gross/net (effective) bitrate:
-  - exact when exact ID and payload is given
-  - range when the ID and payload are not known
-- Calculation of gross/net (effective) transfer time:
-  - exact when exact ID and payload is given
-  - range when the ID and payload are not known
-- Info popups explaining what all of these fields are.
-
-
 [1.3.0]
 ----------------------------------------
 
@@ -54,3 +35,6 @@ CAN FD with flexible data-rate.
 
 - Support for CAN FD with payload bitrate different than then arbitration
   bitrate.
+  - Bitrate can also be provided by the user instead of using one of the
+    default ones from the list above
+  - Bitrate can be expressed in multiple of 1024 (kibibit, Mebibit etc.)

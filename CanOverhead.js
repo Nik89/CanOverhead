@@ -417,6 +417,7 @@ const Field = {
     PAYLOAD: 2,
     DLC: 3,
     TYPE: 4,
+    BITRATE: 5,
 }
 
 /**
@@ -452,7 +453,7 @@ class _CanFrame {
      * @param {number|null} dlc content of the Data Length Code for RTR frames
      *        or null for Data frames
      */
-    constructor(id, payload=null, maxId, dlc = null) {
+    constructor(id, payload = null, maxId, dlc = null) {
         // Check ID
         if (typeof (id) !== "number") {
             throw new TypeError("Identifier must be a number.");
@@ -485,8 +486,7 @@ class _CanFrame {
         if (payload === null) {
             // Replace null payload with empty payload
             payload = new Uint8Array(0);
-        }
-        else if (!(payload instanceof Uint8Array)) {
+        } else if (!(payload instanceof Uint8Array)) {
             throw new TypeError("Payload must be a Uint8Array.");
         }
         // Check if RTR or Data frame
@@ -564,6 +564,14 @@ class _CanFrame {
             return new BitSequence(Bit.DOMINANT);
         }
     }
+
+    /**
+     * Payload length in bits.
+     * @returns {number} amount of bits of the payload.
+     */
+    dataBitLength() {
+        return this.payload.length * 8;
+    }
 }
 
 /**
@@ -585,8 +593,16 @@ class CanFrame11Bit extends _CanFrame {
      * @param {number|null} dlc content of the Data Length Code for RTR frames
      *        or null for Data frames
      */
-    constructor(id, payload=null, dlc = null) {
+    constructor(id, payload = null, dlc = null) {
         super(id, payload, MAX_ID_VALUE_11_BIT, dlc);
+    }
+
+    /**
+     * CAN ID length in bits.
+     * @returns {number} amount of bits of the CAN ID.
+     */
+    idBitLength() {
+        return 11;
     }
 
     /**
@@ -845,7 +861,6 @@ class CanFrame11Bit extends _CanFrame {
     }
 }
 
-
 /**
  * Data structure representing a Classic CAN extended data frame with 29-bit ID.
  *
@@ -865,8 +880,17 @@ class CanFrame29Bit extends _CanFrame {
      * @param {number|null} dlc content of the Data Length Code for RTR frames
      *        or null for Data frames
      */
-    constructor(id, payload=null, dlc = null) {
+    constructor(id, payload = null, dlc = null) {
         super(id, payload, MAX_ID_VALUE_29_BIT, dlc);
+    }
+
+
+    /**
+     * CAN ID length in bits, combining part A and part B.
+     * @returns {number} amount of bits of the CAN ID.
+     */
+    idBitLength() {
+        return 29;
     }
 
     /**

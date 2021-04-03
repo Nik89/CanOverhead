@@ -33,7 +33,7 @@ THIS_FILE_ABS_DIR = os.path.dirname(__file__)
 # allowing us to create the output directory next to this file instead of
 # where the file is called from.
 os.chdir(THIS_FILE_ABS_DIR)
-BUILD_DIR = os.path.join(THIS_FILE_ABS_DIR, "minified")
+BUILD_DIR = os.path.join(THIS_FILE_ABS_DIR, "docs")
 
 
 def cleanup():
@@ -52,7 +52,8 @@ def md2html(input_file_name: str):
     output_file_name += ".html"
     output_file_name = os.path.join(BUILD_DIR, output_file_name)
     markdown.markdownFromFile(input=input_file_name, output=output_file_name,
-                              encoding="UTF-8", output_format="html")
+                              encoding="UTF-8", output_format="html",
+                              tab_length=2)
 
 
 def prepend_comment_in_index_file():
