@@ -10,22 +10,6 @@ and this project adheres to
 
 *******************************************************************************
 
-[1.2.0]
-----------------------------------------
-
-Bitrates and transfer time.
-
-### Added
-
-- Bitrates list available: 1 Mbit/s, 800, 500, 250, 125, 50, 20, 10, 5 kbit/s
-- Calculation of gross transfer time
-- Calculation of overhead percentage and effective bitrate
-- Add question mark icon with popup for extra info about the fields on mouseover
-  ```html
-  <span title="Help text" style="color: darkred; font-weight: bold">[?]</span>
-  ```
-
-
 [1.3.0]
 ----------------------------------------
 
