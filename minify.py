@@ -33,7 +33,7 @@ THIS_FILE_ABS_DIR = os.path.dirname(__file__)
 # allowing us to create the output directory next to this file instead of
 # where the file is called from.
 os.chdir(THIS_FILE_ABS_DIR)
-BUILD_DIR = os.path.join(THIS_FILE_ABS_DIR, "minified")
+BUILD_DIR = os.path.join(THIS_FILE_ABS_DIR, "docs")
 
 
 def cleanup():
