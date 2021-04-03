@@ -26,6 +26,10 @@ Bitrates and transfer time.
 - Calculation of gross/net (effective) transfer time:
   - exact when exact ID and payload is given
   - range when the ID and payload are not known
+- Add question mark icon with popup for extra info about the fields on mouseover
+  ```html
+  <span title="Help text" style="color: darkred; font-weight: bold">[?]</span>
+  ```
 
 
 [1.3.0]
