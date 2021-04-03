@@ -35,10 +35,21 @@ also offline. **Right-click** on the
 and choose _"Save as..."_ to download the `index.html` page. Rename it
 as you please.
 
-The calculator has no backend server, works only
-in your browser locally, no data is transferred. You can verify this by
-setting your browser to stay offline after loading the page and our calculator
-still operates! In Firefox: _File > Work Offline_.
+We also make the same file available in the
+[releases on GitHub](https://github.com/Nik89/CanOverhead/releases).
+
+
+
+Privacy
+---------------------------------------
+
+The calculator has no backend server, works in your browser locally,
+no data is transferred anywhere. If you are paranoid,
+you can also use it after setting your browser to stay offline (in Firefox:
+_File > Work Offline_) after loading the page and the calculator still operates
+- completely disconnecting the computer from the internet also works.
+
+Also: it does not use any cookies.
 
 
 
@@ -51,8 +62,8 @@ open the `index.html` file in your favourite browser for it to work
 (except some URLs to license, changelog etc. may be broken).
 
 To minify and merge all HTML, CSS and JS files into a single `index.html`
-the Python3 script `deploy.py` must be run. This will generate output files
-in the `builds` directory next to the Python script itself.
+the Python3 script `minify.py` must be run. This will generate the compact
+all-in-one `index.html` in the `minified` directory.
 You will need some dependencies to run the script, so be sure to run
 the following:
 ```
