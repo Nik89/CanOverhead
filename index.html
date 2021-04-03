@@ -90,6 +90,22 @@
                 <option value="8">8</option>
             </select>
         </div>
+        <div id="input_can_bitrate_block">
+            <label for="input_can_bitrate">CAN bitrate</label>
+            <select name="input_can_bitrate" id="input_can_bitrate"
+                    class="dropdown_select">
+                <option value="5e6">5 Mbit/s</option>
+                <option value="2e6">2 Mbit/s</option>
+                <option value="1e6">1 Mbit/s</option>
+                <option value="800e3">800 kbit/s</option>
+                <option value="500e3">500 kbit/s</option>
+                <option value="250e3">250 kbit/s</option>
+                <option value="125e3" selected>125 kbit/s</option>
+                <option value="50e3">50 kbit/s</option>
+                <option value="20e3">20 kbit/s</option>
+                <option value="10e3">10 kbit/s</option>
+            </select>
+        </div>
         <div id="input_error" class="input-error"></div>
     </div>
     <div class="buttons">
@@ -118,6 +134,26 @@
                     (assuming same ID and payload lengths)
                 </span>
                 <div id="output_max_length" class="output_can_text"></div>
+            </li>
+            <li>Transfer time
+                <span class="small_label">
+                    (including stuff bits)
+                </span>
+                <div id="output_transfer_time" class="output_can_text"></div>
+            </li>
+            <li>Overhead
+                <span class="small_label">
+                    (including stuff bits)
+                </span>
+                <div id="output_overhead_no_id" class="output_can_text"></div>
+                <div id="output_overhead_with_id" class="output_can_text"></div>
+            </li>
+            <li>Effective bitrate to transfer the data
+                <span class="small_label">
+                    (including stuff bits)
+                </span>
+                <div id="output_effective_bitrate_no_id" class="output_can_text"></div>
+                <div id="output_effective_bitrate_with_id" class="output_can_text"></div>
             </li>
         </ul>
         <h4 id="output_table_title" class="output_section_title">

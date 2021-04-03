@@ -128,6 +128,11 @@ function clearErrorsAndOutputs() {
     clear("output_can_whole_frame_stuffed");
     clear("output_can_whole_frame_stuffed_len");
     clear("output_max_length");
+    clear("output_transfer_time");
+    clear("output_overhead_no_id");
+    clear("output_overhead_with_id");
+    clear("output_effective_bitrate_no_id");
+    clear("output_effective_bitrate_with_id");
     // Clear outputs about the frame fields for data 11-bit frames
     clear("output_can_data11_field01");
     clear("output_can_data11_field01_len");
@@ -226,20 +231,26 @@ function clearErrorsAndOutputs() {
     hide("output_table_data29bit");
 }
 
-
 /**
  * Computes and prints the whole CAN frame as bit sequence.
  * @param {CanFrame11Bit|CanFrame29Bit} canFrame
+ * @param {number} bitrate in bits per second
  */
-function displayCanFrameWholeFrame(canFrame) {
+function displayCanFrameWholeFrame(canFrame, bitrate) {
     // Without stuffing
     const bits = canFrame.wholeFrame();
     display("output_can_whole_frame_len", `[${bits.length()} bits]`);
     display("output_can_whole_frame", bits.toBinStringWithSpacesLeftAlign());
     // With stuffing
-    let stuffedBits = canFrame.wholeFrameStuffed();
-    let stuffBitsAmount = stuffedBits.length() - bits.length();
-    display("output_can_whole_frame_stuffed_len",
+    const stuffedBits = canFrame.wholeFrameStuffed();
+    const stuffBitsAmount = stuffedBits.length() - bits.length();
+    const transferTimeSeconds = stuffedBits.length() / bitrate;
+    const transferTimeStrMillis = (transferTimeSeconds * 1e3).toFixed(3);
+    const dataNoId = canFrame.dataBitLength();
+    const dataWithId = canFrame.dataBitLength() + canFrame.idBitLength();
+    const metadataWithId = stuffedBits.length() - dataNoId;
+    const metadataNoId = stuffedBits.length() - dataWithId;
+        display("output_can_whole_frame_stuffed_len",
         `[${stuffedBits.length()} bits, of which `
         + `<span class="stuff_bit">${stuffBitsAmount} stuff bits</span>]`);
     display("output_can_whole_frame_stuffed",
@@ -247,8 +258,28 @@ function displayCanFrameWholeFrame(canFrame) {
             "<span class=\"stuff_bit\">", "</span>"));
     // Max theoretical length
     display("output_max_length", `${canFrame.maxLengthAfterStuffing()} bits`);
+    display("output_transfer_time", `${transferTimeStrMillis} ms`);
+    display("output_overhead_no_id", `Data (just payload): ${dataNoId.toString().padStart(2)} bits. Metadata: ${metadataWithId.toString().padStart(2)} bits = ${overheadPercentageStr(dataNoId, metadataWithId)}% of frame`);
+    display("output_overhead_with_id", `Data (ID + payload): ${dataWithId.toString().padStart(2)} bits. Metadata: ${metadataNoId.toString().padStart(2)} bits = ${overheadPercentageStr(dataWithId, metadataNoId)}% of frame`);
+    display("output_effective_bitrate_no_id", `Data (just payload): ${effectiveBitrateKbpsStr(dataNoId, transferTimeSeconds)} kbit/s`);
+    display("output_effective_bitrate_with_id", `Data (ID + payload): ${effectiveBitrateKbpsStr(dataWithId, transferTimeSeconds)} kbit/s`);
     unhide("output_list_title");
     unhide("output_list");
+    unhide("output_transfer_time");
+    unhide("output_overhead_no_id");
+    unhide("output_overhead_with_id");
+    unhide("output_effective_bitrate_no_id");
+    unhide("output_effective_bitrate_with_id");
+}
+
+function overheadPercentageStr(data, metadata) {
+    const overhead = metadata / (data + metadata);
+    return (overhead * 100).toFixed(2).padStart(6);
+}
+
+function effectiveBitrateKbpsStr(data, transferTimeSeconds) {
+    const dataEffectiveBitrate = data / transferTimeSeconds;
+    return (dataEffectiveBitrate / 1e3).toFixed(3).padStart(8);
 }
 
 /**
@@ -387,6 +418,33 @@ function displayCanFrame29BitFields(canFrame) {
     display("output_can_data29_field16_hex", field.toHexString());
     unhide("output_table_title");
     unhide("output_table_data29bit");
+}
+
+/**
+ * Obtains, parses and validates the user input for the bitrate.
+ *
+ * @return {number} bitrate in bits per second
+ * @throws ValidationError in case of problems
+ */
+function parseCanFrameBitrateFromInputForm() {
+    const bitrateStr = read("input_can_bitrate").trim().toLowerCase();
+    if (bitrateStr.length === 0) {
+        throw new ValidationError("Empty bitrate", Field.BITRATE);
+    }
+    if (bitrateStr.startsWith("0x")
+        || bitrateStr.startsWith("0b")
+        || bitrateStr.startsWith("0o")) {
+        throw new ValidationError(
+            "Bitrate can be expressed only in base 10. Found: " + bitrateStr,
+            Field.BITRATE);
+    }
+    const bitrate = Number(bitrateStr);
+    if (isNaN(bitrate)) {
+        throw new ValidationError(
+            "Incorrect bitrate format. Cannot be parsed. Found: " + bitrateStr,
+            Field.BITRATE);
+    }
+    return bitrate;
 }
 
 /**
@@ -602,8 +660,10 @@ function displayInputFormForRtrFrame() {
 function resetInputForm() {
     document.getElementById("input_frame_type").selectedIndex = 0;
     document.getElementById("input_can_identifier").value = "";
+    document.getElementById("input_can_identifier_base").selectedIndex = 1;
     document.getElementById("input_can_payload").value = "";
     document.getElementById("input_can_dlc").selectedIndex = 0;
+    document.getElementById("input_can_bitrate").selectedIndex = 6;
 }
 
 function alterInputFormOnFrameTypeChange(dropdown) {
@@ -638,6 +698,7 @@ function calculate() {
         // Parse input fields
         const frameType = parseCanFrameTypeFromInputForm();
         const identifier = parseCanIdentifierFromInputForm();
+        const bitrate = parseCanFrameBitrateFromInputForm();
         let canFrame;
         let payload = null;
         let dlc = null;
@@ -668,7 +729,7 @@ function calculate() {
                     "Unsupported frame type: " + frameType, Field.DLC);
                 displayUnknownError(err)
         }
-        displayCanFrameWholeFrame(canFrame);
+        displayCanFrameWholeFrame(canFrame, bitrate);
         // Successful conversion and output
     } catch (err) {
         displayError(err);
