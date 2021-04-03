@@ -1,0 +1,47 @@
+<h1>CAN bus overhead, stuff bits and effective bitrate calculator</h1>
+<h3><a href="https://nik89.github.io/CanOverhead/">Click to use it in your browser!</a></h3>
+<p>The <a href="https://en.wikipedia.org/wiki/CAN_bus">CAN bus</a>
+is a robust communication bus and protocol used in vehicle,
+allowing frames with 11 or 29-bit identifiers in the header and payload sizes
+of up to 8 bytes for classic CAN and up to 64 for the
+<a href="https://en.m.wikipedia.org/wiki/CAN_FD">CAN FD</a> variant.</p>
+<p>This JavaScript in-browser calculator helps you compute:</p>
+<ul>
+<li>the overhead of a frame in space: size of header and trailer</li>
+<li>the stuff bits: these are bits injected after each streak of 5 bits</li>
+<li>the effective bitrate: compute the transfer speed and time of your data taking
+  into account also the time it takes to transfer the frame overhead.</li>
+</ul>
+<h2>Usage</h2>
+<h3>Online</h3>
+<p>Head over to the
+<a href="https://nik89.github.io/CanOverhead/"><strong>website of the calculator</strong></a>
+to use it. Simple as that!</p>
+<h3>Locally</h3>
+<p>You can also directly download the page and use it in any modern browser,
+also offline. <strong>Right-click</strong> on the
+<a href="https://nik89.github.io/CanOverhead/">website link</a>
+and choose <em>"Save as..."</em> to download the <code>index.html</code> page. Rename it
+as you please.</p>
+<p>We also make the same file available in the
+<a href="https://github.com/Nik89/CanOverhead/releases">releases on GitHub</a>.</p>
+<h2>Privacy</h2>
+<p>The calculator has no backend server, works in your browser locally,
+no data is transferred anywhere. If you are paranoid,
+you can also use it after setting your browser to stay offline (in Firefox:
+<em>File &gt; Work Offline</em>) after loading the page and the calculator still operates
+- completely disconnecting the computer from the internet also works.</p>
+<p>Also: it does not use any cookies.</p>
+<h2>Compilation</h2>
+<p>The calculator is a set of HTML+CSS+JS files, so it does not need actual
+compilation to work. You can simply download or clone the repository and
+open the <code>index.html</code> file in your favourite browser for it to work
+(except some URLs to license, changelog etc. may be broken).</p>
+<p>To minify and merge all HTML, CSS and JS files into a single <code>index.html</code>
+the Python3 script <code>minify.py</code> must be run. This will generate the compact
+all-in-one <code>index.html</code> in the <code>minified</code> directory.
+You will need some dependencies to run the script, so be sure to run
+the following:
+<code>pip install -r requirements.txt</code>
+We recommend using a
+<a href="https://docs.python.org/3/tutorial/venv.html">virtual environment</a>.</p>
