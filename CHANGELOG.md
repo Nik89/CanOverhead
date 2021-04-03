@@ -10,7 +10,7 @@ and this project adheres to
 
 *******************************************************************************
 
-[1.1.0] - 2021-03-xx TODO DATE
+[1.1.0] - 2021-04-03
 ----------------------------------------
 
 ### Added
@@ -26,6 +26,7 @@ and this project adheres to
 - Highlight incorrect input fields with a red border when the computation is
   run.
 - Highlight stuff bits in the output: underlined and with a different color.
+- Minifying instructions and privacy notice included in Readme file.
 
 
 ### Changed
@@ -41,12 +42,12 @@ and this project adheres to
   in the user input.
 - Autofocus on CAN ID input field.
 - Input text fields contain examples for the user input.
-- Renamed _Pause-after-frame_ field to _Inter-Frame Space_ for clairity
+- Renamed _Pause-after-frame_ field to _Inter-Frame Space_ for clarity
   and to match with other descriptions of the CAN frames found online.
 - Moved error messages to one location underneath the input form.
-- Deployment script merges html, css and js files into one html file, making
+- Deployment script merges HTML, CSS and JS files into one HTML file, making
   it much easier to deploy. Removed deployment into `gh-pages` branch, as
-  now it can be done directly from the `main` branch, `builds` subfolder.
+  now it can be done directly from the `main` branch, `minified` sub-folder.
 
 
 ### Fixed
