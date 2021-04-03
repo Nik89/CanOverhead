@@ -5,7 +5,27 @@
 and this project adheres to
 <a href="https://semver.org/spec/v2.0.0.html">Semantic Versioning</a>.</p>
 <hr>
+<h2>[1.2.0] - 2021-04-03</h2>
+<p>Bitrates, transfer time and overheads.</p>
+<h3>Added</h3>
+<ul>
+<li>Bitrates list available: 1 Mbit/s, 800, 500, 250, 125, 50, 20, 10, 5 kbit/s.</li>
+<li>Calculation of gross transfer time.</li>
+<li>Calculation of overhead percentage and effective bitrate.</li>
+<li>Add question mark icon with popup for extra info about the fields on mouseover
+  for some input and some output fields.</li>
+</ul>
+<h3>Fixed</h3>
+<ul>
+<li>Indentation of nested lists in Markdown files was not maintained after
+  conversion to HTML.</li>
+<li>Added missing title to v1.1.0 release in this Changelog.</li>
+<li>Fix minified directory to be "docs" instead of "minified" so it can be
+  deployed with GitHub pages easily.</li>
+</ul>
 <h2>[1.1.0] - 2021-04-03</h2>
+<p>Added 29 bits CAN ID, RTR frames, highlight stuff bits, and complete graphical
+overhaul.</p>
 <h3>Added</h3>
 <ul>
 <li>Support for extended frames (29-bit CAN ID) and Remote Transmission Request
@@ -23,12 +43,14 @@ and this project adheres to
 </ul>
 <h3>Changed</h3>
 <ul>
-<li>Improved style of the following parts into a more modern look-and-feel</li>
+<li>Improved style of the following parts into a more modern look-and-feel<ul>
 <li>input form</li>
 <li>computing button</li>
 <li>whole-frame bit sequence section</li>
 <li>frame fields, now provided as a table. Includes alternating row colors,
-    mouseover effects and hex format column</li>
+  mouseover effects and hex format column</li>
+</ul>
+</li>
 <li>More verbose and detailed error messages for the various incorrect inputs.</li>
 <li>Improved description of input form's payload field, clarifying what is ignored
   in the user input.</li>
@@ -64,22 +86,24 @@ Classic CAN 11-bit ID supported, listing all fields, whole frame as bits pre
 and post-stuffing, max worst-case theoretical frame length.</p>
 <h3>Added</h3>
 <ul>
-<li>Classic CAN with 11-bit IDs with the CAN ID and payload content known:</li>
+<li>Classic CAN with 11-bit IDs with the CAN ID and payload content known:<ul>
 <li>CAN ID input accepted in binary, hex and decimal format, e.g. <code>0b0010010</code>,
-    <code>0xAA</code>, <code>42</code>.</li>
+  <code>0xAA</code>, <code>42</code>.</li>
 <li>Payload content input accepted in hex format, e.g. <code>AA, 0x0C...</code>.</li>
 <li>Compute and display the whole frame as bits (header, payload, trailer)
-    with format <code>0110 1011 1001 1000 ...</code> without stuff bits.
-    The computation of the
-    <a href="https://www.can-cia.org/can-knowledge/can/crc/">CRC-15</a>
-    is included in the computation of the trailer.</li>
+  with format <code>0110 1011 1001 1000 ...</code> without stuff bits.
+  The computation of the
+  <a href="https://www.can-cia.org/can-knowledge/can/crc/">CRC-15</a>
+  is included in the computation of the trailer.</li>
 <li>Same as previous point but with stuff bits included.</li>
 <li>Compute and display the exact amount of added stuff bits.</li>
 <li>Compute the size in bits of the whole frame (header, payload, trailer)
-    without stuff bits.</li>
+  without stuff bits.</li>
 <li>Compute the size range in bits of the whole frame when taking also
-    stuff bits into account (min = no stuff bits applied, max = max stuff
-    bits applied for CAN ID and payload).</li>
+  stuff bits into account (min = no stuff bits applied, max = max stuff
+  bits applied for CAN ID and payload).</li>
 <li>Deployment script that prepares and minifies all the files and compresses
-    them in <code>.gz</code> format</li>
+  them in <code>.gz</code> format</li>
+</ul>
+</li>
 </ul>
