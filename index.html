@@ -77,6 +77,10 @@
         </div>
         <div id="input_can_dlc_block">
             <label for="input_can_dlc">RTR frame Data Length Code (DLC)</label>
+            <span
+                title="This should be the payload length of the frame transmitted by the receiver(s) of the RTR frame. RTR frames themselves have no payload."
+                class="help_popup">&#9432;
+            </span>
             <select name="input_can_dlc" id="input_can_dlc"
                     class="dropdown_select">
                 <option value="0" selected>0</option>
@@ -92,6 +96,10 @@
         </div>
         <div id="input_can_bitrate_block">
             <label for="input_can_bitrate">CAN bitrate</label>
+            <span
+                title="In KILObit (multiples of 1000), not KIBIbit (multiples of 1024)"
+                class="help_popup">&#9432;
+            </span>
             <select name="input_can_bitrate" id="input_can_bitrate"
                     class="dropdown_select">
                 <option value="5e6">5 Mbit/s</option>
@@ -114,17 +122,17 @@
     </div>
     <div class="output">
         <h4 id="output_list_title" class="output_section_title">
-            Whole frame bit sequence
+            Whole frame
         </h4>
         <ul id="output_list">
-            <li>Without stuff bits
+            <li>Whole frame without stuff bits
                 <span id="output_can_whole_frame_len"></span>
                 <div id="output_can_whole_frame"
                      class="output_can_text"></div>
             </li>
-            <li>With stuff bits
+            <li>Whole frame with stuff bits
                 <span class="small_label">
-                    (as appears on bus)
+                    (as appears on the bus)
                 </span>
                 <span id="output_can_whole_frame_stuffed_len"></span>
                 <div id="output_can_whole_frame_stuffed"
@@ -134,11 +142,19 @@
                 <span class="small_label">
                     (assuming same ID and payload lengths)
                 </span>
+                <span
+                    title="Some bit sequences require more stuff bits than others. If the CAN ID and also the payload of the same size as the provided inputs but their contents are the worst possible (in terms of stuffing requirements), this is the length of the whole frame after the stuffing."
+                    class="help_popup">&#9432;
+                </span>
                 <div id="output_max_length" class="output_can_text"></div>
             </li>
-            <li>Transfer time
+            <li>Whole frame transfer time
                 <span class="small_label">
                     (including stuff bits)
+                </span>
+                <span
+                    title="The time it takes to transfer the whole stuffed frame across the bus at the given bitrate, from the Start Of Frame bit (included) until the very first moment the next frame could be transmitted (next SOF excluded)."
+                    class="help_popup">&#9432;
                 </span>
                 <div id="output_transfer_time" class="output_can_text"></div>
             </li>
@@ -146,12 +162,20 @@
                 <span class="small_label">
                     (including stuff bits)
                 </span>
+                <span
+                    title="Overhead = metadata-only bits / all bits. As the CAN ID may be itself already useful data and not only metadata (e.g. indicate a specific command for the receivers), an option where the ID is considered part of the metadata (thus adding to the overhead) is given as well as one where the ID is considered part of the data (thus not adding to the overhead)."
+                    class="help_popup">&#9432;
+                </span>
                 <div id="output_overhead_no_id" class="output_can_text"></div>
                 <div id="output_overhead_with_id" class="output_can_text"></div>
             </li>
             <li>Effective bitrate to transfer the data
                 <span class="small_label">
                     (including stuff bits)
+                </span>
+                <span
+                    title="Effective bitrate = data-only bits / whole frame transfer time. It is the bitrate at which the data is effectively transferred across the bus in case of continuous frame-after-frame transmission of the same frame. The same considerations for CAN ID as data or as metadata apply as for the Overhead field."
+                    class="help_popup">&#9432;
                 </span>
                 <div id="output_effective_bitrate_no_id" class="output_can_text"></div>
                 <div id="output_effective_bitrate_with_id" class="output_can_text"></div>
@@ -233,7 +257,12 @@
             </tr>
             <tr>
                 <td>10</td>
-                <td class="cell_text">Acknowledgement (ACK) Slot</td>
+                <td class="cell_text">Acknowledgement (ACK) Slot
+                    <span
+                        title="Set to 1 by transmitted, pulled to 0 by receiver(s) to acknowledge."
+                        class="help_popup">&#9432;
+                    </span>
+                </td>
                 <td id="output_can_data11_field10_len"></td>
                 <td id="output_can_data11_field10"></td>
                 <td id="output_can_data11_field10_hex"></td>
@@ -254,7 +283,12 @@
             </tr>
             <tr>
                 <td>13</td>
-                <td class="cell_text">Inter-Frame Space (IFS)</td>
+                <td class="cell_text">Inter-Frame Space (IFS)
+                    <span
+                        title="Minimum silence required between 2 consecutive frames."
+                        class="help_popup">&#9432;
+                    </span>
+                </td>
                 <td id="output_can_data11_field13_len"></td>
                 <td id="output_can_data11_field13"></td>
                 <td id="output_can_data11_field13_hex"></td>
@@ -354,7 +388,12 @@
             </tr>
             <tr>
                 <td>13</td>
-                <td class="cell_text">Acknowledgement (ACK) Slot</td>
+                <td class="cell_text">Acknowledgement (ACK) Slot
+                    <span
+                        title="Set to 1 by transmitted, pulled to 0 by receiver(s) to acknowledge."
+                        class="help_popup">&#9432;
+                    </span>
+                </td>
                 <td id="output_can_data29_field13_len"></td>
                 <td id="output_can_data29_field13"></td>
                 <td id="output_can_data29_field13_hex"></td>
@@ -375,7 +414,12 @@
             </tr>
             <tr>
                 <td>16</td>
-                <td class="cell_text">Inter-Frame Space (IFS)</td>
+                <td class="cell_text">Inter-Frame Space (IFS)
+                    <span
+                        title="Minimum silence required between 2 consecutive frames."
+                        class="help_popup">&#9432;
+                    </span>
+                </td>
                 <td id="output_can_data29_field16_len"></td>
                 <td id="output_can_data29_field16"></td>
                 <td id="output_can_data29_field16_hex"></td>
@@ -390,7 +434,7 @@
         and <a href="https://matjaz.it/">Matjaž Guštin</a>
     </div>
     <div>
-        Version 1.1.0
+        Version 1.2.0
         &ndash;
         <a href="changelog.html">
             Changelog

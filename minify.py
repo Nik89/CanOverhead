@@ -1,33 +1,39 @@
 #!/usr/bin/env python3
 # coding: utf-8
 #
-# Deployment script to prepare the web pages of CanOverhead project
-# to be published on the GitHub pages.
-#
-# What it does:
-# 1. Creates a "builds/" directory next to this file, deleting any previous one.
-#    Our ready-for-production web pages will end up here.
-# 2. Converts markdown files to HTML. No CSS is being added, but it's still
-#    nicer than reading txt files in the browser. Outputs the html files
-#    in the build directory.
-# 3. Minifies the HTML, CSS and JS files, outputting them into the buil
-#    directory.
-#
 # Published under the terms of the BSD 3-Clause license. See LICENSE.md for
 # details.
 
-import os
+"""
+Deployment script to prepare the web pages of CanOverhead project
+to be published on the GitHub pages.
 
-import requests
-import shutil
+What it does:
+1. Creates a "builds/" directory next to this file, deleting any previous one.
+   Our ready-for-production web pages will end up here.
+2. Converts markdown files to HTML. No CSS is being added, but it's still
+   nicer than reading txt files in the browser. Outputs the html files
+   in the build directory.
+3. Minifies the HTML, CSS and JS files, outputting them into the build
+   directory.
+4. Inlines the CSS and JS files into the HTML file to have a single output
+   file, easier to deploy and/or send around (e.g. email attachment).
+   It's also simpler to download from a static server.
+"""
+
+import os
 import re
+import shutil
 
 import markdown
+import requests
 
 THIS_FILE_ABS_DIR = os.path.dirname(__file__)
-# Force working dir to be the one where this file is
+# Force working dir to be the one where this file is,
+# allowing us to create the output directory next to this file instead of
+# where the file is called from.
 os.chdir(THIS_FILE_ABS_DIR)
-BUILD_DIR = os.path.join(THIS_FILE_ABS_DIR, "builds")
+BUILD_DIR = os.path.join(THIS_FILE_ABS_DIR, "docs")
 
 
 def cleanup():
@@ -46,13 +52,12 @@ def md2html(input_file_name: str):
     output_file_name += ".html"
     output_file_name = os.path.join(BUILD_DIR, output_file_name)
     markdown.markdownFromFile(input=input_file_name, output=output_file_name,
-                              encoding="UTF-8", output_format="html")
+                              encoding="UTF-8", output_format="html",
+                              tab_length=2)
 
 
 def prepend_comment_in_index_file():
-    """
-    Prepend some comment lines in index.html file
-    """
+    """Prepend some comment lines in index.html file"""
     filename = os.path.join(BUILD_DIR, "index.html")
     line = ("<!-- Oh hi there! If you want to see the "
             "non-minified source code, check\n"
@@ -118,14 +123,14 @@ def inline_js_and_css_into_html(html_file_name: str) -> None:
     inlined = []
     for line in html:
         if '<link' in line and 'stylesheet' in line:
-            css_file = re.search(r'[a-zA-Z0-9_\.]+\.css', line)
+            css_file = re.search(r'[a-zA-Z0-9_.]+\.css', line)
             if css_file is None:
                 raise RuntimeError("Can't extract CSS file name from HTML.")
             css_file = os.path.join(BUILD_DIR, css_file.group(0))
             inlined.append('<style>' + open(css_file).read() + '</style>\n')
             os.remove(css_file)
         elif '<script' in line:
-            js_file = re.search(r'[a-zA-Z0-9_\.]+\.js', line)
+            js_file = re.search(r'[a-zA-Z0-9_.]+\.js', line)
             if js_file is None:
                 raise RuntimeError("Can't extract JS file name from HTML.")
             js_file = os.path.join(BUILD_DIR, js_file.group(0))
@@ -145,6 +150,10 @@ def build():
     md2html("LICENSE.md")
     md2html("README.md")
     md2html("ROADMAP.md")
+    # Note: minifying first, then inlining, as it's much easier to scan
+    # a minified index.html file; additionally the HTML minifier does not
+    # properly minify inlined CSS and JS, so we minify them separately
+    # and then perform the inlining.
     minify_html("index.html")
     minify_css("style.css")
     minify_js("CanOverhead.js")

@@ -17,6 +17,8 @@ tab_width = 4
 max_line_length = 80
 trim_trailing_whitespace = true
 
+[*.js]
+max_line_length = 100
 
 [{*.yml, *.yaml, *.json, *.md}]
 indent_size = 2

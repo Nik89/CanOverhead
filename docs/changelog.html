@@ -1,0 +1,109 @@
+<h1>Changelog</h1>
+<p>All notable changes to this project will be documented in this file.</p>
+<p>The format is based on
+<a href="https://keepachangelog.com/en/1.0.0/">Keep a Changelog</a>,
+and this project adheres to
+<a href="https://semver.org/spec/v2.0.0.html">Semantic Versioning</a>.</p>
+<hr>
+<h2>[1.2.0] - 2021-04-03</h2>
+<p>Bitrates, transfer time and overheads.</p>
+<h3>Added</h3>
+<ul>
+<li>Bitrates list available: 1 Mbit/s, 800, 500, 250, 125, 50, 20, 10, 5 kbit/s.</li>
+<li>Calculation of gross transfer time.</li>
+<li>Calculation of overhead percentage and effective bitrate.</li>
+<li>Add question mark icon with popup for extra info about the fields on mouseover
+  for some input and some output fields.</li>
+</ul>
+<h3>Fixed</h3>
+<ul>
+<li>Indentation of nested lists in Markdown files was not maintained after
+  conversion to HTML.</li>
+<li>Added missing title to v1.1.0 release in this Changelog.</li>
+<li>Fix minified directory to be "docs" instead of "minified" so it can be
+  deployed with GitHub pages easily.</li>
+</ul>
+<h2>[1.1.0] - 2021-04-03</h2>
+<p>Added 29 bits CAN ID, RTR frames, highlight stuff bits, and complete graphical
+overhaul.</p>
+<h3>Added</h3>
+<ul>
+<li>Support for extended frames (29-bit CAN ID) and Remote Transmission Request
+  (RTR frames). The frame type can be selected as first field of the form,
+  impacting the input form itself (to ask for payload or DLC field)
+  and obviously the resulting output.</li>
+<li>Dropdown menu to select the base of the CAN ID to avoid the user typing
+  "0x" or "0b".  Defaults to hex. If the user also types the prefix "0x" or "0b"
+  and it matches with the selected base, then the prefix is ignored.</li>
+<li>Run computation when pressing Enter keyboard key.</li>
+<li>Highlight incorrect input fields with a red border when the computation is
+  run.</li>
+<li>Highlight stuff bits in the output: underlined and with a different color.</li>
+<li>Minifying instructions and privacy notice included in Readme file.</li>
+</ul>
+<h3>Changed</h3>
+<ul>
+<li>Improved style of the following parts into a more modern look-and-feel<ul>
+<li>input form</li>
+<li>computing button</li>
+<li>whole-frame bit sequence section</li>
+<li>frame fields, now provided as a table. Includes alternating row colors,
+  mouseover effects and hex format column</li>
+</ul>
+</li>
+<li>More verbose and detailed error messages for the various incorrect inputs.</li>
+<li>Improved description of input form's payload field, clarifying what is ignored
+  in the user input.</li>
+<li>Autofocus on CAN ID input field.</li>
+<li>Input text fields contain examples for the user input.</li>
+<li>Renamed <em>Pause-after-frame</em> field to <em>Inter-Frame Space</em> for clarity
+  and to match with other descriptions of the CAN frames found online.</li>
+<li>Moved error messages to one location underneath the input form.</li>
+<li>Deployment script merges HTML, CSS and JS files into one HTML file, making
+  it much easier to deploy. Removed deployment into <code>gh-pages</code> branch, as
+  now it can be done directly from the <code>main</code> branch, <code>minified</code> sub-folder.</li>
+</ul>
+<h3>Fixed</h3>
+<ul>
+<li>Broken links in readme to the deployed web page (missing "/" at URL end).</li>
+<li>Display error msg in case of empty CAN ID instead of assuming the ID == 0.</li>
+<li>Handle empty or whitespace-only payloads as valid input (no data).</li>
+<li>Footer's too small bottom margin.</li>
+<li>Typo in footer disclaimer.</li>
+<li>noscript-message about JavaScript being required is not all-h2 anymore.
+  Additional styling is added for it to make it at least slightly decent
+  looking.</li>
+<li>Display a generic error message in case of unknown and uncaught errors
+  at any level in the execution of the code instead of silently doing nothing
+  and crashing the app.</li>
+<li>Fixed non-hex payload chars being parsed into a 0 value.</li>
+<li>Some fields of the CAN frame did not have space separators every 4 bits.</li>
+<li>Fully reset the input form, clearing its content on page reload/refresh.</li>
+</ul>
+<h2>[1.0.0] - 2021-01-31</h2>
+<p>First version, minimum sets of features.
+Classic CAN 11-bit ID supported, listing all fields, whole frame as bits pre
+and post-stuffing, max worst-case theoretical frame length.</p>
+<h3>Added</h3>
+<ul>
+<li>Classic CAN with 11-bit IDs with the CAN ID and payload content known:<ul>
+<li>CAN ID input accepted in binary, hex and decimal format, e.g. <code>0b0010010</code>,
+  <code>0xAA</code>, <code>42</code>.</li>
+<li>Payload content input accepted in hex format, e.g. <code>AA, 0x0C...</code>.</li>
+<li>Compute and display the whole frame as bits (header, payload, trailer)
+  with format <code>0110 1011 1001 1000 ...</code> without stuff bits.
+  The computation of the
+  <a href="https://www.can-cia.org/can-knowledge/can/crc/">CRC-15</a>
+  is included in the computation of the trailer.</li>
+<li>Same as previous point but with stuff bits included.</li>
+<li>Compute and display the exact amount of added stuff bits.</li>
+<li>Compute the size in bits of the whole frame (header, payload, trailer)
+  without stuff bits.</li>
+<li>Compute the size range in bits of the whole frame when taking also
+  stuff bits into account (min = no stuff bits applied, max = max stuff
+  bits applied for CAN ID and payload).</li>
+<li>Deployment script that prepares and minifies all the files and compresses
+  them in <code>.gz</code> format</li>
+</ul>
+</li>
+</ul>

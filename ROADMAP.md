@@ -10,26 +10,6 @@ and this project adheres to
 
 *******************************************************************************
 
-[1.2.0]
-----------------------------------------
-
-Bitrates and transfer time.
-
-### Added
-
-- Bitrates list available: 1 Mbit/s, 800, 500, 250, 125, 50, 20, 10, 5 kbit/s
-  - Bitrate can also be provided by the user instead of using one of the
-    default ones from the list above
-- Calculation of gross/net (effective) bitrate:
-  - exact when exact ID and payload is given
-  - range when the ID and payload are not known
-- Calculation of gross/net (effective) transfer time:
-  - exact when exact ID and payload is given
-  - range when the ID and payload are not known
-- Indicate that CAN frames are from the ISO standard TODOOOOO
-  and FD frames from ISO 11898-1:2015
-
-
 [1.3.0]
 ----------------------------------------
 
@@ -49,26 +29,12 @@ CAN FD frames with only one bitrate.
 [1.4.0]
 ----------------------------------------
 
-CAN FD with flexible datarate.
+CAN FD with flexible data-rate.
 
 ### Added
 
-- Support for CAN FD with payload birate different than then arbitration
-  datarate.
-
-
-
-Other ideas
-----------------------------------------
-
-- Display of the whole frame also in hexadecimal format, padded with zero-bits
-  to the right to the nearest multiple of 8. Display also the amount of
-  padding bits added radio button or similar to select input type).
-- Gzip: test it with small difference between uncompressed and compressed
-  files to see which one is provided by the Github web server
-- merge all JS and CSS files into the HTML file to have just 1 file in the
-  end as a deployment super-compressed deliverable. <script>JS HERE</script>
-  and <style>CSS HERE</style>. Comment markers can be added around these lines
-  to make it easier for the Py parser to know where to remove lines and where to
-  inject new ones. Makes it also really easy to provide the
-  calculator to someone as a single deployment file.
+- Support for CAN FD with payload bitrate different than then arbitration
+  bitrate.
+  - Bitrate can also be provided by the user instead of using one of the
+    default ones from the list above
+  - Bitrate can be expressed in multiple of 1024 (kibibit, Mebibit etc.)

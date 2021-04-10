@@ -80,6 +80,10 @@ a:hover {
     width: 85em; /* Enough for 128 hex chars, covering 64 bytes. */
 }
 
+.help_popup {
+    font-weight: bold;
+}
+
 .buttons {
     margin: 1rem;
     display: flex;
